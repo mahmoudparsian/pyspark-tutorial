@@ -59,7 +59,8 @@ SparkContext available as sc.
 >>>
 >>> counts = bigrams.reduceByKey(lambda x, y : x+y)
 >>> counts.collect()
-[((u'high', u'for'), 1), 
+[
+ ((u'high', u'for'), 1), 
  ((u'fox', u'is'), 1), 
  ((u'is', u'smart'), 1), 
  ((u'is', u'high'), 1), 
@@ -72,4 +73,5 @@ SparkContext available as sc.
  ((u'crazy', u'crazy'), 1), 
  ((u'jumped', u'over'), 1), 
  ((u'jumped', u'very'), 1), 
- ((u'fox', u'jumped'), 3)]
+ ((u'fox', u'jumped'), 3)
+ ]
