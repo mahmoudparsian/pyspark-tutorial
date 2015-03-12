@@ -1,0 +1,20 @@
+# ./pyspark
+Python 2.6.9 (unknown, Sep  9 2014, 15:05:12)
+[GCC 4.2.1 Compatible Apple LLVM 6.0 (clang-600.0.39)] on darwin
+Type "help", "copyright", "credits" or "license" for more information.
+Welcome to
+      ____              __
+     / __/__  ___ _____/ /__
+    _\ \/ _ \/ _ `/ __/  '_/
+   /__ / .__/\_,_/_/ /_/\_\   version 1.2.0
+      /_/
+
+Using Python version 2.6.9 (unknown, Sep  9 2014 15:05:12)
+SparkContext available as sc.
+>>> sc
+<pyspark.context.SparkContext object at 0x1058bf210>
+>>> numbers = sc.parallelize([1, 2, 3, 4])
+>>> sum = numbers.fold(0, (lambda x, y: x + y))
+
+>>> sum
+10
