@@ -38,7 +38,8 @@ SparkContext available as sc.
 >>> words = lines.flatMap(lambda x: x.split(' '))
 >>> debugwords = words.collect();
 >>> debugwords
-[u'crazy', 
+[
+ u'crazy', 
  u'crazy', 
  u'fox', 
  u'jumped', 
@@ -53,11 +54,13 @@ SparkContext available as sc.
  u'smart', 
  u'dog', 
  u'is', 
- u'smart']
+ u'smart'
+]
 >>> ones = words.map(lambda x: (x, 1))
 >>> debugones = ones.collect()
 >>> debugones
-[(u'crazy', 1), 
+[
+ (u'crazy', 1), 
  (u'crazy', 1), 
  (u'fox', 1), 
  (u'jumped', 1), 
@@ -77,7 +80,8 @@ SparkContext available as sc.
 >>> counts = ones.reduceByKey(lambda x, y: x + y)
 >>> debugcounts = counts.collect()
 >>> debugcounts
-[(u'crazy', 3), 
+[
+ (u'crazy', 3), 
  (u'jumped', 2), 
  (u'is', 3), 
  (u'fox', 4), 
