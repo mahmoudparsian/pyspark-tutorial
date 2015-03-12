@@ -1,0 +1,31 @@
+# export SPARK_HOME=...
+# SPARK_HOME/bin/pyspark
+Python 2.6.9 (unknown, Sep  9 2014, 15:05:12)
+Welcome to
+      ____              __
+     / __/__  ___ _____/ /__
+    _\ \/ _ \/ _ `/ __/  '_/
+   /__ / .__/\_,_/_/ /_/\_\   version 1.2.0
+      /_/
+
+Using Python version 2.6.9 (unknown, Sep  9 2014 15:05:12)
+SparkContext available as sc.
+>>> sc
+<pyspark.context.SparkContext object at 0x10c501210>
+
+>>> input = [("k1", 1), ("k1", 2), ("k1", 3), ("k1", 4), ("k1", 5), 
+             ("k2", 6), ("k2", 7), ("k2", 8), 
+             ("k3", 10), ("k3", 12)]
+>>> rdd = sc.parallelize(input)
+>>> sumCount = rdd.combineByKey( 
+                                (lambda x: (x, 1)), 
+                                (lambda x, y: (x[0] + y, x[1] + 1)), 
+                                (lambda x, y: (x[0] + y[0], x[1] + y[1])) 
+                               )
+>>> sumCount.collect()
+[('k3', (22, 2)), ('k2', (21, 3)), ('k1', (15, 5))]
+>>> 
+>>> avg = sumCount.mapValues( lambda v : v[0] / v[1])
+>>> avg.collect()
+[('k3', 11), ('k2', 7), ('k1', 3)]
+>>>
