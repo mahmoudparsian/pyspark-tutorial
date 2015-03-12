@@ -6,6 +6,6 @@ is not supposed to be used for production environment.
 
 pyspark-tutorials:
 
-wordcount: classic word count
-bigrams: find frequency of bigrams
+* wordcount: classic word count
+* bigrams: find frequency of bigrams
 
