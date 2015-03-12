@@ -1,0 +1,75 @@
+1. Prepare Input
+
+# cat data.txt
+crazy crazy fox jumped over the fence
+crazy fox jumped
+the fence is high for fox
+crazy fox is smart
+fox jumped very high
+
+2. Invoke pyspark
+
+# export SPARK_HOME=...
+# SPARK_HOME/bin/pyspark
+Python 2.6.9 (unknown, Sep  9 2014, 15:05:12)
+[GCC 4.2.1 Compatible Apple LLVM 6.0 (clang-600.0.39)] on darwin
+Type "help", "copyright", "credits" or "license" for more information.
+Welcome to
+      ____              __
+     / __/__  ___ _____/ /__
+    _\ \/ _ \/ _ `/ __/  '_/
+   /__ / .__/\_,_/_/ /_/\_\   version 1.2.0
+      /_/
+
+Using Python version 2.6.9 (unknown, Sep  9 2014 15:05:12)
+SparkContext available as sc.
+>>> sc
+<pyspark.context.SparkContext object at 0x10c501210>
+>>> lines = sc.textFile("data.txt")
+>>> lines.collect()
+
+[u'crazy crazy fox jumped over the fence', 
+ u'crazy fox jumped', 
+ u'the fence is high for fox', 
+ u'crazy fox is smart', 
+ u'fox jumped very high'
+]
+>>> bigrams = lines.map(lambda s : s.split(" ")).flatMap(lambda s: [((s[i],s[i+1]),1) for i in range (0, len(s)-1)])
+>>> bigrams.collect()
+[((u'crazy', u'crazy'), 1), 
+ ((u'crazy', u'fox'), 1), 
+ ((u'fox', u'jumped'), 1), 
+ ((u'jumped', u'over'), 1), 
+ ((u'over', u'the'), 1), 
+ ((u'the', u'fence'), 1), 
+ ((u'crazy', u'fox'), 1), 
+ ((u'fox', u'jumped'), 1), 
+ ((u'the', u'fence'), 1), 
+ ((u'fence', u'is'), 1), 
+ ((u'is', u'high'), 1), 
+ ((u'high', u'for'), 1), 
+ ((u'for', u'fox'), 1), 
+ ((u'crazy', u'fox'), 1), 
+ ((u'fox', u'is'), 1), 
+ ((u'is', u'smart'), 1), 
+ ((u'fox', u'jumped'), 1), 
+ ((u'jumped', u'very'), 1), 
+ ((u'very', u'high'), 1)
+]
+>>>
+>>> counts = bigrams.reduceByKey(lambda x, y : x+y)
+>>> counts.collect()
+[((u'high', u'for'), 1), 
+ ((u'fox', u'is'), 1), 
+ ((u'is', u'smart'), 1), 
+ ((u'is', u'high'), 1), 
+ ((u'fence', u'is'), 1), 
+ ((u'very', u'high'), 1), 
+ ((u'crazy', u'fox'), 3), 
+ ((u'over', u'the'), 1), 
+ ((u'for', u'fox'), 1), 
+ ((u'the', u'fence'), 2), 
+ ((u'crazy', u'crazy'), 1), 
+ ((u'jumped', u'over'), 1), 
+ ((u'jumped', u'very'), 1), 
+ ((u'fox', u'jumped'), 3)]
