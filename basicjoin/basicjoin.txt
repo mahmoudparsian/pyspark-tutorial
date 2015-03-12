@@ -1,0 +1,106 @@
+# cat > R.txt
+k1,v1
+k1,v2
+k2,v3
+k2,v4
+k3,v7
+k3,v8
+k3,v9
+
+# cat > S.txt
+k1,v11
+k1,v22
+k1,v33
+k2,v55
+k4,v77
+k5,v88
+
+# ./pyspark
+Python 2.6.9 (unknown, Sep  9 2014, 15:05:12)
+[GCC 4.2.1 Compatible Apple LLVM 6.0 (clang-600.0.39)] on darwin
+Type "help", "copyright", "credits" or "license" for more information.
+Welcome to
+      ____              __
+     / __/__  ___ _____/ /__
+    _\ \/ _ \/ _ `/ __/  '_/
+   /__ / .__/\_,_/_/ /_/\_\   version 1.2.0
+      /_/
+
+Using Python version 2.6.9 (unknown, Sep  9 2014 15:05:12)
+SparkContext available as sc.
+>>> R = sc.textFile("R.txt");
+>>> R.collect()
+[u'k1,v1', 
+ u'k1,v2', 
+ u'k2,v3', 
+ u'k2,v4', 
+ u'k3,v7', 
+ u'k3,v8', 
+ u'k3,v9']
+ 
+>>> S = sc.textFile("S.txt");
+>>> S.collect()
+[u'k1,v11', 
+ u'k1,v22', 
+ u'k1,v33', 
+ u'k2,v55', 
+ u'k4,v77', 
+ u'k5,v88'
+]
+
+>>> r1 = R.map(lambda s: s.split(","))
+>>> r1.collect()
+[
+ [u'k1', u'v1'], 
+ [u'k1', u'v2'], 
+ [u'k2', u'v3'], 
+ [u'k2', u'v4'], 
+ [u'k3', u'v7'], 
+ [u'k3', u'v8'], 
+ [u'k3', u'v9']
+]
+>>> r2 = r1.flatMap(lambda s: [(s[0], s[1])])
+>>> r2.collect()
+[
+ (u'k1', u'v1'), 
+ (u'k1', u'v2'), 
+ (u'k2', u'v3'), 
+ (u'k2', u'v4'), 
+ (u'k3', u'v7'), 
+ (u'k3', u'v8'), 
+ (u'k3', u'v9')
+]
+>>>
+>>> s1 = S.map(lambda s: s.split(","))
+>>> s1.collect()
+[
+ [u'k1', u'v11'], 
+ [u'k1', u'v22'], 
+ [u'k1', u'v33'], 
+ [u'k2', u'v55'], 
+ [u'k4', u'v77'], 
+ [u'k5', u'v88']
+]
+>>> s2 = s1.flatMap(lambda s: [(s[0], s[1])])
+>>> s2.collect()
+[
+ (u'k1', u'v11'), 
+ (u'k1', u'v22'), 
+ (u'k1', u'v33'), 
+ (u'k2', u'v55'), 
+ (u'k4', u'v77'), 
+ (u'k5', u'v88')
+]
+>>> RjoinedS = r2.join(s2)
+>>> RjoinedS.collect()
+[
+ (u'k2', (u'v3', u'v55')), 
+ (u'k2', (u'v4', u'v55')), 
+ (u'k1', (u'v1', u'v11')), 
+ (u'k1', (u'v1', u'v22')), 
+ (u'k1', (u'v1', u'v33')), 
+ (u'k1', (u'v2', u'v11')), 
+ (u'k1', (u'v2', u'v22')), 
+ (u'k1', (u'v2', u'v33'))
+]
+>>>
