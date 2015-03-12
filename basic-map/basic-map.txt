@@ -1,0 +1,26 @@
+# ./pyspark
+Python 2.6.9 (unknown, Sep  9 2014, 15:05:12)
+Welcome to
+      ____              __
+     / __/__  ___ _____/ /__
+    _\ \/ _ \/ _ `/ __/  '_/
+   /__ / .__/\_,_/_/ /_/\_\   version 1.2.0
+      /_/
+
+Using Python version 2.6.9 (unknown, Sep  9 2014 15:05:12)
+SparkContext available as sc.
+>>> sc
+<pyspark.context.SparkContext object at 0x10d926210>
+>>>
+>>> nums = sc.parallelize([1, 2, 3, 4, 5])
+>>> nums.collect()
+[1, 2, 3, 4, 5]
+>>>
+>>> bytwo = nums.map(lambda x: x + 2)
+>>> bytwo.collect()
+[3, 4, 5, 6, 7]
+>>>
+>>> squared = nums.map(lambda x: x * x)
+>>> squared.collect()
+[1, 4, 9, 16, 25]
+>>>
