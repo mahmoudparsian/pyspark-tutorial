@@ -1,0 +1,24 @@
+# ./pyspark
+Python 2.6.9 (unknown, Sep  9 2014, 15:05:12)
+Welcome to
+      ____              __
+     / __/__  ___ _____/ /__
+    _\ \/ _ \/ _ `/ __/  '_/
+   /__ / .__/\_,_/_/ /_/\_\   version 1.2.0
+      /_/
+
+Using Python version 2.6.9 (unknown, Sep  9 2014 15:05:12)
+SparkContext available as sc.
+>>>
+>>> nums = [10, 1, 2, 9, 3, 4, 5, 6, 7]
+>>> sc.parallelize(nums).takeOrdered(3)
+[1, 2, 3]
+>>> sc.parallelize(nums).takeOrdered(3, key=lambda x: -x)
+[10, 9, 7]
+>>>
+>>> kv = >>> [(10,"z1"), (1,"z2"), (2,"z3"), (9,"z4"), (3,"z5"), (4,"z6"), (5,"z7"), (6,"z8"), (7,"z9")]
+>>> sc.parallelize(kv).takeOrdered(3)
+[(1, 'z2'), (2, 'z3'), (3, 'z5')]
+>>>
+>>> sc.parallelize(kv).takeOrdered(3, key=lambda x: -x[0])
+[(10, 'z1'), (9, 'z4'), (7, 'z9')]
