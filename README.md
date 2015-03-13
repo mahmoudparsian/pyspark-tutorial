@@ -12,4 +12,7 @@ pyspark-tutorials
 * basic-map: basic mapping of RDD elements
 * basic-add: how to add all RDD elements together
 * basic-multiply: how to multiply all RDD elements together
- 
+* top-N: find top-N and bottom-N
+* combine-by-key: find average by using combineByKey()
+* basic-filter: how to filter RDD elements
+* basic-average: how to find average
