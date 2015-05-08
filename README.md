@@ -16,6 +16,7 @@ pyspark-tutorials
 * combine-by-key: find average by using combineByKey()
 * basic-filter: how to filter RDD elements
 * basic-average: how to find average
+* cartesian: rdd1.cartesian(rdd2)
 
 How to Minimize the Verbosity of Spark
 ======================================
