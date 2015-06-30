@@ -17,6 +17,7 @@ pyspark-tutorials
 * basic-filter: how to filter RDD elements
 * basic-average: how to find average
 * cartesian: rdd1.cartesian(rdd2)
+* basic-sort: sortByKey ascending/descending
 
 How to Minimize the Verbosity of Spark
 ======================================
