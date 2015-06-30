@@ -1,0 +1,66 @@
+# cat data.txt
+crazy crazy fox jumped
+crazy fox jumped
+fox is fast
+fox is smart
+dog is smart
+
+# ./bin/pyspark
+Welcome to
+      ____              __
+     / __/__  ___ _____/ /__
+    _\ \/ _ \/ _ `/ __/  '_/
+   /__ / .__/\_,_/_/ /_/\_\   version 1.4.0
+      /_/
+
+Using Python version 2.6.9 (unknown, Sep  9 2014 15:05:12)
+SparkContext available as sc, SQLContext available as sqlContext.
+>>>
+>>> lines = sc.textFile('data.txt', 1);
+>>> lines.collect()
+[
+ u'crazy crazy fox jumped', 
+ u'crazy fox jumped', 
+ u'fox is fast', 
+ u'fox is smart', 
+ u'dog is smart'
+]
+
+>>> frequencies = lines.flatMap(lambda x: x.split(' ')).map(lambda x: (x, 1)).reduceByKey(lambda x, y: x + y)
+>>> frequencies.collect()
+[
+ (u'crazy', 3), 
+ (u'jumped', 2), 
+ (u'is', 3), 
+ (u'fox', 4), 
+ (u'dog', 1), 
+ (u'fast', 1), 
+ (u'smart', 2)
+]
+
+>>> frequencies.count()
+7
+
+>>> sorted = frequencies.sortByKey()
+>>> sorted.collect()
+[
+ (u'crazy', 3), 
+ (u'dog', 1), 
+ (u'fast', 1), 
+ (u'fox', 4), 
+ (u'is', 3), 
+ (u'jumped', 2), 
+ (u'smart', 2)
+]
+>>>
+>>> sortedDescending = frequencies.sortByKey(False)
+>>> sortedDescending.collect()
+[
+ (u'smart', 2), 
+ (u'jumped', 2), 
+ (u'is', 3), 
+ (u'fox', 4), 
+ (u'fast', 1), 
+ (u'dog', 1), 
+ (u'crazy', 3)
+]
