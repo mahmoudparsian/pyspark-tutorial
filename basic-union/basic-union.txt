@@ -1,0 +1,32 @@
+# ./pyspark
+Welcome to
+      ____              __
+     / __/__  ___ _____/ /__
+    _\ \/ _ \/ _ `/ __/  '_/
+   /__ / .__/\_,_/_/ /_/\_\   version 1.4.0
+      /_/
+
+Using Python version 2.6.9 (unknown, Sep  9 2014 15:05:12)
+SparkContext available as sc, SQLContext available as sqlContext.
+>>> d1= [(100, 1), (200,2)]
+>>> d1
+[(100, 1), (200, 2)]
+
+>>> d2= [(100, 3), (200,4), (300, 5)]
+>>> d2
+[(100, 3), (200, 4), (300, 5)]
+
+>>> rdd1 = sc.parallelize(d1)
+>>> rdd1.collect()
+[(100, 1), (200, 2)]
+
+>>> rdd2 = sc.parallelize(d2)
+>>> rdd2.collect()
+[(100, 3), (200, 4), (300, 5)]
+>>> rdd3 = rdd1.union(rdd2)
+>>> rdd3.collect()
+[(100, 1), (200, 2), (100, 3), (200, 4), (300, 5)]
+
+>>> rdd4 = rdd3.reduceByKey(lambda x,y: x+y)
+>>> rdd4.collect()
+[(100, 4), (200, 6), (300, 5)]
