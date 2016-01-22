@@ -103,10 +103,18 @@ SparkContext available as sc, HiveContext available as sqlContext.
 
 >>> rdd3 = rdd2.groupByKey()
 >>> rdd3.collect()
-[('a', <pyspark.resultiterable.ResultIterable object at 0x104ec4c50>), ('c', <pyspark.resultiterable.ResultIterable object at 0x104ec4cd0>), ('b', <pyspark.resultiterable.ResultIterable object at 0x104ce7290>)]
+[
+ ('a', <pyspark.resultiterable.ResultIterable object at 0x104ec4c50>), 
+ ('c', <pyspark.resultiterable.ResultIterable object at 0x104ec4cd0>), 
+ ('b', <pyspark.resultiterable.ResultIterable object at 0x104ce7290>)
+]
 
 >>> rdd3.map(lambda x : (x[0], list(x[1]))).collect()
-[('a', [7, 2]), ('c', [1, 2, 3, 4]), ('b', [2, 4])]
+[
+ ('a', [7, 2]), 
+ ('c', [1, 2, 3, 4]), 
+ ('b', [2, 4])
+]
 >>> 
 ````
 
