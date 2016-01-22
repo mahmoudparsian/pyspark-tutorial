@@ -13,7 +13,7 @@ PySpark Examples and Tutorials
 ==============================
 * wordcount: classic word count
 * bigrams: find frequency of bigrams
-* basic-join: basic join of two relations R(K, V1), S(K,V2)
+* basic-join: basic join of two relations R(K, V<sub>1</sub>), S(K,V<sub>2</sub>)
 * basic-map: basic mapping of RDD elements
 * basic-add: how to add all RDD elements together
 * basic-multiply: how to multiply all RDD elements together
