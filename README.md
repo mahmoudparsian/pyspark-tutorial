@@ -76,6 +76,42 @@ Create RDD from a Data Structure (or Collection)
 >>> 
 ````
 
+* Example-3
+
+````
+# ./bin/pyspark 
+Python 2.7.10 (default, Aug 22 2015, 20:33:39) 
+[GCC 4.2.1 Compatible Apple LLVM 7.0.0 (clang-700.0.59.1)] on darwin
+Type "help", "copyright", "credits" or "license" for more information.
+16/01/21 16:46:08 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+Welcome to
+      ____              __
+     / __/__  ___ _____/ /__
+    _\ \/ _ \/ _ `/ __/  '_/
+   /__ / .__/\_,_/_/ /_/\_\   version 1.6.0
+      /_/
+
+Using Python version 2.7.10 (default, Aug 22 2015 20:33:39)
+SparkContext available as sc, HiveContext available as sqlContext.
+>>> kv = [('a',7), ('a', 2), ('b', 2), ('b',4), ('c',1), ('c',2), ('c',3), ('c',4)]
+
+>>> kv
+[('a', 7), ('a', 2), ('b', 2), ('b', 4), ('c', 1), ('c', 2), ('c', 3), ('c', 4)]
+>>> rdd2 = sc.parallelize(kv)
+>>> rdd2.collect()
+[('a', 7), ('a', 2), ('b', 2), ('b', 4), ('c', 1), ('c', 2), ('c', 3), ('c', 4)]
+
+>>> rdd3 = rdd2.groupByKey()
+>>> rdd3.collect()
+[('a', <pyspark.resultiterable.ResultIterable object at 0x104ec4c50>), ('c', <pyspark.resultiterable.ResultIterable object at 0x104ec4cd0>), ('b', <pyspark.resultiterable.ResultIterable object at 0x104ce7290>)]
+
+>>> rdd3.map(lambda x : (x[0], list(x[1]))).collect()
+[('a', [7, 2]), ('c', [1, 2, 3, 4]), ('b', [2, 4])]
+>>> 
+````
+
+
+
 Create RDD from a Local File System
 -----------------------------------
 ````
