@@ -15,7 +15,7 @@ PySpark Examples and Tutorials
 * [Find Frequency of Bigrams](./tutorial/bigrams)
 * [Join of Two Relations R(K, V<sub>1</sub>), S(K, V<sub>2</sub>)](./tutorial/basic-join)
 * [Basic Mapping of RDD Elements](./tutorial/basic-map)
-* [How to add all RDD elements together](./tutorial/basic-add)
+* [How to add all RDD elements together](./tutorial/basic-sum)
 * [How to multiply all RDD elements together](./tutorial/basic-multiply)
 * [Find Top-N and Bottom-N](./tutorial/top-N)
 * [Find average by using combineByKey()](./tutorial/combine-by-key)
