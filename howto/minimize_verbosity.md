@@ -8,7 +8,7 @@ cp $SPARK_HOME/conf/log4j.properties.template $SPARK_HOME/conf/log4j.properties
 
 * Now your file should look like:
 ````
-cat spark-1.3.0/conf/log4j.properties
+cat $SPARK_HOME/conf/log4j.properties
 # Set everything to be logged to the console
 log4j.rootCategory=WARN, console
 log4j.appender.console=org.apache.log4j.ConsoleAppender
