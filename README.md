@@ -11,6 +11,8 @@ to be used for production environment.
 
 PySpark Examples and Tutorials
 ==============================
+* [DNA Base Counting Without In-Mapper Combiner](./tutorial/dna-basecount.md)
+* [DNA Base Counting With In-Mapper Combiner](./tutorial/dna-basecount2.md)
 * [Classic Word Count](./tutorial/wordcount)
 * [Find Frequency of Bigrams](./tutorial/bigrams)
 * [Join of Two Relations R(K, V<sub>1</sub>), S(K, V<sub>2</sub>)](./tutorial/basic-join)
@@ -27,6 +29,13 @@ PySpark Examples and Tutorials
 
 [How to Minimize the Verbosity of Spark](./howto/minimize_verbosity.md) 
 =======================================================================
+
+More PySpark Tutorial References...
+===================================
+* [Getting started with PySpark - Part 1](http://www.mccarroll.net/blog/pyspark/)
+* [Getting started with PySpark - Part 2](http://www.mccarroll.net/blog/pyspark2/index.html)
+* [A really really fast introduction to PySpark](http://www.slideshare.net/hkarau/a-really-really-fast-introduction-to-py-spark-lightning-fast-cluster-computing-with-python-1)
+* [PySpark](http://www.slideshare.net/thegiivee/pysaprk?qid=81cf1b31-8b19-4570-89a5-21d03cad6ecd&v=default&b=&from_search=9)
 
 Questions/Comments
 ==================
