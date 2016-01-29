@@ -11,8 +11,7 @@ to be used for production environment.
 
 PySpark Examples and Tutorials
 ==============================
-* [DNA Base Counting Without In-Mapper Combiner](./tutorial/dna-basecount.md)
-* [DNA Base Counting With In-Mapper Combiner](./tutorial/dna-basecount2.md)
+* [DNA Base Counting](./tutorial/dna-basecount/README.md)
 * [Classic Word Count](./tutorial/wordcount)
 * [Find Frequency of Bigrams](./tutorial/bigrams)
 * [Join of Two Relations R(K, V<sub>1</sub>), S(K, V<sub>2</sub>)](./tutorial/basic-join)
