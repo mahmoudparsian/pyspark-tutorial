@@ -74,12 +74,14 @@ jps
 
 6. Check The Spark URL
 ======================
+
 ````
 http://localhost:8080
 ````
 
 7. Define 2 Very Basic Python Programs
 ======================================
+
 ````
 cat /Users/mparsian/spark-1.6.1-bin-hadoop2.6/test.py
 #!/usr/bin/python
