@@ -66,9 +66,11 @@ drwxr-xr-x@ 24 mparsian  897801646      816 Feb 26 21:02 sbin
 ==========================
 Make sure that Master and Worker processes are running:
 
+````
 jps
 1347 Master
 1390 Worker
+````
 
 6. Check The Spark URL
 ======================
