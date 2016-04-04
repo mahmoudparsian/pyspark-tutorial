@@ -12,7 +12,7 @@ Java HotSpot(TM) 64-Bit Server VM (build 25.72-b15, mixed mode)
 
 2. Download 
 ===========
-Down load the latest Spark from the following URL:
+Download the latest binary Spark from the following URL:
 ````
 http://www.apache.org/dyn/closer.lua/spark/spark-1.6.1/spark-1.6.1-bin-hadoop2.6.tgz
 ````
