@@ -78,7 +78,8 @@ jps
 http://localhost:8080
 ````
 
-7. Define 2 Very Basic Python Programs:
+7. Define 2 Very Basic Python Programs
+======================================
 ````
 cat /Users/mparsian/spark-1.6.1-bin-hadoop2.6/test.py
 #!/usr/bin/python
@@ -98,8 +99,8 @@ def fun2(str):
 
 ````
 
-7. Start pyspark
-================
+8. Start and Run pyspark
+========================
 ````
 cd /Users/mparsian/spark-1.6.1-bin-hadoop2.6/
 ./bin/pyspark
