@@ -82,6 +82,8 @@ http://localhost:8080
 7. Define 2 Very Basic Python Programs
 ======================================
 
+* Python program: ````test.py````
+
 ````
 cat /Users/mparsian/spark-1.6.1-bin-hadoop2.6/test.py
 #!/usr/bin/python
@@ -90,15 +92,17 @@ import sys
 
 for line in sys.stdin:
 	print "hello " + line
+````
+
+* Python program: ````test2.py````
 	
-	
+````	
 cat /Users/mparsian/spark-1.6.1-bin-hadoop2.6/test2.py
 #!/usr/bin/python
 
 def fun2(str):
 	str2 = str + " zaza"
 	return str2
-
 ````
 
 8. Start and Run pyspark
