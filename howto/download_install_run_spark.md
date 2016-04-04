@@ -132,13 +132,13 @@ SparkContext available as sc, HiveContext available as sqlContext.
 ['john', 'paul', 'george', 'ringo']
 
 
->>> testScriptPath = "/Users/mparsian/spark-1.6.1-bin-hadoop2.6/test.py"
->>> test2ScriptPath = "/Users/mparsian/spark-1.6.1-bin-hadoop2.6/test2.py"
->>> import testScriptPath
->>> import test2ScriptPath
+>>> test = "/Users/mparsian/spark-1.6.1-bin-hadoop2.6/test.py"
+>>> test2 = "/Users/mparsian/spark-1.6.1-bin-hadoop2.6/test2.py"
+>>> import test
+>>> import test2
 
 
->>> pipeRDD =  rdd.pipe(testScriptPath)
+>>> pipeRDD =  rdd.pipe(test)
 >>> pipeRDD.collect()
 [u'hello john', u'', u'hello paul', u'', u'hello george', u'', u'hello ringo', u'']
 
@@ -146,10 +146,8 @@ SparkContext available as sc, HiveContext available as sqlContext.
 >>> rdd.collect()
 ['john', 'paul', 'george', 'ringo']
 
->>> rdd2 = rdd.map(lambda x : script2.func(x))
->>> rdd2.collect()
 
->>> rdd2 = rdd.map(lambda x : test2ScriptPath.fun2(x))
+>>> rdd2 = rdd.map(lambda x : test2.fun2(x))
 >>> rdd2.collect()
 ['john zaza', 'paul zaza', 'george zaza', 'ringo zaza']
 >>>
