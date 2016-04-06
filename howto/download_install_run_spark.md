@@ -1,6 +1,12 @@
 Download, Install, and Run PySpark
 ==================================
 
+0. For macbook users: Enable "Remote Login"
+==========================================
+````
+System Preferences --> Sharing --> enable "Remote Login" service
+````
+
 1. Make Sure Java is Installed Properly
 =======================================
 ````
