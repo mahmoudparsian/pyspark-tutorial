@@ -2,6 +2,8 @@ DNA Base Counting
 =================
 
 The following examples demostrates the usage of PySpark to count DNA bases.
+In a nutshell, ````DNA Base Counting```` counts the number of A's, T's, C's, G's, 
+and N's (N refers to undefined code).
 
 
 * [DNA Base Counting Without In-Mapper Combiner](./dna-basecount.md)
