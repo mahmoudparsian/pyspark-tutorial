@@ -62,44 +62,18 @@ SparkContext available as sc, HiveContext available as sqlContext.
  u'ATCGATCGATAT'
 ]
 
->>> ones = recs.flatMap(lambda x : [(c,1) for c in list(x)])
->>> ones.collect()
-[
- (u'A', 1), 
- (u'T', 1), 
- (u'A', 1), 
- (u'T', 1), 
- (u'C', 1), 
- (u'C', 1), 
- (u'C', 1), 
- (u'C', 1), 
- (u'G', 1), 
- (u'G', 1), 
- (u'G', 1), 
- (u'A', 1), 
- (u'T', 1), 
- (u'A', 1), 
- (u'T', 1), 
- (u'C', 1), 
- (u'G', 1), 
- (u'A', 1), 
- (u'T', 1), 
- (u'C', 1), 
- (u'G', 1), 
- (u'A', 1), 
- (u'T', 1), 
- (u'A', 1), 
- (u'T', 1)
-]
+>>> basemapper = "/Users/mparsian/spark-1.6.1-bin-hadoop2.6/basemapper.py"
+>>> import basemapper
+>>> basemapper
+<module 'basemapper' from 'basemapper.py'>
+>>>
+>>> recs = sc.textFile('file:////Users/mparsian/zmp/github/pyspark-tutorial/tutorial/dna-basecount/dna_seq.txt')
+>>> rdd = recs.flatMap(basemapper.mapper)
+>>> rdd.collect()
+[(u'A', 3), (u'C', 4), (u'T', 3), (u'G', 3), (u'A', 4), (u'C', 2), (u'T', 4), (u'G', 2)]
+
 >>> baseCount = rdd.reduceByKey(lambda x,y : x+y)
 >>> baseCount.collect()
-[
- (u'A', 7), 
- (u'C', 6), 
- (u'G', 5), 
- (u'T', 7)
-]
->>> 
+[(u'A', 7), (u'C', 6), (u'G', 5), (u'T', 7)]
+>>>
 ````
-
-	
