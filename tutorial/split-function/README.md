@@ -1,6 +1,8 @@
 How To Use Split Function
 =========================
 
+* Example-1: Split ````RDD<String>```` into Tokens
+
 ````
 # ./bin/pyspark
 Python 2.7.10 (default, Oct 23 2015, 19:19:21)
@@ -30,4 +32,20 @@ SparkContext available as sc, HiveContext available as sqlContext.
 ['abc', 'de', 'abc', 'de', 'ze', 'abc', 'de', 'ze', 'pe']
 >>> rdd2.count()
 9
+````
+
+* Example-2: Create Key-Value Pairs
+
+````
+>>> data2 = ["abc,de", "xyz,deeee,ze", "abc,de,ze,pe", "xyz,bababa"]
+>>> data2
+['abc,de', 'xyz,deeee,ze', 'abc,de,ze,pe', 'xyz,bababa']
+
+>>> rdd4 = sc.parallelize(data2)
+>>> rdd4.collect()
+['abc,de', 'xyz,deeee,ze', 'abc,de,ze,pe', 'xyz,bababa']
+
+>>> rdd5 = rdd4.map(lambda x : (x.split(",")[0], x.split(",")[1]))
+>>> rdd5.collect()
+[('abc', 'de'), ('xyz', 'deeee'), ('abc', 'de'), ('xyz', 'bababa')]
 ````
