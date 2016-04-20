@@ -72,7 +72,8 @@ Finally, we may use the ````collectAsMap()```` method to return the average-by-k
 as a dictionary.
 
 ````
-data = [(A, 2.), (A, 4.), (A, 9.), 
+data = [
+        (A, 2.), (A, 4.), (A, 9.), 
         (B, 10.), (B, 20.), 
         (Z, 3.), (Z, 5.), (Z, 8.), (Z, 12.) 
        ]
@@ -161,7 +162,8 @@ Let's break up the data into 2 partitions (just as an example)
 and see it in action:
 
 ````
-data = [("A", 2.), ("A", 4.), ("A", 9.), 
+data = [
+        ("A", 2.), ("A", 4.), ("A", 9.), 
         ("B", 10.), ("B", 20.), 
         ("Z", 3.), ("Z", 5.), ("Z", 8.), ("Z", 12.) 
        ]
