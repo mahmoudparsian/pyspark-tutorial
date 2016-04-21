@@ -197,11 +197,11 @@ Z ==> (28., 4)
 So, you should get back an array something like this:
 
 Array( [A, (15., 3)], [B, (30., 2)], [Z, (28., 4)])
-````
+
 
 
 sumCount = rdd.combineByKey(lambda value: (value, value*value, 1),
                             lambda x, value: (x[0] + value, x[1] + value*value, x[2] + 1),
                             lambda x, y: (x[0] + y[0], x[1] + y[1], x[2] + y[2])
                            )
-
+````
