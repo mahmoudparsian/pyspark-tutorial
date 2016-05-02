@@ -28,6 +28,7 @@ PySpark Examples and Tutorials
 * [Cartesian Product: rdd1.cartesian(rdd2)](./tutorial/cartesian)
 * [Sort By Key: sortByKey() ascending/descending](./tutorial/basic-sort)
 * [How to Add Indices](./tutorial/add-indices)
+* [mapPartitions() by Examples](./tutorial/map-partitions/README.md)
 
 [How to Minimize the Verbosity of Spark](./howto/minimize_verbosity.md) 
 =======================================================================
