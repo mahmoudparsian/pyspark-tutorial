@@ -146,3 +146,18 @@ Then we use the minmax function for the ````mapPartitions()````:
 >>> max(minmaxlist)
 20
 ````
+
+Questions/Comments
+==================
+* [View Mahmoud Parsian's profile on LinkedIn](http://www.linkedin.com/in/mahmoudparsian)
+* Please send me an email: mahmoud.parsian@yahoo.com
+* [Twitter: @mahmoudparsian](http://twitter.com/mahmoudparsian)
+
+Thank you!
+
+````
+best regards,
+Mahmoud Parsian
+````
+
+[![Data Algorithms Book](https://github.com/mahmoudparsian/data-algorithms-book/blob/master/misc/data_algorithms_image.jpg)](http://shop.oreilly.com/product/0636920033950.do)
