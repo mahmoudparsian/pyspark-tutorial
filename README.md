@@ -28,17 +28,18 @@ PySpark Examples and Tutorials
 * [Cartesian Product: rdd1.cartesian(rdd2)](./tutorial/cartesian)
 * [Sort By Key: sortByKey() ascending/descending](./tutorial/basic-sort)
 * [How to Add Indices](./tutorial/add-indices)
-* [mapPartitions() by Examples](./tutorial/map-partitions/README.md)
+* [Map Partitions: mapPartitions() by Examples](./tutorial/map-partitions/README.md)
 
 [How to Minimize the Verbosity of Spark](./howto/minimize_verbosity.md) 
 =======================================================================
 
-More PySpark Tutorial References...
+PySpark Tutorial and References...
 ===================================
 * [Getting started with PySpark - Part 1](http://www.mccarroll.net/blog/pyspark/)
 * [Getting started with PySpark - Part 2](http://www.mccarroll.net/blog/pyspark2/index.html)
 * [A really really fast introduction to PySpark](http://www.slideshare.net/hkarau/a-really-really-fast-introduction-to-py-spark-lightning-fast-cluster-computing-with-python-1)
 * [PySpark](http://www.slideshare.net/thegiivee/pysaprk?qid=81cf1b31-8b19-4570-89a5-21d03cad6ecd&v=default&b=&from_search=9)
+* [Basic Big Data Manipulation with PySpark](http://bigdatasciencebootcamp.com/posts/Part_3/basic_big_data.html)
 
 Questions/Comments
 ==================
