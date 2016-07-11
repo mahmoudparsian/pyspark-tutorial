@@ -40,6 +40,7 @@ PySpark Tutorial and References...
 * [A really really fast introduction to PySpark](http://www.slideshare.net/hkarau/a-really-really-fast-introduction-to-py-spark-lightning-fast-cluster-computing-with-python-1)
 * [PySpark](http://www.slideshare.net/thegiivee/pysaprk?qid=81cf1b31-8b19-4570-89a5-21d03cad6ecd&v=default&b=&from_search=9)
 * [Basic Big Data Manipulation with PySpark](http://bigdatasciencebootcamp.com/posts/Part_3/basic_big_data.html)
+* [Working in Pyspark: Basics of Working with Data and RDDs](http://www.learnbymarketing.com/618/pyspark-rdd-basics-examples/)
 
 Questions/Comments
 ==================
@@ -54,4 +55,4 @@ best regards,
 Mahmoud Parsian
 ````
 
-[![Data Algorithms Book](https://github.com/mahmoudparsian/data-algorithms-book/blob/master/misc/data_algorithms_image.jpg)](http://shop.oreilly.com/product/0636920033950.do) 
+[![Data Algorithms Book](https://github.com/mahmoudparsian/data-algorithms-book/blob/master/misc/large-image.jpg)](http://shop.oreilly.com/product/0636920033950.do) 
