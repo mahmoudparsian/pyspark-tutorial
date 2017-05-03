@@ -7,14 +7,14 @@ Start PySpark
 First make sure that you have started the Spark cluster. To start Spark, you execute:
 
 ````
-cd $SPRAK_HOME
+cd $SPARK_HOME
 ./sbin/start-all.sh
 ````
 
 To start PySpark, execute the following:
 
 ````
-cd $SPRAK_HOME
+cd $SPARK_HOME
 ./bin/pyspark
 ````
 
