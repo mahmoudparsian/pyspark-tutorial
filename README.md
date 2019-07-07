@@ -5,6 +5,9 @@ provide basic distributed algorithms using PySpark. Note that PySpark is
 an interactive shell for basic testing and debugging and is not supposed 
 to be used for production environment.
 
+[PySpark Algorithms Book](https://github.com/mahmoudparsian/pyspark-algorithms/README.md) 
+================================================================================
+
 [Download, Install Spark and Run PySpark](./howto/download_install_run_spark.md) 
 ================================================================================
 
