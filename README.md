@@ -62,3 +62,6 @@ Mahmoud Parsian
 ````
 
 [![Data Algorithms Book](https://github.com/mahmoudparsian/data-algorithms-book/blob/master/misc/large-image.jpg)](http://shop.oreilly.com/product/0636920033950.do) 
+
+[//]: # (Spark, PySpark, Python)
+[//]: # (MapReduce, Distributed Algorithms, mappers, reducers, partitioners)
