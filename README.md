@@ -3,9 +3,10 @@ PySpark Tutorial
 
 * PySpark is the Python API for Spark.  
 * The purpose of PySpark tutorial is to provide basic distributed algorithms using PySpark. 
-* PySpark  has an interactive shell for basic testing and debugging and is not supposed 
-to be used for production environment.
-* You may use `spark-submit` command for running PySpark programs (may be used for testing and production environemtns)
+* PySpark  has an interactive shell (`$SPARK_HOME/bin/pyspark`) for basic testing and 
+  debugging and is not supposed to be used for production environment.
+* You may use `$SPARK_HOME/bin/spark-submit` command for running PySpark programs 
+  (may be used for testing and production environemtns)
 
 [PySpark Algorithms Book](https://github.com/mahmoudparsian/pyspark-algorithms/README.md) 
 ================================================================================
