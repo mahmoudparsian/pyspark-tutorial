@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>Getting started with PySpark - Part 2</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="author" content="Niall McCarroll" />
+        <meta name="microcms-title" content="Getting started with PySpark - Part 2" />
+        <meta name="microcms-blog" content="" />
+        <meta name="description" content="Getting started with PySpark - Part 2" />
+        <meta name="microcms-date" content="2014-05-05T12:00:00" />
+        <meta name="microcms-tags" content="pyspark,python,data science" />
+ 	    
+<link href="./../../rss.xml" rel="alternate" type="application/rss+xml" title="mccarroll.net RSS feed" />
+<link rel="stylesheet" href="./../../style/standard.css" type="text/css" media="screen" title="standard text size"/>
+<link rel="alternate stylesheet" href="./../../style/medium.css" type="text/css" media="screen" title="larger text size"/>
+<link rel="alternate stylesheet" href="./../../style/large.css" type="text/css" media="screen" title="largest text size" />
+<!-- 
+<link rel="alternate stylesheet" href="./../../style/standard_hi.css" type="text/css" media="screen" title="standard text size (hi contrast)"/>
+<link rel="alternate stylesheet" href="./../../style/medium_hi.css" type="text/css" media="screen" title="larger text size (hi contrast)"/>
+<link rel="alternate stylesheet" href="./../../style/large_hi.css" type="text/css" media="screen" title="largest text size (hi contrast)" />
+-->
+<script type="text/javascript" src="./../../scripts/styleswitcher.js"></script>
+<script type="text/javascript" src="./../../scripts/mccdotnet.js"></script>
+<script type="text/javascript" src="./../../snippets/tinplate/tinplate.js"></script>
+<script type="text/javascript" src="./../../scripts/feedback.js"></script>
+
+
+
+        <script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-28338381-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+  function measure(ele,property) {
+    if (!ele) { return null; }
+    if (window.getComputedStyle) {
+        var sty = window.getComputedStyle(ele,null);
+        var hp = sty.getPropertyValue(property);
+        return Number(hp.split('px')[0]);
+     } else {
+        return null;
+     }
+  }
+
+  function pageload() {
+     var content = document.getElementById("content");
+     var sidebar = document.getElementById("sidebar");
+     if (content && sidebar) {
+        content.style.height = 'auto';
+        sidebar.style.height = 'auto';
+     }
+     var h1 = measure(content,"height");
+     var h2 = measure(sidebar,"height");
+     if (!h1 || !h2) {
+        return;
+     }
+     if (h1 < h2) {
+        content.style.height = String(h2)+"px";
+     } else {
+        sidebar.style.height = String(h1)+"px";
+     }
+  }
+
+</script>
+
+
+        <style>
+            table.rdd {
+                border:2px solid;
+                border-color: #808080;
+                margin-left:20px;
+                margin-bottom:20px;
+                table-layout: fixed;
+                border-collapse: collapse;
+            }
+
+            table.rdd td {
+                padding: 10px;
+                border: dashed 1px;
+                border-color: #909090;
+            }
+        </style>
+    </head>
+    <body onload="pageload()">
+	
+	<div id="header">
+            <div id="title">
+                <a href="./../../index.html"><em><span style="color:black;font-size:36px;">mccarroll<span style="color:red;">dot</span>net</span></em></a>
+	    </div>
+	    
+        <div style="float:right;margin:10px;margin-right:30px;clear:right;">
+ 		    
+
+<a href="#" onclick="setActiveStyleSheetSize('standard text size'); return false;">
+       <img alt="button to select standard text size" src="./../../images/text_small.png" />
+</a>
+<a href="#" onclick="setActiveStyleSheetSize('larger text size'); return false;">
+       <img alt="button to select larger text size" src="./../../images/text_medium.png" />
+</a>
+<a href="#" onclick="setActiveStyleSheetSize('largest text size'); return false;">
+       <img alt="button to select largest text size" src="./../../images/text_large.png" />
+</a>
+
+
+
+
+	    </div>
+	</div>
+
+
+
+	<div id="sidebar">
+    <div class="box">
+                <h3>Blogs I like:</h3>
+                <ul>
+                    <li style="padding:5px;"><a href="http://blog.programmableweb.com/" target="new">Programmable Web</a></li>
+                    <li style="padding:5px;"><a href="http://dataissexy.wordpress.com/" target="new">Data is Sexy</a></li>
+                    <li style="padding:5px;"><a href="http://planet.python.org/" target="new">Planet Python</a></li>
+                    <li style="padding:5px;"><a href="http://www.iheni.com/" target="new">Henny Swan's Blog</a></li>
+                    <li style="padding:5px;"><a href="http://www.guardian.co.uk/environment/georgemonbiot" target="new">George Monbiot</a></li>
+                    <li style="padding:5px;"><a href="http://dmitry.baranovskiy.com/" target="new">Dmitry Baranovskiy</a></li>
+                    <li style="padding:5px;"><a href="http://www.guardian.co.uk/news/datablog" target="new">Guardian Datablog</a></li>
+                    <li style="padding:5px;"><a href="http://www.raspberrypi.org/" target="new">Raspberry Pi</a></li>
+                    <li style="padding:5px;"><a href="http://flowingdata.com/" target="new">Flowing Data</a></li>
+                    <li style="padding:5px;"><a href="http://www.hilarymason.com/" target="new">Hilary Mason</a></li>
+                    <li style="padding:5px;"><a href="http://junkcharts.typepad.com/numbersruleyourworld/" target="new">Kaiser Fung - Numbers rule your world</a></li>
+                    <li style="padding:5px;"><a href="http://googledevelopers.blogspot.co.uk/" target="new">Google Developer Blog</a></li>
+                    <li style="padding:5px;"><a href="http://www.newscientist.com/section/blogs" target="new">New Scientist Blogs</a></li>
+                </ul>
+    </div>
+	<div class="box">
+                <h3>This Site</h3>
+                <ul>
+                    <li style="padding:5px;"><a href="./../../index.html">Home</a></li>
+                    <li style="padding:5px;"><a href="./../../snippets/index.html">Code snippets</a></li>
+                    <li style="padding:5px;"><a href="./../../blog/index.html">Blog</a></li>
+                    <li style="padding:5px;"><a href="./../../py2js/index.html">Python-to-Javascript compiler</a></li>
+                    <li style="padding:5px;"><a href="./../../about/index.html">About...</a></li>
+		    <li style="padding:5px;"><a href="./../../rss.xml"><img style="vertical-align:middle;padding-right:10px;" src="./../../images/feed-icon-28x28.png" alt="Subscribe (RSS 2.0)"/>Subscribe (RSS 2.0)</a></li>  
+                </ul>
+</div>
+
+<div class="box">
+	<h3>Services</h3>
+           	<ul>
+                    <li style="padding:5px;"><a href="./../../search/index.html"><em>Search</em></a></li>
+                    <li style="padding:5px;"><a href="./../../sitemap/index.html"><em>Sitemap</em></a></li>
+                    <li style="padding:5px;"><a href="./../../customize/customize.html"><em>Site Preferences</em></a></li>
+            </ul>
+</div>
+
+
+
+
+</div>
+
+
+        <div id="content">
+            <div id="breadcrumb">
+<a class="crumb" href="../../index.html">Home</a>
+-&gt; <a class="crumb" href="../index.html">Blog</a>
+-&gt; <span class="crumb">Getting started with PySpark - Part 2</span>
+</div><p/>
+
+
+            <div class="box">
+	            <h1>Getting started with PySpark - Part 2</h1>
+                <div class="synopsis">
+                    <p>
+                        In <a href="./../../blog/pyspark/index.html">Part 1</a> we looked at installing the data processing engine <a href="https://spark.incubator.apache.org/" target="new">Apache Spark</a> and started to explore some features of its Python API, <a href="http://spark.apache.org/docs/0.9.0/python-programming-guide.html">PySpark</a>.  In this article, we look in more detail at using PySpark.
+                    </p>
+                    <p>
+                        
+                    </p>
+                    <img src="./../../blog/pyspark2/pyspark.png" style="width:400px;height:auto;"/>
+                </div>
+                <h2>Revisiting the wordcount example</h2>
+                <p>
+                    Recall the example described in <a href="../pyspark/index.html">Part 1</a>, which performs a wordcount on the documents stored under folder /user/dev/gutenberg on HDFS.  We start by writing the transformation in a single invocation, with a few changes to deal with some punctuation characters and convert the text to lower case.
+                </p>
+<pre style="font-family:monospace;margin-left:30px;">
+>>> wordcounts = sc.textFile('hdfs://ubuntu1:54310/user/dev/gutenberg') \
+        .map( lambda x: x.replace(',',' ').replace('.',' ').replace('-',' ').lower()) \
+        .flatMap(lambda x: x.split()) \
+        .map(lambda x: (x, 1)) \
+        .reduceByKey(lambda x,y:x+y) \
+        .map(lambda x:(x[1],x[0])) \
+        .sortByKey(False) 
+>>> wordcounts.take(10)
+[(500662, u'the'), (331864, u'and'), (289323, u'of'), (196741, u'to'), 
+ (149380, u'a'), (132609, u'in'), (100711, u'that'), (92052, u'i'), 
+ (77469, u'he'), (72301, u'for')]
+</pre>
+                <p>
+		            To understand whats going on its best to consider this program as a pipeline of transformations.  Apart from the initial call to the textFile method of variable sc (SparkContext) to create the first resilient distributed dataset (RDD) by reading lines from each file in the specified directory on HDFS, subsequent calls transfrom each input RDD into a new output RDD.  We'll consider a simple example where we start by creating an RDD with just two lines with sc.parallelize, rather than reading the data from files with sc.textFile, and trace what each step in our wordcount program does.  The lines are a quote from a <a href="http://en.wikipedia.org/wiki/Dr._Seuss">Dr Seuss</a> story.
+                </p>
+               
+<pre style="font-family:monospace;margin-left:30px;">
+>>> lines = sc.parallelize(['Its fun to have fun,','but you have to know how.']) 
+>>> wordcounts = lines.map( lambda x: x.replace(',',' ').replace('.',' ').replace('-',' ').lower()) \
+        .flatMap(lambda x: x.split()) \
+        .map(lambda x: (x, 1)) \
+        .reduceByKey(lambda x,y:x+y) \
+        .map(lambda x:(x[1],x[0])) \
+        .sortByKey(False) 
+>>> wordcounts.take(10)
+[(2, 'to'), (2, 'fun'), (2, 'have'), (1, 'its'), (1, 'know'), (1, 'how'), (1, 'you'), (1, 'but')]
+</pre>
+                <p>
+                    <ol>
+                              
+                        <li>
+                            <p><b>map( <it>&lt;function&gt;</it> )</b></p>
+                            <p>map returns a new RDD containing values created by applying the supplied function to each value in the original RDD</p>
+                            <p>Here we use a lambda function which replaces some common punctuation characters with spaces and convert to lower case, producing a new RDD:</p>
+<pre style="font-family:monospace;margin-left:30px;">
+>>> r1 = lines.map( lambda x: x.replace(',',' ').replace('.',' ').replace('-',' ').lower())
+>>> r1.take(10)
+['its fun to have fun ', 'but you have to know how ']
+</pre>
+                        </li>              
+                        <li>
+                            <p><b>flatMap( <it>&lt;function&gt;</it> )</b></p>
+                            <p>flatMap applies a function which takes each input value and returns a list.  Each value of the list becomes a new, separate value in the output RDD</p>
+                            <p>In our example, the lines are split into words and then each word becomes a separate value in the output RDD:</p>
+<pre style="font-family:monospace;margin-left:30px;">
+>>> r2 = r1.flatMap(lambda x: x.split())
+>>> r2.take(20)
+['its', 'fun', 'to', 'have', 'fun', 'but', 'you', 'have', 'to', 'know', 'how']
+>>>
+</pre>
+                        </li>
+                        <li>
+                            <p><b>map( <it>&lt;function&gt;</it> )</b></p>
+                            
+                            <p>In this second map invocation, we use a function which replaces each original value in the input RDD with a 2-tuple containing the word in the first position and the integer value 1 in the second position:</p>
+<pre style="font-family:monospace;margin-left:30px;">
+>>> r3 = r2.map(lambda x: (x, 1))
+>>> r3.take(20)
+[('its', 1), ('fun', 1), ('to', 1), ('have', 1), ('fun', 1), ('but', 1), ('you', 1), ('have', 1), ('to', 1), ('know', 1), ('how', 1)]
+>>>
+</pre>                            
+                        </li>
+                        <li>
+                            <p><b>reduceByKey( <it>&lt;function</it> )</b></p>
+                            <p>Expect that the input RDD contains tuples of the form (&lt;key&gt;,&lt;value&gt;).  Create a new RDD containing a tuple for each unique value of &lt;key&gt; in the input, where the value in the second position of the tuple is created by applying the supplied lambda function to the &lt;value&gt;s with the matching &lt;key&gt; in the input RDD</p>
+                            <p>Here the key will be the word and lambda function will sum up the word counts for each word.  The output RDD will consist of a single tuple for each unique word in the data, where the word is stored at the first position in the tuple and the word count is stored at the second position</p>
+<pre style="font-family:monospace;margin-left:30px;">
+>>> r4 = r3.reduceByKey(lambda x,y:x+y)
+>>> r4.take(20)
+[('fun', 2), ('to', 2), ('its', 1), ('know', 1), ('how', 1), ('you', 1), ('have', 2), ('but', 1)]
+</pre>                          
+                        </li>  
+                        <li>
+                            <p><b>map( <it>&lt;function&gt;</it> )</b></p>
+                            <p>map a lambda function to the data which will swap over the first and second values in each tuple, now the word count appears in the first position and the word in the second position</p>
+<pre style="font-family:monospace;margin-left:30px;">
+>>> r5 = r4.map(lambda x:(x[1],x[0]))
+>>> r5.take(20)
+[(2, 'fun'), (1, 'how'), (1, 'its'), (1, 'know'), (2, 'to'), (1, 'you'), (1, 'but'), (2, 'have')]
+</pre>                            
+                        </li>
+                        <li>
+                            <p><b>sortByKey( <it>ascending=True|False</it> )</b></p>
+                            <p>sort the input RDD by the key value (the value at the first position in each tuple)</p>
+                            <p>In this example the first position stores the word count so this will sort the words so that the most frequently occurring words occur first in the RDD - the False parameter sets the sort order to descending (pass</p>
+<pre style="font-family:monospace;margin-left:30px;">
+>>> r6 = r5.sortByKey(ascending=False)
+>>> r6.take(20)
+[(2, 'fun'), (2, 'to'), (2, 'have'), (1, 'its'), (1, 'know'), (1, 'how'), (1, 'you'), (1, 'but')]
+>>>
+</pre>                        
+                        </li>
+                    </ol>
+                </p>
+                <h2>Finding frequent word bigrams</h2>
+                <p>For a slightly more complicated task, lets look into splitting up sentences from our documents into word bigrams.  A <a href="http://en.wikipedia.org/wiki/Bigram">bigram</a> is pair of successive tokens in some sequence.  We will look at building bigrams from the sequences of words in each sentence, and then try to find the most frequently occuring ones.
+                </p>
+                <p>The first problem is that values in each partition of our initial RDD describe lines from the file rather than sentences.  Sentences may be split over multiple lines.  The glom() RDD method is used to create a single entry for each document containing the list of all lines, we can then join the lines up, then resplit them into sentences using "." as the separator, using flatMap so that every object in our RDD is now a sentence.
+                </p>
+<pre style="font-family:monospace;margin-left:30px;">
+>>> sentences = sc.textFile('hdfs://ubuntu1:54310/user/dev/gutenberg') \
+    .glom() \
+    .map(lambda x: " ".join(x)) \
+    .flatMap(lambda x: x.split("."))
+</pre>
+                <p>Now we have isolated each sentence we can split it into a list of words and extract the word bigrams from it.  Our new RDD contains tuples containing the word bigram (itself a tuple containing the first and second word) as the first value and the number 1 as the second value. 
+                </p>
+<pre style="font-family:monospace;margin-left:30px;">
+>>> bigrams = sentences.map(lambda x:x.split()) \
+    .flatMap(lambda x: [((x[i],x[i+1]),1) for i in range(0,len(x)-1)])
+</pre>
+                <p>Finally we can apply the same reduceByKey and sort steps that we used in the wordcount example, to count up the bigrams and sort them in order of descending frequency.  In reduceByKey the key is not an individual word but a bigram.
+                </p>
+<pre style="font-family:monospace;margin-left:30px;">
+>>> freq_bigrams = bigrams.reduceByKey(lambda x,y:x+y) \
+    .map(lambda x:(x[1],x[0])) \
+    .sortByKey(False)
+>>> freq_bigrams.take(10)
+[(73228, (u'of', u'the')), (36008, (u'in', u'the')), (23860, (u'to', u'the')), 
+ (20582, (u'and', u'the')), (11534, (u'to', u'be')), (10944, (u'on', u'the')), 
+ (10548, (u'for', u'the')), (10374, (u'0', u'0')), (10117, (u'from', u'the')), 
+ (9983, (u'with', u'the'))] 
+</pre>
+                <h2>RDD partitions, map and reduce</h2>
+                <p>
+                    In the example above, the map and reduceByKey RDD transformations will be immediately recognizable to aficionados of the MapReduce paradigm.  Spark supports the efficient parallel application of map and reduce operations by dividing data up into multiple <it>partitions</it>.  In the example above, each file will by default generate one partition.  What Spark adds to existing frameworks like Hadoop are the ability to add multiple map and reduce tasks to a single workflow.
+                </p> 
+                <p>
+                    There are some useful ways to look at the distribution of objects in each partition in our rdd:
+                </p>
+<pre style="font-family:monospace;margin-left:30px;">
+>>> lines = sc.textFile('hdfs://ubuntu1:54310/user/dev/gutenberg')
+>>> def countPartitions(id,iterator): 
+         c = 0 
+         for _ in iterator: 
+              c += 1 
+         yield (id,c) 
+>>> lines.mapPartitionsWithSplit(countPartitions).collectAsMap()
+{0: 566, 1: 100222, 2: 124796, 3: 3735, ..., 96: 6690, 97: 3921, 98: 16271, 99: 1138}
+>>> 
+</pre>
+<p>
+    <ul>
+        <li>
+       Each partition within an RDD is replicated across multiple workers running on different nodes in a cluster so that failure of a single worker should not cause the RDD to become unavailable.
+        </li>
+        <li>
+       Many operations including map and flatMap operations can be applied independently to each partition, running as concurrent jobs based on the number of available cores.  Typically these operations will preserve the number of partitions.
+        </li>
+        <li>
+            When processing reduceByKey, Spark will create a number of output partitions based on the <it>default paralellism</it> based on the numbers of nodes and cores available to Spark.  Data is effectively reshuffled so that input data from different input partitions with the same key value is passed to the same output partition and combined there using the specified reduce function.  sortByKey is another operation which transforms N input partitions to M output partitions.
+        </li>
+    </ul>
+</p>
+<pre style="font-family:monospace;margin-left:30px;">
+>>> sc.defaultParallelism
+4
+>>> wordcounts = sc.textFile('hdfs://ubuntu1:54310/user/dev/gutenberg') \
+            .map( lambda x: x.replace(',',' ').replace('.',' ').replace('-',' ').lower()) \
+            .flatMap(lambda x: x.split()) \
+            .map(lambda x: (x, 1)) \
+            .reduceByKey(lambda x,y:x+y)
+>>> wordcounts.mapPartitionsWithSplit(countPartitions).collectAsMap()
+{0: 122478, 1: 122549, 2: 121597, 3: 122587}
+</pre>    
+<p>
+    The number of partitions generated by the reduce stage can be controlled by supplying the desired number of partitions as an extra parameter to reduceByKey:
+</p>
+<pre style="font-family:monospace;margin-left:30px;">        
+>>> wordcounts = sc.textFile('hdfs://ubuntu1:54310/user/dev/gutenberg') \
+             .map( lambda x: x.replace(',',' ').replace('.',' ').replace('-',' ').lower()) \
+             .flatMap(lambda x: x.split()) \
+             .map(lambda x: (x, 1)) \
+             .reduceByKey(lambda x,y:x+y,<b>numPartitions=2</b>)
+>>> wordcounts.mapPartitionsWithSplit(countPartitions).collectAsMap()
+{0: 244075, 1: 245136}
+</pre>
+            <h2>Monitoring memory usage</h2>
+            <p>
+                  Spark/PySpark work best when there is sufficient resources to keep all the data in RDDs loaded in physical memory.  In practice I found its best to carefully monitor whats happening with memory on each machine in the cluster.  Although Spark's web pages offer a lot of information on task progress, I've found that installing and running <a href="http://ganglia.sourceforge.net/">Ganglia</a> provides a great way to monitor memory across the network.
+            </p>
+            <img src="./../../blog/pyspark2/ganglia.png"/>
+            <h2>Further reading</h2>
+                <p>
+                     For more information on PySpark I suggest taking a look at some of these links:
+                     <ul>
+                        <li>
+                            <a href="http://www.youtube.com/watch?v=xc7Lc8RA8wE">PySpark: Python API for Spark (YouTube, presentation by Josh Rosen)</a>.
+                        </li>
+                        <li>
+                            <a href="http://spark.apache.org/docs/0.9.0/python-programming-guide.html">Spark Python Programming Guide</a>
+                        </li>
+                        <li>
+                            <a href="http://spark.incubator.apache.org/docs/latest/api/pyspark/pyspark.rdd.RDD-class.html" target="new">Resilient Distributed Dataset (RDD) API documentation</a>
+                        </li>    
+                    </ul>
+                </p>
+            </div> 
+            <div id="comments" onclick="feedback.toggle_comments();">
+&nbsp;
+</div> 
+
+<form action="/cgi-bin/feedback.py" method="post">
+	<fieldset>
+	    <legend>Anti-spam check</legend>
+	    <div>
+		<label for="feedback_hex">Hexadecimal number</label>
+		<input type="readonly" name="hex" id="feedback_hex" style="width:50px;" />
+	    </div>
+            <div>
+		<label for="feedback_dec">Decimal equivalent</label>
+		<input type="text" name="decimal" id="feedback_dec" style="width:50px;" />
+	    </div>
+	</fieldset>
+	<fieldset>
+            <legend>Leave a comment</legend>
+           
+	    <div style="display:none;">
+            	<input type="text" name="category" id="feedback_category" value="pyspark"/>
+	    </div>
+            <div>
+            	<label for="feedback_name">Name</label>
+            	<input type="text" name="name" id="feedback_name" style="width:200px;"/>
+            </div>
+            <div>
+            	<label for="feedback_comment">Comment</label>      
+            	<textarea type="text" name="comment" id="feedback_comment" rows="10" cols="50"></textarea>
+            </div>
+            <input type="submit" id="feedback_submit" value="Submit" style="width:80px;"/>        
+	</fieldset>
+</form> 
+
+<script type="text/javascript">feedback.init_form();feedback.load_comments("pyspark");</script>
+
+
+        </div>   
+	        <div id="footer">
+            <p>
+                Copyright &copy; <a href="#">Niall McCarroll</a> 2007-2009
+                <!-- While not required, I would appreciate this link being left in -->
+                | Design by <a href="http://xavisys.com" title="Freelance Web Programming and Design">Xavisys</a>
+                | <a href="http://www.opendesigns.org/" title="Download Free Web Design Templates">Open Designs</a>
+                | Valid <a href="http://jigsaw.w3.org/css-validator/check/referer">CSS</a> &amp; <a href="http://validator.w3.org/check/referer">XHTML</a>
+            </p>
+        </div>
+
+
+    </body>
+</html>
+
