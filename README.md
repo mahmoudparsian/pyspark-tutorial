@@ -61,6 +61,9 @@ best regards,
 Mahmoud Parsian
 ````
 
+[![PySpark Algorithms Book](https://github.com/mahmoudparsian/pyspark-algorithms/blob/master/images/pyspark_algorithms3.jpg)](https://www.amazon.com/dp/B07X4B2218/ref=sr_1_2) 
+
+
 [![Data Algorithms Book](https://github.com/mahmoudparsian/data-algorithms-book/blob/master/misc/large-image.jpg)](http://shop.oreilly.com/product/0636920033950.do) 
 
 [//]: # (metadata:)
