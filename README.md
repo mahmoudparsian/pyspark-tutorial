@@ -8,7 +8,7 @@ PySpark Tutorial
 * You may use `$SPARK_HOME/bin/spark-submit` command for running PySpark programs 
   (may be used for testing and production environemtns)
 
-[PySpark Algorithms Book](https://github.com/mahmoudparsian/pyspark-algorithms/README.md) 
+[PySpark Algorithms Book](https://github.com/mahmoudparsian/pyspark-algorithms/) 
 ================================================================================
 
 [Download, Install Spark and Run PySpark](./howto/download_install_run_spark.md) 
