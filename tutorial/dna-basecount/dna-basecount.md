@@ -37,8 +37,8 @@ SparkContext available as sc, HiveContext available as sqlContext.
  u'ATCGATCGATAT'
 ]
 
->>> ones = recs.flatMap(lambda x : [(c,1) for c in list(x)])
->>> ones.collect()
+>>> rdd = recs.flatMap(lambda x : [(c,1) for c in list(x)])
+>>> rdd.collect()
 [
  (u'A', 1), 
  (u'T', 1), 
