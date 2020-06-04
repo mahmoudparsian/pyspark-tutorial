@@ -29,7 +29,7 @@ Welcome to
       /_/
 
 SparkContext available as sc, HiveContext available as sqlContext.
->>> recs = sc.texFile('file:///home/mparsian/dna_seq.txt')
+>>> recs = sc.textFile('file:///home/mparsian/dna_seq.txt')
 
 >>> recs.collect()
 [
