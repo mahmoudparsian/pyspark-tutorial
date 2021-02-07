@@ -90,12 +90,24 @@ def minmax(iterator):
 			if x < min:
 				min = x
 		#
-	return (min, max)
+	return [(min, max)]
 #
 #data = [10, 20, 3, 4, 5, 2, 2, 20, 20, 10]
 #print minmax(data)	
 ````
 Then we use the minmax function for the ````mapPartitions()````:
+
+>>> rdd = spark.sparkContext.parallelize(data, 3)
+>>> mapped = rdd.mapPartitions(minmax)
+>>> mapped.collect()
+[(3, 20), (2, 5), (2, 20)]
+>>> minmax_list = mapped.collect()
+>>> minimum = min(minmax_list[0])
+>>> minimum
+3
+>>> maximum = max(minmax_list[0])
+>>> maximum
+20
 
 ````
 ### NOTE: data  can be huge, but for understanding 
