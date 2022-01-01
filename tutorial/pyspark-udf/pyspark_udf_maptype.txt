@@ -1,0 +1,57 @@
+$SPARK_HOME/bin/pyspark
+Python 3.8.9 (default, Nov  9 2021, 04:26:29)
+Welcome to
+      ____              __
+     / __/__  ___ _____/ /__
+    _\ \/ _ \/ _ `/ __/  '_/
+   /__ / .__/\_,_/_/ /_/\_\   version 3.2.0
+      /_/
+
+Using Python version 3.8.9 (default, Nov  9 2021 04:26:29)
+Spark context Web UI available at http://10.0.0.232:4040
+Spark context available as 'sc' (master = local[*], app id = local-1641011178190).
+SparkSession available as 'spark'.
+
+>>> from pyspark.sql import Row
+
+>>> data = spark.createDataFrame(
+... [Row(zip_code='94087', city='Sunnyvale'),
+...  Row(zip_code='94088', city='Cupertino'),
+...  Row(zip_code='95055', city='Santa Clara'),
+...  Row(zip_code='95054', city='Palo Alto')])
+
+>>>
+>>> data.show()
++--------+-----------+
+|zip_code|       city|
++--------+-----------+
+|   94087|  Sunnyvale|
+|   94088|  Cupertino|
+|   95055|Santa Clara|
+|   95054|  Palo Alto|
++--------+-----------+
+
+>>> from pyspark.sql.functions import udf
+>>> from pyspark.sql import types as T
+>>>
+>>> @udf(T.MapType(T.StringType(), T.StringType()))
+... def create_structure(zip_code, city):
+...     return {zip_code: city}
+...
+>>> data.withColumn('structure', create_structure(data.zip_code, data.city)).toJSON().collect()
+[
+ '{"zip_code":"94087","city":"Sunnyvale","structure":{"94087":"Sunnyvale"}}', 
+ '{"zip_code":"94088","city":"Cupertino","structure":{"94088":"Cupertino"}}', 
+ '{"zip_code":"95055","city":"Santa Clara","structure":{"95055":"Santa Clara"}}', 
+ '{"zip_code":"95054","city":"Palo Alto","structure":{"95054":"Palo Alto"}}'
+]
+
+>>> data.withColumn('structure', create_structure(data.zip_code, data.city)).show(truncate=False)
++--------+-----------+----------------------+
+|zip_code|city       |structure             |
++--------+-----------+----------------------+
+|94087   |Sunnyvale  |{94087 -> Sunnyvale}  |
+|94088   |Cupertino  |{94088 -> Cupertino}  |
+|95055   |Santa Clara|{95055 -> Santa Clara}|
+|95054   |Palo Alto  |{95054 -> Palo Alto}  |
++--------+-----------+----------------------+
