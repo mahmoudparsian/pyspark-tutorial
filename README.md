@@ -61,6 +61,9 @@ best regards,
 Mahmoud Parsian
 ````
 
+[![Data Algorithms with Spark](./images/data_algorithms_with_spark.jpg)](https://www.oreilly.com/library/view/data-algorithms-with/9781492082378/)
+
+
 [![PySpark Algorithms Book](https://github.com/mahmoudparsian/pyspark-algorithms/blob/master/images/pyspark_algorithms3.jpg)](https://www.amazon.com/dp/B07X4B2218/ref=sr_1_2) 
 
 
