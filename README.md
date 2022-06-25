@@ -79,13 +79,13 @@ Mahmoud Parsian
 <a href="https://www.amazon.com/dp/B07X4B2218/ref=sr_1_2">
     <img
         alt="PySpark Algorithms"
-        src="images/pyspark_algorithms3.jpg"
+        src="images/pyspark_algorithms2.jpg"
 >
 
 <a href="http://shop.oreilly.com/product/0636920033950.do">
     <img
         alt="Data Algorithms"
-        src="images/large-image.jpg"
+        src="images/data_algorithms_image.jpg"
 >
 
 ------
