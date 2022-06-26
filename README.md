@@ -33,21 +33,21 @@
 
 # Books
 
-## [Data Algorithms with Spark (book)](https://github.com/mahmoudparsian/data-algorithms-with-spark/) 
+### [Data Algorithms with Spark](https://github.com/mahmoudparsian/data-algorithms-with-spark/) 
 
-## [Data Algorithms (book)](https://github.com/mahmoudparsian/data-algorithms-book/) 
+### [Data Algorithms](https://github.com/mahmoudparsian/data-algorithms-book/) 
 
-## [PySpark Algorithms (book)](https://github.com/mahmoudparsian/pyspark-algorithms/) 
+### [PySpark Algorithms](https://github.com/mahmoudparsian/pyspark-algorithms/) 
 
 -----
 
 # Miscellaneous 
 
-## [Download, Install Spark and Run PySpark](./howto/download_install_run_spark.md) 
+### [Download, Install Spark and Run PySpark](./howto/download_install_run_spark.md) 
 
-## [Basics of PySpark](./howto/README.md) 
+### [Basics of PySpark](./howto/README.md) 
 
-## [How to Minimize the Verbosity of Spark](./howto/minimize_verbosity.md) 
+### [How to Minimize the Verbosity of Spark](./howto/minimize_verbosity.md) 
 
 -------
 
