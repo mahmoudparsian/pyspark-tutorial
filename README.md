@@ -9,16 +9,6 @@
 
 ------
 
-# [Data Algorithms with Spark (book)](https://github.com/mahmoudparsian/data-algorithms-with-spark/) 
-
-# [PySpark Algorithms (book)](https://github.com/mahmoudparsian/pyspark-algorithms/) 
-
-# [Download, Install Spark and Run PySpark](./howto/download_install_run_spark.md) 
-
-# [Basics of PySpark](./howto/README.md) 
-
------
-
 # PySpark Examples and Tutorials
 
 * [PySpark Examples: RDDs](./tutorial/pyspark-examples/rdds/)
@@ -39,9 +29,27 @@
 * [How to Add Indices](./tutorial/add-indices)
 * [Map Partitions: mapPartitions() by Examples](./tutorial/map-partitions/README.md)
 
+------
+
+# Books
+
+## [Data Algorithms with Spark (book)](https://github.com/mahmoudparsian/data-algorithms-with-spark/) 
+
+## [Data Algorithms (book)](https://github.com/mahmoudparsian/data-algorithms-book/) 
+
+## [PySpark Algorithms (book)](https://github.com/mahmoudparsian/pyspark-algorithms/) 
+
 -----
 
-# [How to Minimize the Verbosity of Spark](./howto/minimize_verbosity.md) 
+# Miscellaneous 
+
+## [Download, Install Spark and Run PySpark](./howto/download_install_run_spark.md) 
+
+## [Basics of PySpark](./howto/README.md) 
+
+## [How to Minimize the Verbosity of Spark](./howto/minimize_verbosity.md) 
+
+-------
 
 # PySpark Tutorial and References...
 * [Getting started with PySpark - Part 1](http://www.mccarroll.net/blog/pyspark/)
@@ -50,6 +58,8 @@
 * [PySpark](http://www.slideshare.net/thegiivee/pysaprk?qid=81cf1b31-8b19-4570-89a5-21d03cad6ecd&v=default&b=&from_search=9)
 * [Basic Big Data Manipulation with PySpark](http://bigdatasciencebootcamp.com/posts/Part_3/basic_big_data.html)
 * [Working in Pyspark: Basics of Working with Data and RDDs](http://www.learnbymarketing.com/618/pyspark-rdd-basics-examples/)
+
+-------
 
 # Questions/Comments
 * [View Mahmoud Parsian's profile on LinkedIn](http://www.linkedin.com/in/mahmoudparsian)
