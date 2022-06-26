@@ -1,0 +1,54 @@
+Understanding Partitions
+
+$ ./bin/pyspark
+Python 3.7.2 (v3.7.2:9a3ffc0492, Dec 24 2018, 02:44:43)
+To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).
+Welcome to
+      ____              __
+     / __/__  ___ _____/ /__
+    _\ \/ _ \/ _ `/ __/  '_/
+   /__ / .__/\_,_/_/ /_/\_\   version 3.1.2
+      /_/
+
+Using Python version 3.7.2 (v3.7.2:9a3ffc0492, Dec 24 2018 02:44:43)
+Spark context Web UI available at http://10.0.0.94:4040
+Spark context available as 'sc' (master = local[*], app id = local-1634788905125).
+SparkSession available as 'spark'.
+>>>
+>>> nums = [1, 2, 3, 4, 5, 77, 77, 66, 99, 33, 33, 22, 22, 11, 123, 44, 45, 67, 89, 77, 66, 44, 55, 99, 80, 90]
+>>> nums
+[1, 2, 3, 4, 5, 77, 77, 66, 99, 33, 33, 22, 22, 11, 123, 44, 45, 67, 89, 77, 66, 44, 55, 99, 80, 90]
+>>> # rdd : RDD[Integer]
+>>> rdd = sc.parallelize(nums)
+>>> rdd.count()
+26
+>>> rdd.collect()
+[1, 2, 3, 4, 5, 77, 77, 66, 99, 33, 33, 22, 22, 11, 123, 44, 45, 67, 89, 77, 66, 44, 55, 99, 80, 90]
+>>>
+>>> # get number of partitions (default, set by cluster manager)
+>>> rdd.getNumPartitions()
+8
+>>> # set number of partitions explicitly to 4
+>>> rdd2 = sc.parallelize(nums, 4)
+>>> rdd2.getNumPartitions()
+4
+>>> # define a debugger to output all elements of a partition
+>>> def debug_partition(partition):
+...     print("partition=", list(partition))
+...
+>>> rdd.foreachPartition(debug_partition)
+partition= [1, 2, 3]
+partition= [33, 33, 22]
+partition= [22, 11, 123]
+partition= [44, 45, 67]
+partition= [77, 66, 99]
+partition= [44, 55, 99, 80, 90]
+partition= [89, 77, 66]
+partition= [4, 5, 77]
+>>>
+>>> rdd2.foreachPartition(debug_partition)
+partition= [89, 77, 66, 44, 55, 99, 80, 90]
+partition= [1, 2, 3, 4, 5, 77]
+partition= [22, 11, 123, 44, 45, 67]
+partition= [77, 66, 99, 33, 33, 22]
+>>>

@@ -1,0 +1,212 @@
+The files I used in class:
+
+$ ls -l /tmp/scu/
+total 24
+-rw-r--r--  1 mparsian  dev   52 Oct  6 20:18 file1
+-rw-r--r--  1 mparsian  dev  102 Oct  6 20:18 file2
+-rw-r--r--  1 mparsian  dev   84 Oct  6 20:20 file3
+
+$ cat /tmp/scu/file1
+a red fox jumped
+a fox jumped and jumped
+a red fox
+
+$ cat /tmp/scu/file2
+a red fox jumped a red fox jumped
+a fox jumped and jumped a fox jumped and jumped
+a red fox a red fox
+
+$ cat /tmp/scu/file3
+red red fox jumped
+fox fox jumped and jumped
+fox a red fox
+a red fox of fox of fox
+
+
+
+$ ./bin/pyspark
+Python 3.7.2 (v3.7.2:9a3ffc0492, Dec 24 2018, 02:44:43)
+To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).
+Welcome to
+      ____              __
+     / __/__  ___ _____/ /__
+    _\ \/ _ \/ _ `/ __/  '_/
+   /__ / .__/\_,_/_/ /_/\_\   version 3.1.2
+      /_/
+
+Using Python version 3.7.2 (v3.7.2:9a3ffc0492, Dec 24 2018 02:44:43)
+Spark context Web UI available at http://10.0.0.94:4040
+Spark context available as 'sc' (master = local[*], app id = local-1633406278060).
+SparkSession available as 'spark'.
+>>>
+>>>
+>>> sc
+<SparkContext master=local[*] appName=PySparkShell>
+>>> spark
+<pyspark.sql.session.SparkSession object at 0x7fb56018b518>
+>>>
+>>>
+>>> numbers = [("A", 1), ("A", 4), ("A", 7), ("B", 10), ("B", 20), ("B", 30), ("B", 40)]
+>>> numbers
+[('A', 1), ('A', 4), ('A', 7), ('B', 10), ('B', 20), ('B', 30), ('B', 40)]
+>>> numbers[0]
+('A', 1)
+>>> numbers[1]
+('A', 4)
+>>>
+>>>
+>>>
+>>> rdd = sc.parallelize(numbers)
+>>> rdd.collect()
+[('A', 1), ('A', 4), ('A', 7), ('B', 10), ('B', 20), ('B', 30), ('B', 40)]
+>>>
+>>>
+>>> rdd.count()
+7
+>>> sum_per_key = rdd.reduceByKey(lambda x, y: x+y)
+>>> sum_per_key.collect()
+[('B', 100), ('A', 12)]
+>>> sum_per_key.count()
+2
+>>>
+>>>
+>>>
+>>> file3_path = "/tmp/scu/file3"
+>>> rdd3 = sc.textFile(file3_path)
+>>>
+>>> rdd3.collect()
+['red red fox jumped', 'fox fox jumped and jumped', 'fox a red fox ', 'a red fox of fox of fox']
+>>>
+>>>
+>>>
+>>> scu_path = "/tmp/scu"
+>>> rdd = sc.textFile(scu_path)
+>>>
+>>>
+>>> rdd.collect()
+['red red fox jumped', 'fox fox jumped and jumped', 'fox a red fox ', 'a red fox of fox of fox', 'a red fox jumped a red fox jumped', 'a fox jumped and jumped a fox jumped and jumped', 'a red fox a red fox', 'a red fox jumped', 'a fox jumped and jumped', 'a red fox ']
+>>> rdd.count()
+10
+>>> rdd3.count()
+4
+>>>
+>>> key_values = [("A", 10), ("A", 20), ("B", 30), ("B", 40), ("B", 50)]
+>>> key_values
+[('A', 10), ('A', 20), ('B', 30), ('B', 40), ('B', 50)]
+>>> kv_rdd = sc.parallelize(key_values)
+>>> kv_rdd.collect()
+[('A', 10), ('A', 20), ('B', 30), ('B', 40), ('B', 50)]
+>>> key_values2 = [("A", (1, 10)), ("A", (2, 20)), ("B", (3, 30)), ("B", (4, 40)), ("B", (10, 50))]
+>>> kv_rdd2 = sc.parallelize(key_values2)
+>>>
+>>> kv_rdd2.collect()
+[('A', (1, 10)), ('A', (2, 20)), ('B', (3, 30)), ('B', (4, 40)), ('B', (10, 50))]
+>>>
+>>>
+>>>
+>>> rdd.collect()
+[
+ 'red red fox jumped', 
+ 'fox fox jumped and jumped', 
+ 'fox a red fox ', 
+ 'a red fox of fox of fox', 
+ 'a red fox jumped a red fox jumped', 
+ 'a fox jumped and jumped a fox jumped and jumped', 
+ 'a red fox a red fox', 
+ 'a red fox jumped', 
+ 'a fox jumped and jumped', 
+ 'a red fox '
+]
+>>> rdd.count()
+10
+>>> rdd.take(3)
+[
+ 'red red fox jumped', 
+ 'fox fox jumped and jumped', 
+ 'fox a red fox '
+]
+>>> rdd.take(5)
+[
+ 'red red fox jumped', 
+ 'fox fox jumped and jumped', 
+ 'fox a red fox ', 
+ 'a red fox of fox of fox', 
+ 'a red fox jumped a red fox jumped'
+]
+>>> tokenized = rdd.map(lambda x: x.split(" "))
+>>> tokenized.collect()
+[
+ ['red', 'red', 'fox', 'jumped'], 
+ ['fox', 'fox', 'jumped', 'and', 'jumped'], 
+ ['fox', 'a', 'red', 'fox', ''], 
+ ['a', 'red', 'fox', 'of', 'fox', 'of', 'fox'], 
+ ['a', 'red', 'fox', 'jumped', 'a', 'red', 'fox', 'jumped'], 
+ ['a', 'fox', 'jumped', 'and', 'jumped', 'a', 'fox', 'jumped', 'and', 'jumped'], 
+ ['a', 'red', 'fox', 'a', 'red', 'fox'], 
+ ['a', 'red', 'fox', 'jumped'], 
+ ['a', 'fox', 'jumped', 'and', 'jumped'], 
+ ['a', 'red', 'fox', '']
+]
+>>> tokenized
+PythonRDD[12] at collect at <stdin>:1
+>>>
+...
+>>> words = tokenized.flatMap(lambda x: x)
+>>>
+>>> wrds.collect()
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+NameError: name 'wrds' is not defined
+>>> words.collect()
+['red', 'red', 'fox', 'jumped', 'fox', 'fox', 'jumped', 'and', 'jumped', 'fox', 'a', 'red', 'fox', '', 'a', 'red', 'fox', 'of', 'fox', 'of', 'fox', 'a', 'red', 'fox', 'jumped', 'a', 'red', 'fox', 'jumped', 'a', 'fox', 'jumped', 'and', 'jumped', 'a', 'fox', 'jumped', 'and', 'jumped', 'a', 'red', 'fox', 'a', 'red', 'fox', 'a', 'red', 'fox', 'jumped', 'a', 'fox', 'jumped', 'and', 'jumped', 'a', 'red', 'fox', '']
+>>> words.count()
+58
+>>> pairs = words.map(lambda word: (word, 1))
+>>> pairs.collect()
+[('red', 1), ('red', 1), ('fox', 1), ('jumped', 1), ('fox', 1), ('fox', 1), ('jumped', 1), ('and', 1), ('jumped', 1), ('fox', 1), ('a', 1), ('red', 1), ('fox', 1), ('', 1), ('a', 1), ('red', 1), ('fox', 1), ('of', 1), ('fox', 1), ('of', 1), ('fox', 1), ('a', 1), ('red', 1), ('fox', 1), ('jumped', 1), ('a', 1), ('red', 1), ('fox', 1), ('jumped', 1), ('a', 1), ('fox', 1), ('jumped', 1), ('and', 1), ('jumped', 1), ('a', 1), ('fox', 1), ('jumped', 1), ('and', 1), ('jumped', 1), ('a', 1), ('red', 1), ('fox', 1), ('a', 1), ('red', 1), ('fox', 1), ('a', 1), ('red', 1), ('fox', 1), ('jumped', 1), ('a', 1), ('fox', 1), ('jumped', 1), ('and', 1), ('jumped', 1), ('a', 1), ('red', 1), ('fox', 1), ('', 1)]
+>>>
+>>> freq = pairs.reduceByKey(lambda x, y: x+y)
+>>> freq.collect()
+[('fox', 17), ('', 2), ('of', 2), ('and', 4), ('red', 10), ('jumped', 12), ('a', 11)]
+>>>
+>>>
+>>>
+>>> groupedbykey = pairs.groupByKey()
+>>> groupedbykey.collect()
+[
+ ('fox', <pyspark.resultiterable.ResultIterable object at 0x7f990f1fd0b8>), 
+ ('', <pyspark.resultiterable.ResultIterable object at 0x7f990f1fd518>), 
+ ('of', <pyspark.resultiterable.ResultIterable object at 0x7f990f1fd470>), 
+ ('and', <pyspark.resultiterable.ResultIterable object at 0x7f990f1fd080>), 
+ ('red', <pyspark.resultiterable.ResultIterable object at 0x7f990f1fd390>), 
+ ('jumped', <pyspark.resultiterable.ResultIterable object at 0x7f990f1fd358>), 
+ ('a', <pyspark.resultiterable.ResultIterable object at 0x7f990f1fd2b0>)
+]
+>>>
+>>> groupedbykey.mapValues(lambda iter: list(iter)).collect()
+[
+ ('fox', [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]), 
+ ('', [1, 1]), 
+ ('of', [1, 1]), 
+ ('and', [1, 1, 1, 1]), 
+ ('red', [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]), 
+ ('jumped', [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]), 
+ ('a', [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1])
+]
+>>>
+>>> freq_by_grouping = groupedbykey.mapValues(lambda iter: sum(iter))
+>>> freq_by_grouping.collect()
+[('fox', 17), ('', 2), ('of', 2), ('and', 4), ('red', 10), ('jumped', 12), ('a', 11)]
+>>> # drop all (K, V) if len(K) is < 2
+...
+>>> filtered = freq_by_grouping.filter(lambda x: len(x[0]) >= 2)
+>>> filtered.collect()
+[('fox', 17), ('of', 2), ('and', 4), ('red', 10), ('jumped', 12)]
+>>>
+>>>
+>>> # keep (K,V) if V > 5
+...
+>>> filtered_by_value = filtered.filter(lambda x: x[1] > 5)
+>>> filtered_by_value.collect()
+[('fox', 17), ('red', 10), ('jumped', 12)]
+>>>

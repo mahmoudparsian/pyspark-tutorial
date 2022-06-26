@@ -1,0 +1,91 @@
+$ ./bin/pyspark
+Python 3.7.2 (v3.7.2:9a3ffc0492, Dec 24 2018, 02:44:43)
+[Clang 6.0 (clang-600.0.57)] on darwin
+Type "help", "copyright", "credits" or "license" for more information.
+Using Spark's default log4j profile: org/apache/spark/log4j-defaults.properties
+Setting default log level to "WARN".
+To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).
+Welcome to
+      ____              __
+     / __/__  ___ _____/ /__
+    _\ \/ _ \/ _ `/ __/  '_/
+   /__ / .__/\_,_/_/ /_/\_\   version 2.4.4
+      /_/
+
+Using Python version 3.7.2 (v3.7.2:9a3ffc0492, Dec 24 2018 02:44:43)
+SparkSession available as 'spark'.
+>>>
+>>> a =[ 1, 2, 3, 4, 5]
+>>> rdd = spark.sparkContext.parallelize(a)
+>>> rdd.collect()
+[1, 2, 3, 4, 5]
+>>> rdd.count()
+5
+>>> sumofvalues = rdd.reduce(lambda x, y: x+y)
+>>> sumofvalues
+15
+>>>
+>>> product = rdd.reduce(lambda x, y: x*y)
+>>> product
+120
+>>> z = [ "1", "2", "3", "4", "5", "6", "7"]
+>>> rdd = spark.sparkContext.parallelize(z)
+>>> rdd.collect()
+['1', '2', '3', '4', '5', '6', '7']
+>>> concat = rdd.reduce(lambda x, y: x+y)
+>>> concat
+'1234567'
+>>>
+>>> [ "1", "2", "3", "4", "5", "6", "7"]
+['1', '2', '3', '4', '5', '6', '7']
+>>> z = [ "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b"]
+>>>
+>>>
+>>> z
+['1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b']
+>>> rdd = spark.sparkContext.parallelize(z, 3)
+>>> rdd.collect()
+['1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b']
+>>> concat = rdd.reduce(lambda x, y: x+y)
+>>> concat
+'123456789ab'
+>>> rdd = spark.sparkContext.parallelize(z, 10)
+>>> concat = rdd.reduce(lambda x, y: x+y)
+>>> concat
+'123456789ab'
+
+
+>>>
+>>> nums = [1, 3, 5, 4, 2, 1, 0, 9, 10]
+>>> nums
+[1, 3, 5, 4, 2, 1, 0, 9, 10]
+>>> rdd = spark.sparkContext.parallelize(nums)
+>>> rdd.collect()
+[1, 3, 5, 4, 2, 1, 0, 9, 10]
+>>> rdd.count()
+9
+>>> sumvalues = rdd.reduce(lambda a, b: a+b)
+>>> sumvalues
+35
+
+>>> product = rdd.reduce(lambda a, b: a*b)
+>>> product
+0
+>>> nums = [1, 3, 5, 4, 2, 1, 30, 9, 10]
+>>> rdd = spark.sparkContext.parallelize(nums)
+>>> sumvalues = rdd.reduce(lambda a, b: a+b)
+>>> sumvalues
+65
+>>> product = rdd.reduce(lambda a, b: a*b)
+>>> product
+324000
+>>> rdd.collect()
+[1, 3, 5, 4, 2, 1, 30, 9, 10]
+
+>>> strs = ["1", "3", "5", "4", "2", "1"]
+>>> strs
+['1', '3', '5', '4', '2', '1']
+>>> rdd = spark.sparkContext.parallelize(strs)
+>>> concat = rdd.reduce(lambda a, b: a+b)
+>>> concat
+'135421'

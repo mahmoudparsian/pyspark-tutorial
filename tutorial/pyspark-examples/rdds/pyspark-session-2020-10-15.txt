@@ -1,0 +1,221 @@
+$ cat /Users/mparsian/salaries.txt 
+alex,sales,20000
+bob,business,30000
+alex,sales2,25000
+bob,business2,35000
+alex,sales,26000
+bob,business,36000
+alex,sales4,21000
+bob,business,31000
+alex,sales,24000
+bob,business,34000
+alex,sales6,12000
+
+ 
+$ ~/spark-3.0.0/bin/pyspark
+Python 3.7.2 (v3.7.2:9a3ffc0492, Dec 24 2018, 02:44:43) 
+[Clang 6.0 (clang-600.0.57)] on darwin
+Type "help", "copyright", "credits" or "license" for more information.
+Using Spark's default log4j profile: org/apache/spark/log4j-defaults.properties
+Setting default log level to "WARN".
+To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).
+Welcome to
+      ____              __
+     / __/__  ___ _____/ /__
+    _\ \/ _ \/ _ `/ __/  '_/
+   /__ / .__/\_,_/_/ /_/\_\   version 3.0.0
+      /_/
+
+Using Python version 3.7.2 (v3.7.2:9a3ffc0492, Dec 24 2018 02:44:43)
+SparkSession available as 'spark'.
+>>> 
+>>> 
+>>> # Transformations: map(), flatMap(), mapPartitions(), 
+... # Reductions: reduce(), reduceByKey(), groupByKey()
+... 
+>>> 
+>>> nums = [1, 2, 3, 44, 55, 66, 77, 88, 4, 3, 5, 7, 7, 7, 9]
+>>> rdd = spark.sparkContext.parallelize(nums)
+>>> 
+>>> 
+>>> rdd.collect()
+[1, 2, 3, 44, 55, 66, 77, 88, 4, 3, 5, 7, 7, 7, 9]                              
+>>> rdd.count()
+15                                                                              
+>>> number_of_partitions= rdd.getNumPartitions()
+>>> number_of_partitions
+8
+>>> 
+>>> 
+>>> 
+
+>>> 
+>>> def debug(iterator):
+...    elements = []
+...    for x in iterator:
+...       elements.append(x)
+...    print("elements="+ str(elements))
+... 
+>>> 
+>>> rdd.foreachPartition(debug)
+elements=[44, 55]
+elements=[7, 9]
+elements=[3, 5]
+elements=[7, 7]
+elements=[1]
+elements=[2, 3]
+elements=[88, 4]
+elements=[66, 77]
+>>> rdd = spark.sparkContext.parallelize(nums)
+>>> number_of_partitions= rdd.getNumPartitions()
+>>> number_of_partitions
+8
+>>> 
+>>> rdd2 = spark.sparkContext.parallelize(nums, 3)
+>>> number_of_partitions2 = rdd2.getNumPartitions()
+>>> number_of_partitions2
+3
+>>> rdd2.foreachPartition(debug)
+elements=[1, 2, 3, 44, 55]
+elements=[66, 77, 88, 4, 3]
+elements=[5, 7, 7, 7, 9]
+>>> 
+>>> rdd4 = spark.sparkContext.parallelize(nums, 4)
+>>> number_of_partitions4 = rdd4.getNumPartitions()
+>>> number_of_partitions4
+4
+>>> rdd4.foreachPartition(debug)
+elements=[1, 2, 3]
+elements=[3, 5, 7, 7, 7, 9]
+elements=[77, 88, 4]
+elements=[44, 55, 66]
+>>> 
+>>> 
+>>> rdd.foreachPartition(lambda iterator : debug(iterator))
+elements=[44, 55]
+elements=[7, 9]
+elements=[88, 4]
+elements=[7, 7]
+elements=[2, 3]
+elements=[66, 77]
+elements=[3, 5]
+elements=[1]
+>>> 
+>>> 
+>>> rdd.collect()
+[1, 2, 3, 44, 55, 66, 77, 88, 4, 3, 5, 7, 7, 7, 9]
+>>> def myfun(x):
+...   return (x, x+5)
+... 
+>>> 
+>>> myfunc(8)
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+NameError: name 'myfunc' is not defined
+>>> myfun(8)
+(8, 13)
+>>> 
+>>> 
+>>> myfun(90)
+(90, 95)
+>>> rdd2 = rdd.map(lambda x: myfun(x))
+>>> rdd2.collect()
+[(1, 6), (2, 7), (3, 8), (44, 49), (55, 60), (66, 71), (77, 82), (88, 93), (4, 9), (3, 8), (5, 10), (7, 12), (7, 12), (7, 12), (9, 14)]
+>>> 
+>>> 
+>>> rdd3 = rdd.map(myfun)
+>>> rdd3.collect()
+[(1, 6), (2, 7), (3, 8), (44, 49), (55, 60), (66, 71), (77, 82), (88, 93), (4, 9), (3, 8), (5, 10), (7, 12), (7, 12), (7, 12), (9, 14)]
+>>> 
+>>> 
+>>> 
+>>> input_path = "/Users/mparsian/salaries.txt"
+>>> input_path
+'/Users/mparsian/salaries.txt'
+>>> 
+>>> 
+>>> # create recs :RDD[String]
+... 
+>>> recs = spark.sparkContext.textFile(input_path)
+>>> recs
+/Users/mparsian/salaries.txt MapPartitionsRDD[13] at textFile at NativeMethodAccessorImpl.java:0
+>>> recs.collect()
+['alex,sales,20000', 'bob,business,30000', 'alex,sales2,25000', 'bob,business2,35000', 'alex,sales,26000', 'bob,business,36000', 'alex,sales4,21000', 'bob,business,31000', 'alex,sales,24000', 'bob,business,34000', 'alex,sales6,12000']
+>>> 
+>>> 
+>>> def create_name_salary_pair(rec):
+...    tokens = rec.split(",")
+...    name = tokens[0]
+...    salary = tokens[2]
+...    return (name, salary)
+... 
+>>> 
+>>> create_name_salary_pair('bob,business,34000')
+('bob', '34000')
+>>> create_name_salary_pair('alex,sales,20000')
+('alex', '20000')
+>>> 
+>>> 
+
+>>> pairs = recs.map(lambda x: create_name_salary_pair(x))
+>>> pairs.collect()
+[('alex', '20000'), ('bob', '30000'), ('alex', '25000'), ('bob', '35000'), ('alex', '26000'), ('bob', '36000'), ('alex', '21000'), ('bob', '31000'), ('alex', '24000'), ('bob', '34000'), ('alex', '12000')]
+>>> # ('alex', (6, sum, avg), ...
+... 
+>>> 
+>>> grouped = pairs.groupByKey()
+>>> 
+>>> grouped.mapValues(lambda salaries: list(salaries)).collect()
+[('alex', ['20000', '25000', '26000', '21000', '24000', '12000']), ('bob', ['30000', '35000', '36000', '31000', '34000'])]
+>>> 
+>>> def create_name_salary_pair(rec):
+...    tokens = rec.split(",")
+...    name = tokens[0]
+...    salary = tokens[2]
+...    return (name, int(salary))
+... 
+>>> 
+>>> pairs = recs.map(lambda x: create_name_salary_pair(x))
+>>> pairs.collect()
+[('alex', 20000), ('bob', 30000), ('alex', 25000), ('bob', 35000), ('alex', 26000), ('bob', 36000), ('alex', 21000), ('bob', 31000), ('alex', 24000), ('bob', 34000), ('alex', 12000)]
+
+>>> grouped = pairs.groupByKey()
+>>> grouped.collect()
+[('alex', <pyspark.resultiterable.ResultIterable object at 0x7ffc961fb3c8>), ('bob', <pyspark.resultiterable.ResultIterable object at 0x7ffc961fb400>)]
+>>> grouped.mapValues(lambda salaries: list(salaries)).collect()
+[('alex', [20000, 25000, 26000, 21000, 24000, 12000]), ('bob', [30000, 35000, 36000, 31000, 34000])]
+>>> 
+>>> final_rdd = grouped.mapValues(lambda salaries: (len(salaries), sum(salaries), sum(salaries)/len(salaries)))
+>>> final_rdd.collect()
+[('alex', (6, 128000, 21333.333333333332)), ('bob', (5, 166000, 33200.0))]
+>>> 
+>>> 
+>>> final_rdd2 = grouped.map(lambda x: (x[0], (len(x[1]), sum(x[1]), sum(x[1])/len(x[1]))))
+>>> final_rdd2.collect()
+[('alex', (6, 128000, 21333.333333333332)), ('bob', (5, 166000, 33200.0))]
+>>> 
+>>> recs.collect()
+['alex,sales,20000', 'bob,business,30000', 'alex,sales2,25000', 'bob,business2,35000', 'alex,sales,26000', 'bob,business,36000', 'alex,sales4,21000', 'bob,business,31000', 'alex,sales,24000', 'bob,business,34000', 'alex,sales6,12000']
+>>> pairs = recs.map(lambda x: create_name_salary_pair(x))
+>>> pairs.collect()
+[('alex', 20000), ('bob', 30000), ('alex', 25000), ('bob', 35000), ('alex', 26000), ('bob', 36000), ('alex', 21000), ('bob', 31000), ('alex', 24000), ('bob', 34000), ('alex', 12000)]
+>>> 
+>>> tuples2 = pairs.mapValues(lambda s : (s, 1))
+>>> tuples2.collect()
+[('alex', (20000, 1)), ('bob', (30000, 1)), ('alex', (25000, 1)), ('bob', (35000, 1)), ('alex', (26000, 1)), ('bob', (36000, 1)), ('alex', (21000, 1)), ('bob', (31000, 1)), ('alex', (24000, 1)), ('bob', (34000, 1)), ('alex', (12000, 1))]
+>>> 
+>>> 
+>>> reduced = tuples2.reduceByKey(lambda a, b: (a[0]+b[0], a[1]+b[1]))
+>>> reduced.collect()
+[('alex', (128000, 6)), ('bob', (166000, 5))]
+>>> 
+>>> final_answer_by_reducebykey = reduced.mapValues(lambda v : (v[1], v[0], v[0]/v[1]))
+>>> final_answer_by_reducebykey.collect()
+[('alex', (6, 128000, 21333.333333333332)), ('bob', (5, 166000, 33200.0))]
+>>> 
+>>> 
+>>> # find (avg, median) per key
+... # 1. by using groupByKey()
+... # 2. by using reduceByKey()
+... 
+>>> 

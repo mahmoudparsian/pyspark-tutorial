@@ -1,0 +1,146 @@
+
+mparsian@Mahmouds-MacBook ~/spark-2.4.0 $ cat > fox.txt
+a fox jumped
+a red fox jumped and jumped
+a blue and red fox jumped
+fox is blue red
+
+$ cat fox.txt
+a fox jumped
+a red fox jumped and jumped
+a blue and red fox jumped
+fox is blue red
+
+~/spark-2.4.0 $ ./bin/pyspark
+Python 3.7.2 (v3.7.2:9a3ffc0492, Dec 24 2018, 02:44:43)
+[Clang 6.0 (clang-600.0.57)] on darwin
+Type "help", "copyright", "credits" or "license" for more information.
+2019-04-18 18:02:14 WARN  NativeCodeLoader:62 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+Setting default log level to "WARN".
+To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).
+Welcome to
+      ____              __
+     / __/__  ___ _____/ /__
+    _\ \/ _ \/ _ `/ __/  '_/
+   /__ / .__/\_,_/_/ /_/\_\   version 2.4.0
+      /_/
+
+Using Python version 3.7.2 (v3.7.2:9a3ffc0492, Dec 24 2018 02:44:43)
+SparkSession available as 'spark'.
+>>> spark
+<pyspark.sql.session.SparkSession object at 0x10225b8d0>
+
+>>> records = spark.sparkContext.textFile("/Users/mparsian/spark-2.4.0/fox.txt")
+>>> records.collect()
+[
+ 'a fox jumped', 
+ 'a red fox jumped and jumped', 
+ 'a blue and red fox jumped', 
+ 'fox is blue red'
+]
+>>> records.count()
+4
+>>>
+>>> def tokenize(record):
+...     tokens = record.split(" ")
+...     return tokens
+...
+>>>
+>>> x = "a fox jumped"
+>>> x
+'a fox jumped'
+>>> tokens = tokenize(x)
+>>> tokens
+['a', 'fox', 'jumped']
+>>>
+>>>
+>>> words =  records.flatMap(tokenize)
+>>> words.collect()
+['a', 'fox', 'jumped', 'a', 'red', 'fox', 'jumped', 'and', 'jumped', 'a', 'blue', 'and', 'red', 'fox', 'jumped', 'fox', 'is', 'blue', 'red']
+>>> words.count()
+19
+>>> pairs = words.map(lambda x : (x,1))
+>>> pairs.collect()
+[('a', 1), ('fox', 1), ('jumped', 1), ('a', 1), ('red', 1), ('fox', 1), ('jumped', 1), ('and', 1), ('jumped', 1), ('a', 1), ('blue', 1), ('and', 1), ('red', 1), ('fox', 1), ('jumped', 1), ('fox', 1), ('is', 1), ('blue', 1), ('red', 1)]
+>>> pairs.count()
+19
+>>>
+>>> frequencies = pairs.reduceByKey(lambda a, b: a+b)
+>>> frequencies.collect()
+[('is', 1), ('a', 3), ('fox', 4), ('jumped', 4), ('red', 3), ('and', 2), ('blue', 2)]
+>>>
+>>>
+>>> filtered = frequencies.filter(lambda x : x[1] > 2)
+>>> filtered.collect()
+[('a', 3), ('fox', 4), ('jumped', 4), ('red', 3)]
+>>> filtered.count()
+4
+>>> a = ("dada", 5)
+>>> a[0]
+'dada'
+>>> a[1]
+5
+>>>
+>>>
+>>> test =  records.map(tokenize)
+>>> test.collect()
+[['a', 'fox', 'jumped'], ['a', 'red', 'fox', 'jumped', 'and', 'jumped'], ['a', 'blue', 'and', 'red', 'fox', 'jumped'], ['fox', 'is', 'blue', 'red']]
+>>> test.count()
+4
+>>>
+>>>
+>>> pairs.collect()
+[('a', 1), ('fox', 1), ('jumped', 1), ('a', 1), ('red', 1), ('fox', 1), ('jumped', 1), ('and', 1), ('jumped', 1), ('a', 1), ('blue', 1), ('and', 1), ('red', 1), ('fox', 1), ('jumped', 1), ('fox', 1), ('is', 1), ('blue', 1), ('red', 1)]
+>>>
+>>> grouped = pairs.groupByKey()
+
+>>> grouped.collect()
+[
+ ('is', <pyspark.resultiterable.ResultIterable object at 0x102268da0>),
+ ('a', <pyspark.resultiterable.ResultIterable object at 0x1022c1a90>), 
+ ('fox', <pyspark.resultiterable.ResultIterable object at 0x1022c1a58>),
+ ('jumped', <pyspark.resultiterable.ResultIterable object at 0x1022c1be0>), 
+ ('red', <pyspark.resultiterable.ResultIterable object at 0x1022c1b00>), 
+ ('and', <pyspark.resultiterable.ResultIterable object at 0x1022c1dd8>), 
+ ('blue', <pyspark.resultiterable.ResultIterable object at 0x1022c1d30>)
+]
+>>>
+>>> grouped = pairs.groupByKey().mapValues(lambda it: list(it))
+>>> grouped.collect()
+[
+('is', [1]), 
+('a', [1, 1, 1]), 
+('fox', [1, 1, 1, 1]), 
+('jumped', [1, 1, 1, 1]), 
+('red', [1, 1, 1]), 
+('and', [1, 1]), 
+('blue', [1, 1])
+]
+>>> grouped = pairs.groupByKey()
+>>> grouped.collect()
+[('is', <pyspark.resultiterable.ResultIterable object at 0x1022d2400>), ('a', <pyspark.resultiterable.ResultIterable object at 0x1022d2470>), ('fox', <pyspark.resultiterable.ResultIterable object at 0x1022d2438>), ('jumped', <pyspark.resultiterable.ResultIterable object at 0x1022d25c0>), ('red', <pyspark.resultiterable.ResultIterable object at 0x1022d24e0>), ('and', <pyspark.resultiterable.ResultIterable object at 0x1022d26d8>), ('blue', <pyspark.resultiterable.ResultIterable object at 0x1022d2748>)]
+>>> freq2 = grouped.mapValues(lambda it: sum(it))
+>>> freq2.collect()
+[
+ ('is', 1), 
+ ('a', 3), 
+ ('fox', 4), 
+ ('jumped', 4), 
+ ('red', 3), 
+ ('and', 2), 
+ ('blue', 2)
+]
+>>> freq2.count()
+7
+>>> frequencies = records.flatMap(tokenize).map(lambda x: (x,1)).reduceByKey(lambda a, b: a+b)
+>>> frequencies.collect()
+[
+ ('is', 1), 
+ ('a', 3), 
+ ('fox', 4), 
+ ('jumped', 4), 
+ ('red', 3), 
+ ('and', 2), 
+ ('blue', 2)
+]
+>>>

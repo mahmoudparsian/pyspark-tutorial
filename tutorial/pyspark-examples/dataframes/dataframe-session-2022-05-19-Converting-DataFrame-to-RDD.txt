@@ -1,0 +1,100 @@
+This demo shows how to convert 
+1. a DataFrame to an RDD
+2. an RDD to a DataFrame
+
+
+~  % /Users/mparsian/spark-3.2.1/bin/pyspark
+Python 3.8.9 (default, Jul 19 2021, 09:37:32)
+Welcome to Spark version 3.2.1
+
+Spark context Web UI available at http://10.0.0.234:4041
+Spark context available as 'sc' (master = local[*], app id = local-1653016254174).
+SparkSession available as 'spark'.
+>>> data = [('alex', 'sales', 23000), ('jane', 'HR', 29000), ('bob', 'sales', 43000),('mary', 'HR', 93000)]
+>>> data
+[('alex', 'sales', 23000), ('jane', 'HR', 29000), ('bob', 'sales', 43000), ('mary', 'HR', 93000)]
+>>> df = spark.createDataFrame(data, ['name', 'dept', 'salary'])
+>>> df.show()
++----+-----+------+
+|name| dept|salary|
++----+-----+------+
+|alex|sales| 23000|
+|jane|   HR| 29000|
+| bob|sales| 43000|
+|mary|   HR| 93000|
++----+-----+------+
+
+>>> df.printSchema()
+root
+ |-- name: string (nullable = true)
+ |-- dept: string (nullable = true)
+ |-- salary: long (nullable = true)
+
+>>> rdd5 = df.rdd
+>>> rdd5.collect()
+[
+ Row(name='alex', dept='sales', salary=23000), 
+ Row(name='jane', dept='HR', salary=29000), 
+ Row(name='bob', dept='sales', salary=43000), 
+ Row(name='mary', dept='HR', salary=93000)
+]
+>>>
+>>> df2 = rdd5.toDF()
+>>> df2.show()
++----+-----+------+
+|name| dept|salary|
++----+-----+------+
+|alex|sales| 23000|
+|jane|   HR| 29000|
+| bob|sales| 43000|
+|mary|   HR| 93000|
++----+-----+------+
+
+>>> from pyspark.sql import Row
+>>> # NOTE: to convert an RDD into a DataFrame,  
+>>> # each Row() must have the same column names:
+>>> rows = 
+[
+ Row(name='alex', dept='sales', salary=23000), 
+ Row(name='jane', dept='HR', salary=29000, address='123 main street')
+]
+>>> rdd = sc.parallelize(rows)
+>>> rdd.collect()
+[Row(name='alex', dept='sales', salary=23000), Row(name='jane', dept='HR', salary=29000, address='123 main street')]
+>>> df44 = rdd.toDF()
+>>> df44.show()
+22/05/19 20:21:51 ERROR Executor: Exception in task 10.0 in stage 15.0 (TID 100)
+java.lang.IllegalStateException: Input row doesn't have expected number of values required by the schema. 3 fields are required while 4 values are provided.
+...
+>>> # create Row()'s which have the same columns
+>>> rows = 
+[
+ Row(name='alex', dept='sales', salary=23000, address=None), 
+ Row(name='jane', dept='HR', salary=29000, address='123 main street')
+]
+>>> rdd = sc.parallelize(rows)
+>>> df44 = rdd.toDF()
+>>> df44.show()
++----+-----+------+---------------+
+|name| dept|salary|        address|
++----+-----+------+---------------+
+|alex|sales| 23000|           null|
+|jane|   HR| 29000|123 main street|
++----+-----+------+---------------+
+
+>>>
+>>> some_data = [('alex', 10), ('jane', 20)]
+>>> rdd3 = sc.parallelize(some_data)
+>>> rdd3.collect()
+[('alex', 10), ('jane', 20)]
+>>> rdd3_with_rows = rdd3.map(lambda x: Row(name=x[0], age=x[1]))
+>>> rdd3_with_rows.collect()
+[Row(name='alex', age=10), Row(name='jane', age=20)]
+>>> df3 = rdd3_with_rows.toDF()
+>>> df3.show()
++----+---+
+|name|age|
++----+---+
+|alex| 10|
+|jane| 20|
++----+---+

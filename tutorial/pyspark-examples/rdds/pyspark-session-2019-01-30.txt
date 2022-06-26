@@ -1,0 +1,92 @@
+$ ./bin/pyspark
+Python 3.7.2 (v3.7.2:9a3ffc0492, Dec 24 2018, 02:44:43)
+[Clang 6.0 (clang-600.0.57)] on darwin
+Setting default log level to "WARN".
+To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).
+Welcome to
+      ____              __
+     / __/__  ___ _____/ /__
+    _\ \/ _ \/ _ `/ __/  '_/
+   /__ / .__/\_,_/_/ /_/\_\   version 2.4.0
+      /_/
+
+Using Python version 3.7.2 (v3.7.2:9a3ffc0492, Dec 24 2018 02:44:43)
+SparkSession available as 'spark'.
+>>>
+>>> spark
+<pyspark.sql.session.SparkSession object at 0x1164b7828>
+>>>
+>>>
+>>> pairs = [("alex", 100, 1), ("jane", 200, 3), ("ted", 300, 3)]
+>>> pairs
+[('alex', 100, 1), ('jane', 200, 3), ('ted', 300, 3)]
+>>>
+>>> rdd = spark.sparkContext.parallelize(pairs)
+>>> rdd.collect()
+[('alex', 100, 1), ('jane', 200, 3), ('ted', 300, 3)]
+>>> rdd.count()
+3
+>>> def find_average(record):
+...     return record[1]/record[2]
+...
+>>>
+>>> x = ('jane', 200, 3)
+>>> y = find_average(x)
+>>> y
+66.66666666666667
+>>> x = ('ted', 300, 3)
+>>> y = find_average(x)
+>>> y
+100.0
+>>> rdd.collect()
+[('alex', 100, 1), ('jane', 200, 3), ('ted', 300, 3)]
+>>> rdd2 = rdd.map(find_average)
+>>> rdd2.collect()
+[100.0, 66.66666666666667, 100.0]
+>>> def find_average(record):
+...     return (record[0], record[1]/record[2])
+...
+>>>
+>>> x = ('jane', 200, 3)
+>>> y = find_average(x)
+>>> y
+('jane', 66.66666666666667)
+>>> rdd2 = rdd.map(find_average)
+>>> rdd2.collect()
+[('alex', 100.0), ('jane', 66.66666666666667), ('ted', 100.0)]
+>>> def find_average22(record):
+...     return [(record[0], record[1]/record[2])]
+...
+>>> x = ('ted', 300, 3)
+>>> y = find_average22(x)
+>>> y
+[('ted', 100.0)]
+>>>
+>>>
+>>> rdd3 = rdd.flatMap(find_average22)
+>>> rdd3.collect()
+[('alex', 100.0), ('jane', 66.66666666666667), ('ted', 100.0)]
+>>>
+>>>
+>>>
+>>> numbers = [1, 2, 3, 4, 5, 6]
+>>> rdd4 = spark.sparkContext.parallelize(numbers)
+>>> rdd4.count()
+6
+>>> rdd.collect()
+[('alex', 100, 1), ('jane', 200, 3), ('ted', 300, 3)]
+>>> rdd4.collect()
+[1, 2, 3, 4, 5, 6]
+>>>
+>>>
+>>> mysum = rdd4.reduce(lambda x, y: x+7)
+>>> mysum
+36
+>>> rdd5 = rdd4.map(lambda x : x +7)
+>>> rdd5.collect()
+[8, 9, 10, 11, 12, 13]
+>>> rdd5
+PythonRDD[8] at collect at <stdin>:1
+>>> rdd4
+ParallelCollectionRDD[5] at parallelize at PythonRDD.scala:195
+>>>

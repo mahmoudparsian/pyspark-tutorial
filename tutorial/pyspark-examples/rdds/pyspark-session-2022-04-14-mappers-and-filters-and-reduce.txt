@@ -1,0 +1,57 @@
+# spark : SparkSession
+
+# create a Python collection
+numbers = [1, 2, 3, 4, 5, -1, -2, -3, 10, 12, 30]
+
+# create an RDD[Integer] from a Python collection
+rdd = spark.sparkContext.parallelize(numbers)
+
+# get all elements (used for debugging -- do not use this for large RDDs)
+rdd.collect()
+[1, 2, 3, 4, 5, -1, -2, -3, 10, 12, 30]
+
+# count the number of elements
+rdd.count()
+11
+
+# apply a map() transformation to rdd and create a new RDD as rdd2
+rdd2 = rdd.map(lambda x : 3 *x)
+rdd2.collect()
+[3, 6, 9, 12, 15, -3, -6, -9, 30, 36, 90]
+
+# create a new RDD (as rdd3) from rdd2
+rdd3 = rdd2.map(lambda x: (x, 2*x))
+rdd3.collect()
+[
+(3, 6),
+ (6, 12),
+ (9, 18),
+ (12, 24),
+ (15, 30),
+ (-3, -6),
+ (-6, -12),
+ (-9, -18),
+ (30, 60),
+ (36, 72),
+ (90, 180)
+]
+
+# find all positive numbers from a given RDD (as rdd)
+# filter() is a transformation
+positives = rdd.filter(lambda x : x > 0)
+positives.collect()
+[1, 2, 3, 4, 5, 10, 12, 30]
+
+# find all negative numbers from a given RDD (as rdd)
+# filter() is a transformation
+negatives = rdd.filter(lambda x : x < 0)
+negatives.collect()
+[-1, -2, -3]
+
+# find the sum of all numbers for a given RDD[Integer]
+# reduce() is an action: it creates a NON-RDD
+# reduce() is  NOT a Transformation): it does NOT create an RDD
+total = rdd.reduce(lambda x, y: x+y)
+
+
+ 

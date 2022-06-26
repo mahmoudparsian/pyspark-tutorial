@@ -1,0 +1,135 @@
+mapPartitions() Explained.
+
+
+./bin/pyspark 
+Python 3.7.2 (v3.7.2:9a3ffc0492, Dec 24 2018, 02:44:43) 
+[Clang 6.0 (clang-600.0.57)] on darwin
+Type "help", "copyright", "credits" or "license" for more information.
+20/10/19 20:19:38 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+Using Spark's default log4j profile: org/apache/spark/log4j-defaults.properties
+Setting default log level to "WARN".
+To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).
+Welcome to
+      ____              __
+     / __/__  ___ _____/ /__
+    _\ \/ _ \/ _ `/ __/  '_/
+   /__ / .__/\_,_/_/ /_/\_\   version 3.0.0
+      /_/
+
+Using Python version 3.7.2 (v3.7.2:9a3ffc0492, Dec 24 2018 02:44:43)
+SparkSession available as 'spark'.
+>>> input_path = '/Users/mparsian/numbers'
+>>> rdd = spark.sparkContext.textFile(input_path)
+>>> 
+>>> rdd.collect()
+['3', '5', '55', '44', '9', '3', '66', '77', '88', '34', '23', '11', '14', '4', '3', '8', '9', '78', '79', '60', '56', '45']
+>>> num_of_partitions = rdd.numPartitions()
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+AttributeError: 'RDD' object has no attribute 'numPartitions'
+>>> num_of_partitions = rdd.getNumPartitions()
+>>> 
+>>> num_of_partitions
+2
+>>> rdd = spark.sparkContext.textFile(input_path, 4)
+>>> num_of_partitions = rdd.getNumPartitions()
+>>> num_of_partitions
+5
+>>> rdd = spark.sparkContext.textFile(input_path, 4)
+>>> num_of_partitions = rdd.getNumPartitions()
+>>> num_of_partitions
+5
+>>> def debug(iterator):
+...   elements = []
+...   for x in iterator:
+...     elements.append(x)
+...   print("elements="+ str(elements))
+... 
+>>> 
+>>> rdd.foreachPartition(debug)
+elements=['78', '79', '60', '56', '45']
+elements=[]
+elements=['11', '14', '4', '3', '8', '9']
+elements=['3', '5', '55', '44', '9', '3', '66']
+elements=['77', '88', '34', '23']
+>>> 
+>>> 
+>>> rdd = spark.sparkContext.textFile(input_path)
+>>> rdd.colect()
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+AttributeError: 'RDD' object has no attribute 'colect'
+>>> rdd.collect()
+['3', '5', '55', '44', '9', '3', '66', '77', '88', '34', '23', '11', '14', '4', '3', '8', '9', '78', '79', '60', '56', '45']
+>>> num_of_partitions = rdd.getNumPartitions()
+>>> num_of_partitions
+2
+>>> rdd.foreachPartition(debug)
+elements=['14', '4', '3', '8', '9', '78', '79', '60', '56', '45']
+elements=['3', '5', '55', '44', '9', '3', '66', '77', '88', '34', '23', '11']
+>>> 
+>>> 
+>>> 
+>>> def find_min_max(partition):
+...   first_time = False
+...   for n in partition:
+...     if first_time == False:
+...       min2 = n 
+...       max2 = n
+...       first_time == True
+...     else:
+...       min2 = min(n, min2) 
+...       max2 = max(n, max2)
+...   return [(min2, max2)]
+... 
+>>> 
+>>> target = rdd.mapPartitions(find_min_max)
+>>> target.collect()
+[('11', '11'), ('45', '45')]
+>>> 
+>>> rdd_integer = rdd.map(lambda n : int(n))
+>>> rdd_integer.collect()
+[3, 5, 55, 44, 9, 3, 66, 77, 88, 34, 23, 11, 14, 4, 3, 8, 9, 78, 79, 60, 56, 45]
+>>> target = rdd.mapPartitions(find_min_max)
+>>> target.collect()
+[('11', '11'), ('45', '45')]
+>>> 
+>>> 
+>>> target = rdd_integer.mapPartitions(find_min_max)
+>>> target.collect()
+[(11, 11), (45, 45)]
+>>> 
+>>> 
+>>> def find_min_max(partition):
+...   first_time = False
+...   for n in partition:
+...     if first_time == False:
+...       min2 = n 
+...       max2 = n
+...       first_time = True
+...     else:
+...       min2 = min(n, min2) 
+...       max2 = max(n, max2)
+...   return [(min2, max2)]
+...   
+... 
+>>> def debug(iterator):
+...   elements = []
+...   for x in iterator:
+...     elements.append(x)
+...   print("elements="+ str(elements))
+... 
+>>> 
+>>> target = rdd_integer.mapPartitions(find_min_max)
+
+>>> target.collect()
+[(3, 88), (3, 79)]
+>>> rdd_integer.foreachPartition(debug)
+elements=[14, 4, 3, 8, 9, 78, 79, 60, 56, 45]
+elements=[3, 5, 55, 44, 9, 3, 66, 77, 88, 34, 23, 11]
+>>> target
+PythonRDD[14] at collect at <stdin>:1
+>>> final_min_max = target.reduce(lambda x, y: (min(x[0], y[0]), max(x[1], y[1])))
+>>> final_min_max
+(3, 88)
+>>> 

@@ -1,0 +1,124 @@
+mparsian@mahmoudsmacbook ~/spark-2.2.1 $ source zbin/zenv_setup.sh
+mparsian@mahmoudsmacbook ~/spark-2.2.1 $ ./bin/pyspark
+Python 2.7.10 (default, Feb  7 2017, 00:08:15)
+[GCC 4.2.1 Compatible Apple LLVM 8.0.0 (clang-800.0.34)] on darwin
+Type "help", "copyright", "credits" or "license" for more information.
+Using Spark's default log4j profile: org/apache/spark/log4j-defaults.properties
+Setting default log level to "WARN".
+Welcome to
+      ____              __
+     / __/__  ___ _____/ /__
+    _\ \/ _ \/ _ `/ __/  '_/
+   /__ / .__/\_,_/_/ /_/\_\   version 2.2.1
+      /_/
+
+Using Python version 2.7.10 (default, Feb  7 2017 00:08:15)
+SparkSession available as 'spark'.
+>>> spark
+<pyspark.sql.session.SparkSession object at 0x10d17da50>
+>>>
+>>>
+>>>
+>>>
+>>> spark
+<pyspark.sql.session.SparkSession object at 0x10d17da50>
+>>>
+>>>
+>>> sc = spark.sparkContext
+>>>
+>>> sc
+<SparkContext master=local[*] appName=PySparkShell>
+>>>
+>>>
+>>> rdd = sc.textFile("file:///Users/mparsian/zmp/github/pyspark-tutorial/data/foxdata.txt")
+>>>
+>>>
+>>> rdd
+file:///Users/mparsian/zmp/github/pyspark-tutorial/data/foxdata.txt MapPartitionsRDD[1] at textFile at NativeMethodAccessorImpl.java:0
+>>>
+>>>
+>>> rdd.count()
+3
+>>> rdd.collect()
+[u'red fox jumped high', u'fox jumped over high fence', u'red fox jumped']
+>>> rdd.take(2)
+[u'red fox jumped high', u'fox jumped over high fence']
+>>> rdd.take(1)
+[u'red fox jumped high']
+>>> rdd.collect()
+[u'red fox jumped high', u'fox jumped over high fence', u'red fox jumped']
+>>>
+>>>
+
+>>> rdd2 = rdd.map(lambda x : (x, len(x)))
+>>> rdd2.collect()
+[(u'red fox jumped high', 19), (u'fox jumped over high fence', 26), (u'red fox jumped', 14)]
+>>> rdd2 = rdd.map(lambda x : (x, len(x), len(x)-2))
+>>>
+>>> rdd2.collect()
+[(u'red fox jumped high', 19, 17), (u'fox jumped over high fence', 26, 24), (u'red fox jumped', 14, 12)]
+>>> rdd3 = rdd.map(lambda x : (x, len(x), len(x)-2))
+>>>
+>>>
+>>> rdd3.collect()
+[(u'red fox jumped high', 19, 17), (u'fox jumped over high fence', 26, 24), (u'red fox jumped', 14, 12)]
+>>>
+>>>
+>>> rdd4 = rdd.map(lambda x : (len(x), x, x))
+>>> rdd4.collect()
+[(19, u'red fox jumped high', u'red fox jumped high'), (26, u'fox jumped over high fence', u'fox jumped over high fence'), (14, u'red fox jumped', u'red fox jumped')]
+>>>
+>>>
+>>>
+>>> rdd.collect()
+[u'red fox jumped high', u'fox jumped over high fence', u'red fox jumped']
+>>> rdd2 = rdd.flatMap(lambda x: x.split(" "))
+>>> rdd2.collect()
+[u'red', u'fox', u'jumped', u'high', u'fox', u'jumped', u'over', u'high', u'fence', u'red', u'fox', u'jumped']
+>>> rdd2.count()
+12
+>>>
+>>>
+>>> pairs = rdd2.map(lambda w : (w, 1))
+>>> pairs.count()
+12
+>>> pairs.collect()
+[(u'red', 1), (u'fox', 1), (u'jumped', 1), (u'high', 1), (u'fox', 1), (u'jumped', 1), (u'over', 1), (u'high', 1), (u'fence', 1), (u'red', 1), (u'fox', 1), (u'jumped', 1)]
+>>>
+>>>
+
+>>>
+>>> pairs.collect()
+[(u'red', 1), (u'fox', 1), (u'jumped', 1), (u'high', 1), (u'fox', 1), (u'jumped', 1), (u'over', 1), (u'high', 1), (u'fence', 1), (u'red', 1), (u'fox', 1), (u'jumped', 1)]
+>>> grouped = pairs.groupByKey()
+>>> grouped.collect()
+[(u'high', <pyspark.resultiterable.ResultIterable object at 0x10d1bb550>), (u'over', <pyspark.resultiterable.ResultIterable object at 0x10d1bb510>), (u'fox', <pyspark.resultiterable.ResultIterable object at 0x10d17d310>), (u'red', <pyspark.resultiterable.ResultIterable object at 0x10d17d250>), (u'fence', <pyspark.resultiterable.ResultIterable object at 0x10d17d350>), (u'jumped', <pyspark.resultiterable.ResultIterable object at 0x10d17d390>)]
+>>> grouped.mapValues(lambda iter : list(iter)).collect()
+[(u'high', [1, 1]), (u'over', [1]), (u'fox', [1, 1, 1]), (u'red', [1, 1]), (u'fence', [1]), (u'jumped', [1, 1, 1])]
+>>>
+>>> freq = grouped.mapValues(lambda iter: sum(iter))
+>>> freq.collect()
+[(u'high', 2), (u'over', 1), (u'fox', 3), (u'red', 2), (u'fence', 1), (u'jumped', 3)]
+>>> freq.collectAsHashMap()
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+AttributeError: 'PipelinedRDD' object has no attribute 'collectAsHashMap'
+>>> freq.collectAsHashMap
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+AttributeError: 'PipelinedRDD' object has no attribute 'collectAsHashMap'
+>>> freq.collectAsMap
+<bound method PipelinedRDD.collectAsMap of PythonRDD[19] at collect at <stdin>:1>
+>>> freq.collectAsMap()
+{u'fence': 1, u'jumped': 3, u'over': 1, u'fox': 3, u'high': 2, u'red': 2}
+>>>
+>>>
+>>>
+>>>
+>>>
+>>> pairs.collect()
+[(u'red', 1), (u'fox', 1), (u'jumped', 1), (u'high', 1), (u'fox', 1), (u'jumped', 1), (u'over', 1), (u'high', 1), (u'fence', 1), (u'red', 1), (u'fox', 1), (u'jumped', 1)]
+>>> freq = pairs.reduceByKey(lambda x, y: x+y)
+>>> freq.collectAsMap()
+{u'fence': 1, u'jumped': 3, u'over': 1, u'fox': 3, u'high': 2, u'red': 2}
+>>>

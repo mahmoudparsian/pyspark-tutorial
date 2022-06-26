@@ -1,0 +1,223 @@
+# cat  data_kv.txt
+1,alex
+2,alex
+3,david
+3,david
+4,jane
+6,jane
+
+mparsian@Mahmouds-MacBook:~/zmp/zs/spark-1.2.0/bin# ./pyspark
+Python 2.6.9 (unknown, Sep  9 2014, 15:05:12)
+[GCC 4.2.1 Compatible Apple LLVM 6.0 (clang-600.0.39)] on darwin
+
+>>> rdd1 = sc.textFile("data_kv.txt");
+>>> list1 = rdd1.collect();
+
+>>> list1
+[u'1,alex', u'2,alex', u'3,david', u'3,david', u'4,jane', u'6,jane']
+
+>>> rdd2 = rdd1.filter(lambda s: "alex" in s);
+>>> list2 = rdd2.collect();
+
+>>> list2
+[u'1,alex', u'2,alex']
+
+>>> rdd2 = rdd1.flatMap(lambda line: line.split(","))
+
+>>> list2
+[u'1', u'alex', u'2', u'alex', u'3', u'david', u'3', u'david', u'4', u'jane', u'6', u'jane']
+>>> list1 = rdd1.collect();
+
+>>> list1
+[u'1,alex', u'2,alex', u'3,david', u'3,david', u'4,jane', u'6,jane']
+
+>>>
+ rdd2 = rdd1.map(lambda x: (x.split(",")[0], x.split(",")[1]))
+>>> list2 = rdd2.collect();
+
+>>> list2
+[(u'1', u'alex'), (u'2', u'alex'), (u'3', u'david'), (u'3', u'david'), (u'4', u'jane'), (u'6', u'jane')]
+>>> rdd3 = rdd2.groupByKey();
+>>> list3 = rdd3.collect();
+
+>>> list3
+[(u'1', <pyspark.resultiterable.ResultIterable object at 0x10b44e210>), 
+ (u'3', <pyspark.resultiterable.ResultIterable object at 0x10b44e250>), 
+ (u'2', <pyspark.resultiterable.ResultIterable object at 0x10b44e290>), 
+ (u'4', <pyspark.resultiterable.ResultIterable object at 0x10b44e2d0>), 
+ (u'6', <pyspark.resultiterable.ResultIterable object at 0x10b44e310>)]
+
+>>> rdd3.saveAsTextFile("/Users/mparsian/rdd3");
+
+mparsian@Mahmouds-MacBook:~# ls -l rdd3/
+total 16
+-rw-r--r--  1 ...    0 Feb 18 12:21 _SUCCESS
+-rw-r--r--  1 ...  140 Feb 18 12:21 part-00000
+-rw-r--r--  1 ...  210 Feb 18 12:21 part-00001
+mparsian@Mahmouds-MacBook:~# cat rdd3/part*
+(u'1', <pyspark.resultiterable.ResultIterable object at 0x104ba1f10>)
+(u'3', <pyspark.resultiterable.ResultIterable object at 0x104ba1f10>)
+(u'2', <pyspark.resultiterable.ResultIterable object at 0x104ba1f10>)
+(u'4', <pyspark.resultiterable.ResultIterable object at 0x104ba1f10>)
+(u'6', <pyspark.resultiterable.ResultIterable object at 0x104ba1f10>)
+
+
+val rdd = sc.sequenceFile[String, Double](path)
+rdd = sc.parallelize([('key1', 1.0), ('key2', 2.0), ('key3', 3.0)])
+rdd.saveAsSequenceFile('/tmp/pysequencefile/')
+...
+
+sc.sequenceFile('/tmp/pysequencefile/').collect()
+[(u'key1', 1.0), (u'key2', 2.0), (u'key3', 3.0)]
+
+
+Examples:	Word	Count	
+from pyspark.context import SparkContext
+sc = SparkContext(...)
+lines = sc.textFile(sys.argv[2], 1)
+counts = lines
+words = .map(lambda x: (x, 1)) \
+        .reduceByKey(lambda x, y: x + y)
+for (word, count) in counts.collect(): print "%s : %i" % (word, count) 
+
+lines.flatMap(lambda x: x.split(' ')) \
+ .map(lambda x: (x, 1)) 
+ 
+ 
+ Example: Word Count
+from	pyspark.context	import	SparkContext
+sc	=	SparkContext(...)
+lines	=	sc.textFile(sys.argv[2],	1)
+counts	=	lines.flatMap(lambda	x:	x.split('	'))	\										
+	 	 	 	 		.map(lambda	x:	(x,	1))	\																												
+	 	 	 	 		.reduceByKey(lambda	x,	y:	x	+	y)
+for	(word,	count)	in	counts.collect(): print	"%s	:	%i"	%	(word,	count)	
+	 
+
+When possible, RDD
+transformations are pipelined:
+lines.flatMap(lambda x: x.split(' ')) \
+ .map(lambda x: (x, 1)) 
+
+
+file = spark.textFile("hdfs://...")
+errors = file.filter(lambda line: "ERROR" in line)
+# Count all the errors
+errors.count()
+# Count errors mentioning MySQL
+errors.filter(lambda line: "MySQL" in line).count()
+# Fetch the MySQL errors as an array of strings
+errors.filter(lambda line: "MySQL" in line).collect()
+
+errors.cache()
+
+Word Count
+In this example, we use a few more transformations to build 
+a dataset of (String, Int) pairs called counts and then save it to a file.
+
+file = spark.textFile("hdfs://...")
+counts = file.flatMap(lambda line: line.split(" ")) \
+             .map(lambda word: (word, 1)) \
+             .reduceByKey(lambda a, b: a + b)
+counts.saveAsTextFile("hdfs://...")
+====================================================
+
+mparsian@Mahmouds-MacBook:~/zmp/BigData-MapReduce-Course/pyspark# ~/zmp/zs/spark-1.2.0/bin/pyspark
+Python 2.6.9 (unknown, Sep  9 2014, 15:05:12)
+[GCC 4.2.1 Compatible Apple LLVM 6.0 (clang-600.0.39)] on darwin
+Type "help", "copyright", "credits" or "license" for more information.
+
+>>> sc
+<pyspark.context.SparkContext object at 0x10ff25210>
+>>> rdd1 = sc.textFile("data.txt");
+>>> list1 = rdd1.collect();
+>>> list1
+[u'crazy crazy fox jumped', u'crazy fox  jumped', u'fox is fast', u'fox is smart']
+>>> rdd1.count();
+4
+>>> rdd2 = rdd1.map(lambda x: x.split(" "))
+>>> list2 = rdd2.collect();
+>>> list2
+[[u'crazy', u'crazy', u'fox', u'jumped'], [u'crazy', u'fox', u'', u'jumped'], [u'fox', u'is', u'fast'], [u'fox', u'is', u'smart']]
+>>> ones = rdd2.map(lambda x: (x, 1))
+>>> listones = ones.collect();
+>>> listones
+[([u'crazy', u'crazy', u'fox', u'jumped'], 1), ([u'crazy', u'fox', u'', u'jumped'], 1), ([u'fox', u'is', u'fast'], 1), ([u'fox', u'is', u'smart'], 1)]
+>>> ones = rdd2.map(lambda x: (x, 1))15/02/23 10:52:20 INFO BlockManager: Removing broadcast 4
+
+>>> lines = sc.textFile("data.txt", 1)
+>>> debuglines = lines.collect();
+>>> debuglines
+[u'crazy crazy fox jumped', u'crazy fox  jumped', u'fox is fast', u'fox is smart']
+>>> words = lines.flatMap(lambda x: x.split(' '))
+>>> debugwords = words.collect();
+>>> debugwords
+[u'crazy', u'crazy', u'fox', u'jumped', u'crazy', u'fox', u'', u'jumped', u'fox', u'is', u'fast', u'fox', u'is', u'smart']
+>>> ones = words.map(lambda x: (x, 1))
+>>> debugones = ones.collect()
+>>> debugones
+[(u'crazy', 1), (u'crazy', 1), (u'fox', 1), (u'jumped', 1), (u'crazy', 1), (u'fox', 1), (u'', 1), (u'jumped', 1), (u'fox', 1), (u'is', 1), (u'fast', 1), (u'fox', 1), (u'is', 1), (u'smart', 1)]
+>>> counts = ones.reduceByKey(lambda x, y: x + y)
+>>> debugcounts = counts.collect()
+>>> debugcounts
+[(u'', 1), (u'crazy', 3), (u'jumped', 2), (u'is', 2), (u'fox', 4), (u'fast', 1), (u'smart', 1)]
+>>>
+===============================
+
+interactive session: valid and tested: Feb. 23, 2015
+
+mparsian@Mahmouds-MacBook:~/zmp/BigData-MapReduce-Course/pyspark# cat data.txt
+crazy crazy fox jumped
+crazy fox jumped
+fox is fast
+fox is smart
+dog is smart
+
+SPARK_HOME=~/zmp/zs/spark-1.2.0
+mparsian@Mahmouds-MacBook:~/zmp/BigData-MapReduce-Course/pyspark# ~/zmp/zs/spark-1.2.0/bin/pyspark
+Python 2.6.9 (unknown, Sep  9 2014, 15:05:12)
+[GCC 4.2.1 Compatible Apple LLVM 6.0 (clang-600.0.39)] on darwin
+Type "help", "copyright", "credits" or "license" for more information.
+
+Welcome to
+      ____              __
+     / __/__  ___ _____/ /__
+    _\ \/ _ \/ _ `/ __/  '_/
+   /__ / .__/\_,_/_/ /_/\_\   version 1.2.0
+      /_/
+
+Using Python version 2.6.9 (unknown, Sep  9 2014 15:05:12)
+SparkContext available as sc.
+>>> sc
+<pyspark.context.SparkContext object at 0x10ae02210>
+>>> lines = sc.textFile("data.txt", 1)
+>>> debuglines = lines.collect();
+>>> debuglines
+[u'crazy crazy fox jumped', u'crazy fox jumped', u'fox is fast', u'fox is smart', u'dog is smart']
+>>> words = lines.flatMap(lambda x: x.split(' '))
+>>> debugwords = words.collect();
+>>> debugwords
+[u'crazy', u'crazy', u'fox', u'jumped', u'crazy', u'fox', u'jumped', u'fox', u'is', u'fast', u'fox', u'is', u'smart', u'dog', u'is', u'smart']
+>>> ones = words.map(lambda x: (x, 1))
+>>> debugones = ones.collect()
+>>> debugones
+[(u'crazy', 1), (u'crazy', 1), (u'fox', 1), (u'jumped', 1), (u'crazy', 1), (u'fox', 1), (u'jumped', 1), (u'fox', 1), (u'is', 1), (u'fast', 1), (u'fox', 1), (u'is', 1), (u'smart', 1), (u'dog', 1), (u'is', 1), (u'smart', 1)]
+>>> counts = ones.reduceByKey(lambda x, y: x + y)
+>>> debugcounts = counts.collect()
+>>> debugcounts
+[(u'crazy', 3), (u'jumped', 2), (u'is', 3), (u'fox', 4), (u'dog', 1), (u'fast', 1), (u'smart', 2)]
+>>>
+
+>>> grouped = ones.groupByKey();
+>>> debuggrouped = grouped.collect();
+
+>>> counts.saveAsTextFile("output.txt")
+
+mparsian@Mahmouds-MacBook:~/zmp/BigData-MapReduce-Course/pyspark# cat output.txt/part*
+(u'crazy', 3)
+(u'jumped', 2)
+(u'is', 3)
+(u'fox', 4)
+(u'dog', 1)
+(u'fast', 1)
+(u'smart', 2)

@@ -1,0 +1,187 @@
+---- BEGIN NOTE ---- 
+You need to update the directory names accordingly
+---- END NOTE ----
+
+Spark Installation directory: 
+/home/mparsian/spark-2.4.0
+
+# create sample data files:
+$ mkdir /home/mparsian/spark-2.4.0/scu
+$ cat > /home/mparsian/spark-2.4.0/scu/file1.txt
+fox jumped
+fox jumped high
+blue fox jumped
+CTRL-D
+
+$ cat > /home/mparsian/spark-2.4.0/scu/file2.txt
+red fox jumped
+blue fox jumped
+red fox is high
+CTRL-D
+
+$ ls -l /home/mparsian/spark-2.4.0/scu/
+-rw-r--r--  1 mparsian  897801646  43 Jan 22 18:00 file1.txt
+-rw-r--r--  1 mparsian  897801646  47 Jan 22 18:00 file2.txt
+
+$ cat /home/mparsian/spark-2.4.0/scu/file1.txt
+fox jumped
+fox jumped high
+blue fox jumped
+
+$ cat /home/mparsian/spark-2.4.0/scu/file2.txt
+red fox jumped
+blue fox jumped
+red fox is high
+
+
+# Start cluster
+cd /home/mparsian/spark-2.4.0
+./sbin/start-all.sh
+
+# check Java processes:
+$ jps
+59922 Worker
+59995 Jps
+59851 Master
+
+$ ./bin/pyspark
+Python 3.7.2 (v3.7.2:9a3ffc0492, Dec 24 2018, 02:44:43)
+Welcome to
+      ____              __
+     / __/__  ___ _____/ /__
+    _\ \/ _ \/ _ `/ __/  '_/
+   /__ / .__/\_,_/_/ /_/\_\   version 2.4.0
+      /_/
+
+Using Python version 3.7.2 (v3.7.2:9a3ffc0492, Dec 24 2018 02:44:43)
+SparkSession available as 'spark'.
+>>> spark
+<pyspark.sql.session.SparkSession object at 0x1142097f0>
+>>> input_path = "/home/mparsian/spark-2.4.0/scu"
+>>> input_path
+'/home/mparsian/spark-2.4.0/scu'
+>>> rdd = spark.sparkContext.textFile(input_path)
+>>> rdd.collect()
+[
+ 'red fox jumped', 
+ 'blue fox jumped', 
+ 'red fox is high', 
+ 'fox jumped', 
+ 'fox jumped high', 
+ 'blue fox jumped'
+]
+>>> rdd.count()
+6
+>>> rdd
+/Users/mparsian/spark-2.4.0/scu MapPartitionsRDD[1] at textFile at NativeMethodAccessorImpl.java:0
+>>> rdd.take(3)
+[
+ 'red fox jumped', 
+ 'blue fox jumped', 
+ 'red fox is high'
+]
+>>> tokenized = rdd.map(lambda rec: rec.split())
+>>> tokenized.collect()
+[
+ ['red', 'fox', 'jumped'], 
+ ['blue', 'fox', 'jumped'], 
+ ['red', 'fox', 'is', 'high'], 
+ ['fox', 'jumped'], 
+ ['fox', 'jumped', 'high'], 
+ ['blue', 'fox', 'jumped']
+]
+>>> words = tokenized.flatMap(lambda x: x)
+>>> words.collect()
+['red', 'fox', 'jumped', 'blue', 'fox', 'jumped', 'red', 'fox', 'is', 'high', 'fox', 'jumped', 'fox', 'jumped', 'high', 'blue', 'fox', 'jumped']
+>>> words.count()
+18
+>>> pairs = words.map(lambda word: (word, 1))
+>>> pairs.count()
+18
+>>> pairs.collect()
+[('red', 1), ('fox', 1), ('jumped', 1), ('blue', 1), ('fox', 1), ('jumped', 1), ('red', 1), ('fox', 1), ('is', 1), ('high', 1), ('fox', 1), ('jumped', 1), ('fox', 1), ('jumped', 1), ('high', 1), ('blue', 1), ('fox', 1), ('jumped', 1)]
+>>> freq = pairs.reduceByKey(lambda x, y: x+y)
+>>> freq.collect()
+[
+ ('is', 1), 
+ ('high', 2), 
+ ('red', 2), 
+ ('fox', 6), 
+ ('jumped', 5), 
+ ('blue', 2)
+]
+>>>
+>>> freq.saveAsTextFile("/Users/mparsian/tmp/saved")
+>>>
+>>>
+>>> words.collect()
+['red', 'fox', 'jumped', 'blue', 'fox', 'jumped', 'red', 'fox', 'is', 'high', 'fox', 'jumped', 'fox', 'jumped', 'high', 'blue', 'fox', 'jumped']
+>>> pairs.collect()
+[('red', 1), ('fox', 1), ('jumped', 1), ('blue', 1), ('fox', 1), ('jumped', 1), ('red', 1), ('fox', 1), ('is', 1), ('high', 1), ('fox', 1), ('jumped', 1), ('fox', 1), ('jumped', 1), ('high', 1), ('blue', 1), ('fox', 1), ('jumped', 1)]
+>>> grouped = pairs.groupByKey()
+>>>
+>>> grouped.collect()
+[
+ ('is', <pyspark.resultiterable.ResultIterable object at 0x1140649e8>), 
+ ('high', <pyspark.resultiterable.ResultIterable object at 0x1142176d8>), 
+ ('red', <pyspark.resultiterable.ResultIterable object at 0x114217c88>), 
+ ('fox', <pyspark.resultiterable.ResultIterable object at 0x114217898>), 
+ ('jumped', <pyspark.resultiterable.ResultIterable object at 0x114217e48>), 
+ ('blue', <pyspark.resultiterable.ResultIterable object at 0x114217048>)
+]
+>>>
+>>>
+>>> grouped.mapValues(lambda v: list(v)).collect()
+[
+ ('is', [1]), 
+ ('high', [1, 1]), ('red', [1, 1]), 
+ ('fox', [1, 1, 1, 1, 1, 1]), 
+ ('jumped', [1, 1, 1, 1, 1]), 
+ ('blue', [1, 1])
+]
+>>>
+>>> freq2 = grouped.mapValues(lambda v: sum(v))
+>>> freq2.collect()
+[('is', 1), ('high', 2), ('red', 2), ('fox', 6), ('jumped', 5), ('blue', 2)]
+>>>
+>>> grouped.collect()
+[
+ ('is', <pyspark.resultiterable.ResultIterable object at 0x1142705f8>), 
+ ('high', <pyspark.resultiterable.ResultIterable object at 0x114270748>), 
+ ('red', <pyspark.resultiterable.ResultIterable object at 0x1142700f0>), 
+ ('fox', <pyspark.resultiterable.ResultIterable object at 0x114270160>), 
+ ('jumped', <pyspark.resultiterable.ResultIterable object at 0x114270c88>), 
+ ('blue', <pyspark.resultiterable.ResultIterable object at 0x1142701d0>)
+]
+>>> rdd2 = grouped.mapValues(lambda x: sum(x))
+>>> rdd2.collect()
+[('is', 1), ('high', 2), ('red', 2), ('fox', 6), ('jumped', 5), ('blue', 2)]
+
+>>> rdd2 = grouped.mapValues(lambda x: str(x)+"hello")
+>>> rdd2.collect()
+[('is', '<pyspark.resultiterable.ResultIterable object at 0x10b684898>hello'), 
+ ('high', '<pyspark.resultiterable.ResultIterable object at 0x10b684898>hello'), 
+ ('red', '<pyspark.resultiterable.ResultIterable object at 0x10b684898>hello'), 
+ ('fox', '<pyspark.resultiterable.ResultIterable object at 0x10b684898>hello'), 
+ ('jumped', '<pyspark.resultiterable.ResultIterable object at 0x10b684898>hello'), 
+ ('blue', '<pyspark.resultiterable.ResultIterable object at 0x10b684898>hello')]
+>>>
+>>> grouped.collect()
+[
+ ('is', <pyspark.resultiterable.ResultIterable object at 0x114272208>), 
+ ('high', <pyspark.resultiterable.ResultIterable object at 0x114272240>), 
+ ('red', <pyspark.resultiterable.ResultIterable object at 0x114272438>), 
+ ('fox', <pyspark.resultiterable.ResultIterable object at 0x1142724a8>), 
+ ('jumped', <pyspark.resultiterable.ResultIterable object at 0x1142725c0>), 
+ ('blue', <pyspark.resultiterable.ResultIterable object at 0x114272518>)
+]
+>>> grouped.mapValues(lambda x: str(sum(x))+"hello").collect()
+[
+ ('is', '1hello'), 
+ ('high', '2hello'), 
+ ('red', '2hello'), 
+ ('fox', '6hello'), 
+ ('jumped', '5hello'), 
+ ('blue', '2hello')
+]
+>>>

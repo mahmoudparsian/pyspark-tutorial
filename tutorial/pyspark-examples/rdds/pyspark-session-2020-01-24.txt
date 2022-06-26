@@ -1,0 +1,50 @@
+How to read a text file and convert into an RDD[String]
+
+$ cat /tmp/books.txt
+ISBN-100,sales,biology
+IS-01235,sales,econ
+ISBN-101,sales,econ
+ISBN-102,sales,biology
+ISBN-109,econ,sales
+ISBN-103,CS,sales
+ISBN-104,CS,biology
+ISBN-105,CS,econ
+ISBN-200,CS
+
+$ ./bin/pyspark
+Python 3.7.2 (v3.7.2:9a3ffc0492, Dec 24 2018, 02:44:43)
+[Clang 6.0 (clang-600.0.57)] on darwin
+Welcome to
+      ____              __
+     / __/__  ___ _____/ /__
+    _\ \/ _ \/ _ `/ __/  '_/
+   /__ / .__/\_,_/_/ /_/\_\   version 2.4.4
+      /_/
+
+Using Python version 3.7.2 (v3.7.2:9a3ffc0492, Dec 24 2018 02:44:43)
+SparkSession available as 'spark'.
+>>>
+>>>
+>>>
+>>> spark
+<pyspark.sql.session.SparkSession object at 0x11957b668>
+>>>
+>>>
+>>>
+>>> input_path = "/tmp/books.txt"
+>>>
+>>> records = spark.sparkContext.textFile(input_path)
+>>> records.collect()
+[
+ 'ISBN-100,sales,biology', 
+ 'IS-01235,sales,econ', 
+ 'ISBN-101,sales,econ', 
+ 'ISBN-102,sales,biology', 
+ 'ISBN-109,econ,sales', 
+ 'ISBN-103,CS,sales', 
+ 'ISBN-104,CS,biology', 
+ 'ISBN-105,CS,econ', 
+ 'ISBN-200,CS'
+]
+>>> records.count()
+9

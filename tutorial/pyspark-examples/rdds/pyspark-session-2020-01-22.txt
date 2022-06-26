@@ -1,0 +1,116 @@
+$ ./bin/pyspark
+Python 3.7.2 (v3.7.2:9a3ffc0492, Dec 24 2018, 02:44:43)
+[Clang 6.0 (clang-600.0.57)] on darwin
+Type "help", "copyright", "credits" or "license" for more information.
+Welcome to
+      ____              __
+     / __/__  ___ _____/ /__
+    _\ \/ _ \/ _ `/ __/  '_/
+   /__ / .__/\_,_/_/ /_/\_\   version 2.4.4
+      /_/
+
+Using Python version 3.7.2 (v3.7.2:9a3ffc0492, Dec 24 2018 02:44:43)
+SparkSession available as 'spark'.
+>>>
+>>>
+>>>
+>>> spark
+<pyspark.sql.session.SparkSession object at 0x10aa38668>
+>>>
+>>> sc = spark.sparkContext
+>>>
+>>> sc
+<SparkContext master=local[*] appName=PySparkShell>
+>>>
+>>>
+>>> numbers = [1, 2, 3, 4, 5, 6, -1, -2]
+>>> numbers
+[1, 2, 3, 4, 5, 6, -1, -2]
+>>> len(numbers)
+8
+>>> rdd = sc.parallelize(numbers)
+>>> rdd.collect()
+[1, 2, 3, 4, 5, 6, -1, -2]
+>>> rdd.count()
+8
+>>> rdd
+ParallelCollectionRDD[0] at parallelize at PythonRDD.scala:195
+>>>
+>>> rdd_pos = rdd.filter(lambda x: x > 0)
+>>> rdd_pos.collect()
+[1, 2, 3, 4, 5, 6]
+
+>>> rdd_pos.count()
+6
+>>>
+>>> rdd_pos.collect()
+[1, 2, 3, 4, 5, 6]
+>>>
+>>> sum_of_all = rdd_pos.reduce(lambda x, y: x+y)
+>>> sum_of_all
+21
+>>> rdd_pos.take(2)
+[1, 2]
+>>>
+>>>
+>>> rdd.collect()
+[1, 2, 3, 4, 5, 6, -1, -2]
+>>> rdd.count()
+8
+>>> rdd4 = rdd.map(lambda x : x+100)
+>>> rdd4.collect()
+[101, 102, 103, 104, 105, 106, 99, 98]
+>>>
+>>>
+>>>
+>>> kv = [('alex', 2), ('alex', 20), ('alex', 40), ('jane', 100), ('jane', 400)]
+>>> kv
+[('alex', 2), ('alex', 20), ('alex', 40), ('jane', 100), ('jane', 400)]
+>>> len(kv)
+5
+>>> key_value_pairs = sc.parallelize(kv)
+>>> key_value_pairs.count()
+5
+>>> key_value_pairs.collect()
+[
+ ('alex', 2), 
+ ('alex', 20), 
+ ('alex', 40), 
+ ('jane', 100), 
+ ('jane', 400)
+]
+>>>
+>>>
+>>> grouped = key_value_pairs.groupByKey()
+>>> grouped.collect()
+[
+ ('alex', <pyspark.resultiterable.ResultIterable object at 0x10aa9f5f8>), 
+ ('jane', <pyspark.resultiterable.ResultIterable object at 0x10aa9f5c0>)
+]
+>>>
+>>> grouped.map(lambda x: (x[0], list(x[1]))).collect()
+[
+ ('alex', [2, 20, 40]), 
+ ('jane', [100, 400])
+]
+>>> grouped_sum = grouped.map(lambda x: (x[0], sum(x[1])))
+>>> grouped_sum.collect()
+[
+ ('alex', 62),
+ ('jane', 500)
+]
+>>>
+>>>
+>>> grouped.collect()
+[
+ ('alex', <pyspark.resultiterable.ResultIterable object at 0x10aa9fb70>), 
+ ('jane', <pyspark.resultiterable.ResultIterable object at 0x10aa9fe48>)
+]
+>>> grouped_sum_2 = grouped.mapValues(lambda x: sum(x))
+>>> grouped_sum_2.collect()
+[
+ ('alex', 62), 
+ ('jane', 500)
+]
+>>>
+

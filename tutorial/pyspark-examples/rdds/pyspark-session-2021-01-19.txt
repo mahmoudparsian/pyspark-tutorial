@@ -1,0 +1,126 @@
+$ ./bin/pyspark
+Python 3.7.2 (v3.7.2:9a3ffc0492, Dec 24 2018, 02:44:43)
+[Clang 6.0 (clang-600.0.57)] on darwin
+Type "help", "copyright", "credits" or "license" for more information.
+21/01/19 20:03:50 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+Using Spark's default log4j profile: org/apache/spark/log4j-defaults.properties
+Setting default log level to "WARN".
+To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).
+Welcome to
+      ____              __
+     / __/__  ___ _____/ /__
+    _\ \/ _ \/ _ `/ __/  '_/
+   /__ / .__/\_,_/_/ /_/\_\   version 3.0.0
+      /_/
+
+Using Python version 3.7.2 (v3.7.2:9a3ffc0492, Dec 24 2018 02:44:43)
+SparkSession available as 'spark'.
+>>>
+>>>
+>>> tuples2 = [('alex', 4), ('alex', 5), ('bob', 40), ('bob', 50), ('bob', 4)]
+>>> tuples2
+[('alex', 4), ('alex', 5), ('bob', 40), ('bob', 50), ('bob', 4)]
+>>>
+>>>
+>>> pairs_rdd = spark.sparkContext.parallelize(tuples2)
+>>> pairs_rdd
+ParallelCollectionRDD[0] at readRDDFromFile at PythonRDD.scala:262
+
+>>> pairs_rdd.collect()
+[('alex', 4), ('alex', 5), ('bob', 40), ('bob', 50), ('bob', 4)]
+>>> pairs_rdd.count()
+5
+>>> tuples33 = [('alex', 4, 44), ('alex', 5, 55), ('bob', 40, 66)]
+>>> tuples33
+[('alex', 4, 44), ('alex', 5, 55), ('bob', 40, 66)]
+>>> rdd = spark.sparkContext.parallelize(tuples33)
+>>>
+>>> rdd.collect()
+[('alex', 4, 44), ('alex', 5, 55), ('bob', 40, 66)]
+>>> rdd.count()
+3
+>>>
+>>>
+>>>
+>>> pairs_rdd.collect()
+[('alex', 4), ('alex', 5), ('bob', 40), ('bob', 50), ('bob', 4)]
+
+>>> new_rdd = pairs_rdd.map(lambda x: (x[0], x[1], 2*int(x[1])))
+>>> new_rdd.collect()
+[('alex', 4, 8), ('alex', 5, 10), ('bob', 40, 80), ('bob', 50, 100), ('bob', 4, 8)]
+>>>
+>>> columns = ["name", "age", "salary"]
+>>> some_tuples = [('alex', 40, 80000), ('alex', 50, 1000000), ('bob', 40, 8000000), ('bob', 50, 10000)]
+>>> df = spark.createDataFrame(some_tuples, columns)
+>>> df.show()
++----+---+-------+
+|name|age| salary|
++----+---+-------+
+|alex| 40|  80000|
+|alex| 50|1000000|
+| bob| 40|8000000|
+| bob| 50|  10000|
++----+---+-------+
+
+>>> df.printSchema()
+root
+ |-- name: string (nullable = true)
+ |-- age: long (nullable = true)
+ |-- salary: long (nullable = true)
+
+>>> rdd = spark.sparkContext.parallelize(some_tuples)
+>>> rdd.collect()
+[('alex', 40, 80000), ('alex', 50, 1000000), ('bob', 40, 8000000), ('bob', 50, 10000)]
+>>> rdd.take(2)
+[('alex', 40, 80000), ('alex', 50, 1000000)]
+>>>
+
+>>>
+>>> data = ["alex,20", "alex,30", "bob,40", "bob,50", "bob,60"]
+>>> data
+['alex,20', 'alex,30', 'bob,40', 'bob,50', 'bob,60']
+>>>
+>>>
+>>> rdd = spark.sparkContext.parallelize(data)
+>>> rdd.collect()
+['alex,20', 'alex,30', 'bob,40', 'bob,50', 'bob,60']
+>>> rdd.count()
+5
+
+>>> def create_pairs(rec):
+...   tokens = rec.split(",")
+...   key = tokens[0]
+...   value = tokens[1]
+...   return (key, value)
+...
+>>>
+>>> pairs = rdd.map(lambda x: create_pairs(x))
+>>> pairs.collect()
+[('alex', '20'), ('alex', '30'), ('bob', '40'), ('bob', '50'), ('bob', '60')]
+>>> pairs.count()
+5
+>>> pairs = rdd.map(create_pairs)
+>>> pairs.collect()
+[('alex', '20'), ('alex', '30'), ('bob', '40'), ('bob', '50'), ('bob', '60')]
+>>> pairs.count()
+5
+>>>
+>>> sum_by_key = pairs.reduceByKey(lambda x, y: x+y)
+>>> sum_by_key.collect()
+[('bob', '405060'), ('alex', '2030')]
+>>>
+>>> def create_pair(rec):
+...   tokens = rec.split(",")
+...   key = tokens[0]
+...   value = int(tokens[1])
+...   return (key, value)
+...
+>>>
+
+>>> rdd2 = rdd.map(lambda x: create_pair(x))
+>>> rdd2.collect()
+[('alex', 20), ('alex', 30), ('bob', 40), ('bob', 50), ('bob', 60)]
+>>> sum_by_key = rdd2.reduceByKey(lambda x, y: x+y)
+>>> sum_by_key.collect()
+[('bob', 150), ('alex', 50)]
+>>>

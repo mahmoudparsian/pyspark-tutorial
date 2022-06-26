@@ -1,0 +1,164 @@
+$ ./bin/pyspark
+Python 3.7.2 (v3.7.2:9a3ffc0492, Dec 24 2018, 02:44:43) 
+[Clang 6.0 (clang-600.0.57)] on darwin
+Type "help", "copyright", "credits" or "license" for more information.
+Using Spark's default log4j profile: org/apache/spark/log4j-defaults.properties
+Setting default log level to "WARN".
+To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).
+Welcome to
+      ____              __
+     / __/__  ___ _____/ /__
+    _\ \/ _ \/ _ `/ __/  '_/
+   /__ / .__/\_,_/_/ /_/\_\   version 3.0.0
+      /_/
+
+Using Python version 3.7.2 (v3.7.2:9a3ffc0492, Dec 24 2018 02:44:43)
+SparkSession available as 'spark'.
+>>> spark
+<pyspark.sql.session.SparkSession object at 0x7fc7a913eba8>
+>>> 
+>>> 
+>>> 
+>>> # create RDD[(String, Integer)]
+... 
+>>> key_value_pairs = 
+[
+ ('alex', 10), 
+ ('alex', 20), 
+ ('alex', 30), 
+ ('bob', 100), 
+ ('bob', 200), 
+ ('zazo', 7)
+]
+
+>>> # create an RDD[(String, Integer)] from a python collection
+>>> key_value = spark.sparkContext.parallelize(key_value_pairs)
+>>> key_value.count()
+6                                                                               
+>>> key_value.collect()
+[
+ ('alex', 10), 
+ ('alex', 20), 
+ ('alex', 30), 
+ ('bob', 100), 
+ ('bob', 200), 
+ ('zazo', 7)
+]
+>>> 
+>>> 
+>>># use the reduceByKey() transformation 
+>>> sum_of_values_per_key = key_value.reduceByKey(lambda x, y: x+y)
+>>> 
+>>> sum_of_values_per_key.count()
+3                                                                               
+>>> sum_of_values_per_key.collect()
+[
+ ('bob', 300), 
+ ('alex', 60), 
+ ('zazo', 7)
+]
+>>> 
+>>> 
+>>> 
+>>> filtered = sum_of_values_per_key.filter(lambda x: x[1] > 10)
+>>> filtered.collect()
+[('bob', 300), ('alex', 60)]
+>>> 
+>>> 
+>>> key_value.collect()
+[
+ ('alex', 10), 
+ ('alex', 20), 
+ ('alex', 30), 
+ ('bob', 100), 
+ ('bob', 200), 
+ ('zazo', 7)
+]
+>>> 
+>>> grouped = key_value.groupByKey()
+>>> grouped.collect()
+[ 
+ ('bob', <pyspark.resultiterable.ResultIterable object at 0x7fc7a919f5c0>), 
+ ('alex', <pyspark.resultiterable.ResultIterable object at 0x7fc7a919f630>), 
+ ('zazo', <pyspark.resultiterable.ResultIterable object at 0x7fc7a919f588>)
+]
+>>> grouped.mapValues(lambda v : list(v)).collect()
+[
+ ('bob', [100, 200]), 
+ ('alex', [10, 20, 30]), 
+ ('zazo', [7])
+]
+>>> sum_of_values_per_key_2 = grouped.mapValues(lambda values: sum(values))
+>>> sum_of_values_per_key_2.collect()
+[
+ ('bob', 300), 
+ ('alex', 60), 
+ ('zazo', 7)
+]
+>>> 
+>>> 
+>>> pairs = [('a', 10), ('a', 100), ('a', 200), ('b', 10)]
+>>> rdd = spark.sparkContext.parallelize(pairs)
+>>> 
+>>> rdd.collect()
+[('a', 10), ('a', 100), ('a', 200), ('b', 10)]
+>>> rdd2 = rdd.mapValues(lambda v: v+1000)
+>>> rdd2.collect()
+[('a', 1010), ('a', 1100), ('a', 1200), ('b', 1010)]
+>>> 
+>>> rdd3 = rdd.map(lambda x: x[1]+1000)
+>>> rdd3.collect()
+[1010, 1100, 1200, 1010]
+>>> 
+>>> 
+>>> rdd3 = rdd.map(lambda x: (x[0], x[1]+1000))
+>>> rdd3.collect()
+[('a', 1010), ('a', 1100), ('a', 1200), ('b', 1010)]
+>>> 
+>>> 
+>>> data = [ ['a', 'b', 'c'], ['z'], [], [], ['alex', 'bob'] ]
+>>> rdd = spark.sparkContext.parallelize(data)
+>>> rdd.collect()
+[['a', 'b', 'c'], ['z'], [], [], ['alex', 'bob']]
+>>> rdd.count()
+5
+>>> flattened = rdd.flatMap(lambda x: x)
+>>> flattened.count()
+6
+>>> flattened.collect()
+['a', 'b', 'c', 'z', 'alex', 'bob']
+>>> mapped = rdd.map(lambda x: x)
+>>> mapped.count()
+5
+>>> mapped.collect()
+[['a', 'b', 'c'], ['z'], [], [], ['alex', 'bob']]
+>>> 
+>>> 
+>>> data = [ ['a', 'b', 'c'], ['z'], [], [], ('alex', 'bob') ]
+>>> flattened2 = rdd.flatMap(lambda x: x)
+>>> flattened2.collect()
+['a', 'b', 'c', 'z', 'alex', 'bob']
+>>> 
+>>> 
+>>> 
+>>> data2 = [ ['a', 'b', 'c'], ['z'], [], [], ('alex', 'bob') ]
+>>> data2
+[['a', 'b', 'c'], ['z'], [], [], ('alex', 'bob')]
+>>> rdd2 = spark.sparkContext.parallelize(data2)
+>>> 
+>>> 
+>>> rdd2.collect()
+[['a', 'b', 'c'], ['z'], [], [], ('alex', 'bob')]
+>>> rdd2.count()
+5
+>>> flattened2 = rdd2.flatMap(lambda x: x)
+>>> flattened2.collect()
+['a', 'b', 'c', 'z', 'alex', 'bob']
+>>> 
+>>> 
+>>> data3 = [ ['a', 'b', 'c'], ['z'], [], [], 'alex', 'bob' ]
+>>> rdd3 = spark.sparkContext.parallelize(data3)
+>>> flattened3 = rdd3.flatMap(lambda x: x)
+>>> flattened3.collect()
+['a', 'b', 'c', 'z', 'a', 'l', 'e', 'x', 'b', 'o', 'b']
+>>> 

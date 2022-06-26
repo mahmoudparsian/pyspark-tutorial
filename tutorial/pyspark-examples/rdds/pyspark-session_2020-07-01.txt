@@ -1,0 +1,130 @@
+cat /Users/mparsian/spark-3.0.0/zbin/foxdata.txt
+red fox jumped high
+fox jumped over high fence
+red fox jumped
+
+mparsian@Mahmouds-MacBook ~/spark-3.0.0 $ ./bin/pyspark
+Python 3.7.2 (v3.7.2:9a3ffc0492, Dec 24 2018, 02:44:43)
+[Clang 6.0 (clang-600.0.57)] on darwin
+Type "help", "copyright", "credits" or "license" for more information.
+20/07/01 17:51:27 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+Using Spark's default log4j profile: org/apache/spark/log4j-defaults.properties
+Setting default log level to "WARN".
+To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).
+Welcome to
+      ____              __
+     / __/__  ___ _____/ /__
+    _\ \/ _ \/ _ `/ __/  '_/
+   /__ / .__/\_,_/_/ /_/\_\   version 3.0.0
+      /_/
+
+Using Python version 3.7.2 (v3.7.2:9a3ffc0492, Dec 24 2018 02:44:43)
+SparkSession available as 'spark'.
+>>>
+>>>
+>>>
+>>>
+>>> input_path = '/Users/mparsian/spark-3.0.0/zbin/foxdata.txt'
+>>> input_path
+'/Users/mparsian/spark-3.0.0/zbin/foxdata.txt'
+>>> recs = spark.sparkContext.textFile(input_path)
+>>>
+>>>
+>>>
+>>> recs
+/Users/mparsian/spark-3.0.0/zbin/foxdata.txt MapPartitionsRDD[1] at textFile at NativeMethodAccessorImpl.java:0
+>>>
+>>>
+>>> recs.collect()
+['red fox jumped high', 'fox jumped over high fence', 'red fox jumped']
+>>> recs.count()
+3
+>>> rdd_with_len = recs.map(lambda x: (x, len(x)))
+>>> rdd_with_len.collect()
+[('red fox jumped high', 19), ('fox jumped over high fence', 26), ('red fox jumped', 14)]
+>>>
+>>>
+>>>
+>>> upper = recs.map(lambda x: x.upper())
+>>> upper.collect()
+['RED FOX JUMPED HIGH', 'FOX JUMPED OVER HIGH FENCE', 'RED FOX JUMPED']
+>>> spark
+<pyspark.sql.session.SparkSession object at 0x7fdc8d93eba8>
+>>> lower = recs.map(lambda x: x.lower())
+>>> lower.collect()
+['red fox jumped high', 'fox jumped over high fence', 'red fox jumped']
+>>>
+>>>
+>>>
+>>> lower_and_upper = lower.union(upper)
+>>> lower_and_upper.collect()
+['red fox jumped high', 'fox jumped over high fence', 'red fox jumped', 'RED FOX JUMPED HIGH', 'FOX JUMPED OVER HIGH FENCE', 'RED FOX JUMPED']
+>>> lower_and_upper.count()
+6
+>>>
+>>>
+>>>
+>>> counts = recs.map(lambda x : (len(x), 3*len(x)))
+>>> counts.collect()
+[(19, 57), (26, 78), (14, 42)]
+>>>
+>>>
+>>>
+>>> numbers = [1, 2, 3, 5, 6, 7, 8, -1, -4, 77, 99, -87, -100, 100]
+>>> numbers
+[1, 2, 3, 5, 6, 7, 8, -1, -4, 77, 99, -87, -100, 100]
+
+>>> numbers = [1, 2, 3, 5, 6, 7, 8, -1, -4, 77, 99, -87, -100, 100]
+>>>
+>>>
+>>>
+>>> numbers
+[1, 2, 3, 5, 6, 7, 8, -1, -4, 77, 99, -87, -100, 100]
+>>> rdd = spark.sparkContext.parallelize(numbers)
+>>> rdd.collect()
+[1, 2, 3, 5, 6, 7, 8, -1, -4, 77, 99, -87, -100, 100]
+>>> rdd.count()
+14
+>>> pos = rdd.filter(lambda x: x > 0)
+>>> pos.collect()
+[1, 2, 3, 5, 6, 7, 8, 77, 99, 100]
+
+>>>
+>>> squared = rdd.map(lambda x : x*x)
+>>> squared.collect()
+[1, 4, 9, 25, 36, 49, 64, 1, 16, 5929, 9801, 7569, 10000, 10000]
+>>> tuples3 = rdd.map(lambda x : (x, x*x, x*100))
+>>> tuples3.collect()
+[(1, 1, 100), (2, 4, 200), (3, 9, 300), (5, 25, 500), (6, 36, 600), (7, 49, 700), (8, 64, 800), (-1, 1, -100), (-4, 16, -400), (77, 5929, 7700), (99, 9801, 9900), (-87, 7569, -8700), (-100, 10000, -10000), (100, 10000, 10000)]
+>>>
+>>>
+>>>
+>>> rdd.collect()
+[1, 2, 3, 5, 6, 7, 8, -1, -4, 77, 99, -87, -100, 100]
+>>> gt4 = rdd.filter(lambda x: x > 4)
+>>> gt4.collect()
+[5, 6, 7, 8, 77, 99, 100]
+>>>
+>>>
+>>>
+>>> rdd.collect()
+[1, 2, 3, 5, 6, 7, 8, -1, -4, 77, 99, -87, -100, 100]
+>>> total = rdd.reduce(lambda x, y: x+y)
+>>> total
+116
+
+Assume that rdd has 3 partitions: partition-1, partition-2, partition-3
+
+>>> partition-1: 1, 2, 3, 5, 6, 7, 8
+partition-1: will sum up to: 32
+
+>>> partition-2: -1, -4, 77, 99 
+partition-2: will sum up to: 171
+
+>>> partition-3: -87, -100, 100
+partition-3: will sum up to: -87
+
+===============
+partition-1 & partition-2 will result in: 203
+203 & partition-3 will result in: 116 (Final result)
+                     

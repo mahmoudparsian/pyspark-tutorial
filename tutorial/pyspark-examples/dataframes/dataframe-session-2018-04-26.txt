@@ -1,0 +1,1257 @@
+$ cat depts.csv
+d1,marketing
+d2,sales
+d3,business
+
+$ cat name_dept_age_salary.csv
+alex,d1,60,18000
+adel,d1,40,45000
+adel,d1,50,77000
+jane,d2,40,52000
+jane,d2,60,81000
+alex,d2,50,62000
+mary,d3,50,92000
+mary,d3,60,63000
+mary,d3,40,55000
+mary,d3,40,55000
+
+
+$ ./bin/pyspark
+>>>
+Welcome to
+      ____              __
+     / __/__  ___ _____/ /__
+    _\ \/ _ \/ _ `/ __/  '_/
+   /__ / .__/\_,_/_/ /_/\_\   version 2.2.1
+      /_/
+
+Using Python version 2.7.10 (default, Feb  7 2017 00:08:15)
+SparkSession available as 'spark'.
+>>>
+>>> spark
+<pyspark.sql.session.SparkSession object at 0x10e613a50>
+
+
+emps = spark
+      .read
+      .format("csv")
+      .option("header", "false")
+      .option("inferSchema", "true")
+      .load("file:///Users/mparsian/spark-2.2.1/zbin/name_dept_age_salary.csv")
+
+
+>>> emps.show()
++----+---+---+-----+
+| _c0|_c1|_c2|  _c3|
++----+---+---+-----+
+|alex| d1| 60|18000|
+|adel| d1| 40|45000|
+|adel| d1| 50|77000|
+|jane| d2| 40|52000|
+|jane| d2| 60|81000|
+|alex| d2| 50|62000|
+|mary| d3| 50|92000|
+|mary| d3| 60|63000|
+|mary| d3| 40|55000|
+|mary| d3| 40|55000|
++----+---+---+-----+
+
+emps.printSchema
+<bound method DataFrame.printSchema of DataFrame[_c0: string, _c1: string, _c2: int, _c3: int]>
+
+
+from pyspark.sql.types import StructType
+from pyspark.sql.types import StructField
+from pyspark.sql.types import StringType
+from pyspark.sql.types import IntegerType
+
+empsSchema = StructType([
+StructField("name", StringType(), True),
+StructField("dept", StringType(), True),
+StructField("age", IntegerType(), True),
+StructField("salary", IntegerType(), True)
+])
+
+
+emps2 = spark.read.format("csv").option("header", "false").load("file:///Users/mparsian/spark-2.2.1/zbin/name_dept_age_salary.csv", schema=empsSchema)  
+
+>>> emps2 = spark.read.format("csv").option("header", "false").option("inferSbin/name_dept_age_salary.csv", schema=empsSchema)  
+>>>
+>>> emps2.show()
++----+----+---+------+
+|name|dept|age|salary|
++----+----+---+------+
+|alex|  d1| 60| 18000|
+|adel|  d1| 40| 45000|
+|adel|  d1| 50| 77000|
+|jane|  d2| 40| 52000|
+|jane|  d2| 60| 81000|
+|alex|  d2| 50| 62000|
+|mary|  d3| 50| 92000|
+|mary|  d3| 60| 63000|
+|mary|  d3| 40| 55000|
+|mary|  d3| 40| 55000|
++----+----+---+------+
+
+>>> emps2.printSchema
+<bound method DataFrame.printSchema of DataFrame[name: string, dept: string, age: int, salary: int]>
+>>>
+>>> emps2.select("dept", "salary")
+DataFrame[dept: string, salary: int]
+>>> emps2.select("dept", "salary").show()
++----+------+
+|dept|salary|
++----+------+
+|  d1| 18000|
+|  d1| 45000|
+|  d1| 77000|
+|  d2| 52000|
+|  d2| 81000|
+|  d2| 62000|
+|  d3| 92000|
+|  d3| 63000|
+|  d3| 55000|
+|  d3| 55000|
++----+------+
+
+>>> emps2.registerTempTable("employees")
+>>> spark.sql("select * from employees where salary > 55000").show()
++----+----+---+------+
+|name|dept|age|salary|
++----+----+---+------+
+|adel|  d1| 50| 77000|
+|jane|  d2| 60| 81000|
+|alex|  d2| 50| 62000|
+|mary|  d3| 50| 92000|
+|mary|  d3| 60| 63000|
++----+----+---+------+
+
+>>> spark.sql("select dept, sum(salary) as sum from employees group by dept").show()
++----+------+
+|dept|   sum|
++----+------+
+|  d2|195000|
+|  d3|265000|
+|  d1|140000|
++----+------+
+
+>>> spark.sql("select e1.dept, e1.age, e2.dept, e2.age from employees e1 cross join employees e2").show(100)
++----+---+----+---+
+|dept|age|dept|age|
++----+---+----+---+
+|  d1| 60|  d1| 60|
+|  d1| 60|  d1| 40|
+|  d1| 60|  d1| 50|
+|  d1| 60|  d2| 40|
+|  d1| 60|  d2| 60|
+|  d1| 60|  d2| 50|
+|  d1| 60|  d3| 50|
+|  d1| 60|  d3| 60|
+|  d1| 60|  d3| 40|
+|  d1| 60|  d3| 40|
+|  d1| 40|  d1| 60|
+|  d1| 40|  d1| 40|
+|  d1| 40|  d1| 50|
+|  d1| 40|  d2| 40|
+|  d1| 40|  d2| 60|
+|  d1| 40|  d2| 50|
+|  d1| 40|  d3| 50|
+|  d1| 40|  d3| 60|
+|  d1| 40|  d3| 40|
+|  d1| 40|  d3| 40|
+|  d1| 50|  d1| 60|
+|  d1| 50|  d1| 40|
+|  d1| 50|  d1| 50|
+|  d1| 50|  d2| 40|
+|  d1| 50|  d2| 60|
+|  d1| 50|  d2| 50|
+|  d1| 50|  d3| 50|
+|  d1| 50|  d3| 60|
+|  d1| 50|  d3| 40|
+|  d1| 50|  d3| 40|
+|  d2| 40|  d1| 60|
+|  d2| 40|  d1| 40|
+|  d2| 40|  d1| 50|
+|  d2| 40|  d2| 40|
+|  d2| 40|  d2| 60|
+|  d2| 40|  d2| 50|
+|  d2| 40|  d3| 50|
+|  d2| 40|  d3| 60|
+|  d2| 40|  d3| 40|
+|  d2| 40|  d3| 40|
+|  d2| 60|  d1| 60|
+|  d2| 60|  d1| 40|
+|  d2| 60|  d1| 50|
+|  d2| 60|  d2| 40|
+|  d2| 60|  d2| 60|
+|  d2| 60|  d2| 50|
+|  d2| 60|  d3| 50|
+|  d2| 60|  d3| 60|
+|  d2| 60|  d3| 40|
+|  d2| 60|  d3| 40|
+|  d2| 50|  d1| 60|
+|  d2| 50|  d1| 40|
+|  d2| 50|  d1| 50|
+|  d2| 50|  d2| 40|
+|  d2| 50|  d2| 60|
+|  d2| 50|  d2| 50|
+|  d2| 50|  d3| 50|
+|  d2| 50|  d3| 60|
+|  d2| 50|  d3| 40|
+|  d2| 50|  d3| 40|
+|  d3| 50|  d1| 60|
+|  d3| 50|  d1| 40|
+|  d3| 50|  d1| 50|
+|  d3| 50|  d2| 40|
+|  d3| 50|  d2| 60|
+|  d3| 50|  d2| 50|
+|  d3| 50|  d3| 50|
+|  d3| 50|  d3| 60|
+|  d3| 50|  d3| 40|
+|  d3| 50|  d3| 40|
+|  d3| 60|  d1| 60|
+|  d3| 60|  d1| 40|
+|  d3| 60|  d1| 50|
+|  d3| 60|  d2| 40|
+|  d3| 60|  d2| 60|
+|  d3| 60|  d2| 50|
+|  d3| 60|  d3| 50|
+|  d3| 60|  d3| 60|
+|  d3| 60|  d3| 40|
+|  d3| 60|  d3| 40|
+|  d3| 40|  d1| 60|
+|  d3| 40|  d1| 40|
+|  d3| 40|  d1| 50|
+|  d3| 40|  d2| 40|
+|  d3| 40|  d2| 60|
+|  d3| 40|  d2| 50|
+|  d3| 40|  d3| 50|
+|  d3| 40|  d3| 60|
+|  d3| 40|  d3| 40|
+|  d3| 40|  d3| 40|
+|  d3| 40|  d1| 60|
+|  d3| 40|  d1| 40|
+|  d3| 40|  d1| 50|
+|  d3| 40|  d2| 40|
+|  d3| 40|  d2| 60|
+|  d3| 40|  d2| 50|
+|  d3| 40|  d3| 50|
+|  d3| 40|  d3| 60|
+|  d3| 40|  d3| 40|
+|  d3| 40|  d3| 40|
++----+---+----+---+
+
+>>>
+emps2 = spark.read.format("csv").option("header", "false").option("inferSchema", "true").load("file:///Users/mparsian/spark-2.2.1/zbin/name_dept_age_salary.csv", schema = empsSchema)
+
+
+emps2 = spark.read.format("csv").option("header", "false").load("file:///Users/mparsian/spark-2.2.1/zbin/name_dept_age_salary.csv", schema = empsSchema)
+
+
+
+
+deptsSchema = StructType([
+StructField("dept", StringType(), True),
+StructField("deptname", StringType(), True)
+])
+
+
+depts = spark.read.format("csv").option("header", "false").load("file:///Users/mparsian/spark-2.2.1/zbin/depts.csv", schema = deptsSchema)
+
+
+>>> emps = spark.read.format("csv").option("header", "false").option("inferSaame_dept_age_salary.csv")Users/mparsian/spark-2.2.1/zbin/n
+>>> emps.show()
++----+---+---+-----+
+| _c0|_c1|_c2|  _c3|
++----+---+---+-----+
+|alex| d1| 60|18000|
+|adel| d1| 40|45000|
+|adel| d1| 50|77000|
+|jane| d2| 40|52000|
+|jane| d2| 60|81000|
+|alex| d2| 50|62000|
+|mary| d3| 50|92000|
+|mary| d3| 60|63000|
+|mary| d3| 40|55000|
+|mary| d3| 40|55000|
++----+---+---+-----+
+
+>>> emps.printSchema
+<bound method DataFrame.printSchema of DataFrame[_c0: string, _c1: string, _c2: string, _c3: string]>
+>>>
+>>>
+>>>
+
+>>> from pyspark.sql.types import StructField
+>>> from pyspark.sql.types import StringType
+>>> from pyspark.sql.types import IntegerType
+>>>
+>>> from pyspark.sql.types import StructType
+>>> from pyspark.sql.types import StructField
+>>> from pyspark.sql.types import StringType
+>>> from pyspark.sql.types import IntegerType
+>>>
+>>> empSchema = StructType([
+... StructField("name", StringType(), True),
+... StructField("dept", StringType(), True),
+... StructField("age", IntegerType(), True),
+... StructField("salary", IntegerType(), True)
+... ])
+>>>
+>>> empSchema
+StructType(List(StructField(name,StringType,true),StructField(dept,StringType,true),StructField(age,IntegerType,true),StructField(salary,IntegerType,true)))
+>>> emps = spark.read.format("csv").option("header", "false").option("inferScin/name_dept_age_salary.csv")Users/mparsian/spark-2.2.1/zb
+>>> emps.show()
++----+---+---+-----+
+| _c0|_c1|_c2|  _c3|
++----+---+---+-----+
+|alex| d1| 60|18000|
+|adel| d1| 40|45000|
+|adel| d1| 50|77000|
+|jane| d2| 40|52000|
+|jane| d2| 60|81000|
+|alex| d2| 50|62000|
+|mary| d3| 50|92000|
+|mary| d3| 60|63000|
+|mary| d3| 40|55000|
+|mary| d3| 40|55000|
++----+---+---+-----+
+
+>>> <bound method DataFrame.printSchema of DataFrame[_c0: string, _c1: string, _cemps.printSchema
+<bound method DataFrame.printSchema of DataFrame[_c0: string, _c1: string, _c2: int, _c3: int]>
+>>>
+>>>
+
+>>> emps2 = spark.read.format("csv").option("header", "false").option("inferSbin/name_dept_age_salary.csv", schema=empsSchema)  2.2.1/zb
+>>>
+>>> emps2.show()
++----+----+---+------+
+|name|dept|age|salary|
++----+----+---+------+
+|alex|  d1| 60| 18000|
+|adel|  d1| 40| 45000|
+|adel|  d1| 50| 77000|
+|jane|  d2| 40| 52000|
+|jane|  d2| 60| 81000|
+|alex|  d2| 50| 62000|
+|mary|  d3| 50| 92000|
+|mary|  d3| 60| 63000|
+|mary|  d3| 40| 55000|
+|mary|  d3| 40| 55000|
++----+----+---+------+
+
+>>> emps2.printSchema
+<bound method DataFrame.printSchema of DataFrame[name: string, dept: string, age: int, salary: int]>
+>>>
+>>> emps2.select("dept", "salary")
+DataFrame[dept: string, salary: int]
+>>> emps2.select("dept", "salary").show()
++----+------+
+|dept|salary|
++----+------+
+|  d1| 18000|
+|  d1| 45000|
+|  d1| 77000|
+|  d2| 52000|
+|  d2| 81000|
+|  d2| 62000|
+|  d3| 92000|
+|  d3| 63000|
+|  d3| 55000|
+|  d3| 55000|
++----+------+
+
+>>> emps2.registerTempTable("employees")
+>>> spark.sql("select * from employees where salary > 55000").show()
++----+----+---+------+
+|name|dept|age|salary|
++----+----+---+------+
+|adel|  d1| 50| 77000|
+|jane|  d2| 60| 81000|
+|alex|  d2| 50| 62000|
+|mary|  d3| 50| 92000|
+|mary|  d3| 60| 63000|
++----+----+---+------+
+
+>>> spark.sql("select * from employees").show()
++----+----+---+------+
+|name|dept|age|salary|
++----+----+---+------+
+|alex|  d1| 60| 18000|
+|adel|  d1| 40| 45000|
+|adel|  d1| 50| 77000|
+|jane|  d2| 40| 52000|
+|jane|  d2| 60| 81000|
+|alex|  d2| 50| 62000|
+|mary|  d3| 50| 92000|
+|mary|  d3| 60| 63000|
+|mary|  d3| 40| 55000|
+|mary|  d3| 40| 55000|
++----+----+---+------+
+
+
+>>> spark.sql("select dept, sum(salaray) as sum from employees group by dept").show()                    * from employees").show()
++----+----+---+------+
+|name|dept|age|salary|
++----+----+---+------+
+|alex|  d1| 60| 18000|
+|adel|  d1| 40| 45000|
+|adel|  d1| 50| 77000|
+|jane|  d2| 40| 52000|
+|jane|  d2| 60| 81000|
+|alex|  d2| 50| 62000|
+|mary|  d3| 50| 92000|
+|mary|  d3| 60| 63000|
+|mary|  d3| 40| 55000|
+|mary|  d3| 40| 55000|
++----+----+---+------+
+
+>>> spark.sql("select dept, sum(salary) as sum from employees group by dept").show()
++----+------+
+|dept|   sum|
++----+------+
+|  d2|195000|
+|  d3|265000|
+|  d1|140000|
++----+------+
+
+
+>>> spark.sql("select a.dept, a.age, b.dept, b.age from employees a, employees b where a.dept = b.dept").show()
++----+---+----+---+
+|dept|age|dept|age|
++----+---+----+---+
+|  d1| 60|  d1| 50|
+|  d1| 60|  d1| 40|
+|  d1| 60|  d1| 60|
+|  d1| 40|  d1| 50|
+|  d1| 40|  d1| 40|
+|  d1| 40|  d1| 60|
+|  d1| 50|  d1| 50|
+|  d1| 50|  d1| 40|
+|  d1| 50|  d1| 60|
+|  d2| 40|  d2| 50|
+|  d2| 40|  d2| 60|
+|  d2| 40|  d2| 40|
+|  d2| 60|  d2| 50|
+|  d2| 60|  d2| 60|
+|  d2| 60|  d2| 40|
+|  d2| 50|  d2| 50|
+|  d2| 50|  d2| 60|
+|  d2| 50|  d2| 40|
+|  d3| 50|  d3| 40|
+|  d3| 50|  d3| 40|
++----+---+----+---+
+only showing top 20 rows
+
+>>> spark.sql("select a.dept, a.age, b.dept, b.age from employees a, employees b where a.dept = b.dept").count()
+34
+>>> spark.sql("select a.dept, a.age, b.dept, b.age from employees a, employees b where a.dept = b.dept").show(100)
++----+---+----+---+
+|dept|age|dept|age|
++----+---+----+---+
+|  d1| 60|  d1| 50|
+|  d1| 60|  d1| 40|
+|  d1| 60|  d1| 60|
+|  d1| 40|  d1| 50|
+|  d1| 40|  d1| 40|
+|  d1| 40|  d1| 60|
+|  d1| 50|  d1| 50|
+|  d1| 50|  d1| 40|
+|  d1| 50|  d1| 60|
+|  d2| 40|  d2| 50|
+|  d2| 40|  d2| 60|
+|  d2| 40|  d2| 40|
+|  d2| 60|  d2| 50|
+|  d2| 60|  d2| 60|
+|  d2| 60|  d2| 40|
+|  d2| 50|  d2| 50|
+|  d2| 50|  d2| 60|
+|  d2| 50|  d2| 40|
+|  d3| 50|  d3| 40|
+|  d3| 50|  d3| 40|
+|  d3| 50|  d3| 60|
+|  d3| 50|  d3| 50|
+|  d3| 60|  d3| 40|
+|  d3| 60|  d3| 40|
+|  d3| 60|  d3| 60|
+|  d3| 60|  d3| 50|
+|  d3| 40|  d3| 40|
+|  d3| 40|  d3| 40|
+|  d3| 40|  d3| 60|
+|  d3| 40|  d3| 50|
+|  d3| 40|  d3| 40|
+|  d3| 40|  d3| 40|
+|  d3| 40|  d3| 60|
+|  d3| 40|  d3| 50|
++----+---+----+---+
+
+>>> spark.sql("select a.dept, a.age, b.dept, b.age from employees a, employees b where a.dept = b.dept").show(100)
++----+---+----+---+
+|dept|age|dept|age|
++----+---+----+---+
+|  d1| 60|  d1| 50|
+|  d1| 60|  d1| 40|
+|  d1| 60|  d1| 60|
+|  d1| 40|  d1| 50|
+|  d1| 40|  d1| 40|
+|  d1| 40|  d1| 60|
+|  d1| 50|  d1| 50|
+|  d1| 50|  d1| 40|
+|  d1| 50|  d1| 60|
+|  d2| 40|  d2| 50|
+|  d2| 40|  d2| 60|
+|  d2| 40|  d2| 40|
+|  d2| 60|  d2| 50|
+|  d2| 60|  d2| 60|
+|  d2| 60|  d2| 40|
+|  d2| 50|  d2| 50|
+|  d2| 50|  d2| 60|
+|  d2| 50|  d2| 40|
+|  d3| 50|  d3| 40|
+|  d3| 50|  d3| 40|
+|  d3| 50|  d3| 60|
+|  d3| 50|  d3| 50|
+|  d3| 60|  d3| 40|
+|  d3| 60|  d3| 40|
+|  d3| 60|  d3| 60|
+|  d3| 60|  d3| 50|
+|  d3| 40|  d3| 40|
+|  d3| 40|  d3| 40|
+|  d3| 40|  d3| 60|
+|  d3| 40|  d3| 50|
+|  d3| 40|  d3| 40|
+|  d3| 40|  d3| 40|
+|  d3| 40|  d3| 60|
+|  d3| 40|  d3| 50|
++----+---+----+---+
+
+
+>>> spark.sql("select * from employees natural join employees").show(100)
++----+----+---+------+
+|name|dept|age|salary|
++----+----+---+------+
+|alex|  d1| 60| 18000|
+|adel|  d1| 40| 45000|
+|adel|  d1| 50| 77000|
+|jane|  d2| 40| 52000|
+|jane|  d2| 60| 81000|
+|alex|  d2| 50| 62000|
+|mary|  d3| 50| 92000|
+|mary|  d3| 60| 63000|
+|mary|  d3| 40| 55000|
+|mary|  d3| 40| 55000|
+|mary|  d3| 40| 55000|
+|mary|  d3| 40| 55000|
++----+----+---+------+
+
+>>> spark.sql("select e1.dept, e1.age, e2.dept, e2.age from employees e1 cross join employees e2").show(100)
++----+---+----+---+
+|dept|age|dept|age|
++----+---+----+---+
+|  d1| 60|  d1| 60|
+|  d1| 60|  d1| 40|
+|  d1| 60|  d1| 50|
+|  d1| 60|  d2| 40|
+|  d1| 60|  d2| 60|
+|  d1| 60|  d2| 50|
+|  d1| 60|  d3| 50|
+|  d1| 60|  d3| 60|
+|  d1| 60|  d3| 40|
+|  d1| 60|  d3| 40|
+|  d1| 40|  d1| 60|
+|  d1| 40|  d1| 40|
+|  d1| 40|  d1| 50|
+|  d1| 40|  d2| 40|
+|  d1| 40|  d2| 60|
+|  d1| 40|  d2| 50|
+|  d1| 40|  d3| 50|
+|  d1| 40|  d3| 60|
+|  d1| 40|  d3| 40|
+|  d1| 40|  d3| 40|
+|  d1| 50|  d1| 60|
+|  d1| 50|  d1| 40|
+|  d1| 50|  d1| 50|
+|  d1| 50|  d2| 40|
+|  d1| 50|  d2| 60|
+|  d1| 50|  d2| 50|
+|  d1| 50|  d3| 50|
+|  d1| 50|  d3| 60|
+|  d1| 50|  d3| 40|
+|  d1| 50|  d3| 40|
+|  d2| 40|  d1| 60|
+|  d2| 40|  d1| 40|
+|  d2| 40|  d1| 50|
+|  d2| 40|  d2| 40|
+|  d2| 40|  d2| 60|
+|  d2| 40|  d2| 50|
+|  d2| 40|  d3| 50|
+|  d2| 40|  d3| 60|
+|  d2| 40|  d3| 40|
+|  d2| 40|  d3| 40|
+|  d2| 60|  d1| 60|
+|  d2| 60|  d1| 40|
+|  d2| 60|  d1| 50|
+|  d2| 60|  d2| 40|
+|  d2| 60|  d2| 60|
+|  d2| 60|  d2| 50|
+|  d2| 60|  d3| 50|
+|  d2| 60|  d3| 60|
+|  d2| 60|  d3| 40|
+|  d2| 60|  d3| 40|
+|  d2| 50|  d1| 60|
+|  d2| 50|  d1| 40|
+|  d2| 50|  d1| 50|
+|  d2| 50|  d2| 40|
+|  d2| 50|  d2| 60|
+|  d2| 50|  d2| 50|
+|  d2| 50|  d3| 50|
+|  d2| 50|  d3| 60|
+|  d2| 50|  d3| 40|
+|  d2| 50|  d3| 40|
+|  d3| 50|  d1| 60|
+|  d3| 50|  d1| 40|
+|  d3| 50|  d1| 50|
+|  d3| 50|  d2| 40|
+|  d3| 50|  d2| 60|
+|  d3| 50|  d2| 50|
+|  d3| 50|  d3| 50|
+|  d3| 50|  d3| 60|
+|  d3| 50|  d3| 40|
+|  d3| 50|  d3| 40|
+|  d3| 60|  d1| 60|
+|  d3| 60|  d1| 40|
+|  d3| 60|  d1| 50|
+|  d3| 60|  d2| 40|
+|  d3| 60|  d2| 60|
+|  d3| 60|  d2| 50|
+|  d3| 60|  d3| 50|
+|  d3| 60|  d3| 60|
+|  d3| 60|  d3| 40|
+|  d3| 60|  d3| 40|
+|  d3| 40|  d1| 60|
+|  d3| 40|  d1| 40|
+|  d3| 40|  d1| 50|
+|  d3| 40|  d2| 40|
+|  d3| 40|  d2| 60|
+|  d3| 40|  d2| 50|
+|  d3| 40|  d3| 50|
+|  d3| 40|  d3| 60|
+|  d3| 40|  d3| 40|
+|  d3| 40|  d3| 40|
+|  d3| 40|  d1| 60|
+|  d3| 40|  d1| 40|
+|  d3| 40|  d1| 50|
+|  d3| 40|  d2| 40|
+|  d3| 40|  d2| 60|
+|  d3| 40|  d2| 50|
+|  d3| 40|  d3| 50|
+|  d3| 40|  d3| 60|
+|  d3| 40|  d3| 40|
+|  d3| 40|  d3| 40|
++----+---+----+---+
+
+
+>>>
+>>>
+>>> spark
+<pyspark.sql.session.SparkSession object at 0x10e4daa50>
+>>>
+>>>
+>>>
+>>>
+>>>
+>>>
+>>>
+>>> emps = spark.read.format("csv").option("header", "false").option("inferSchema", "true").load("file:///Users/mpin/name_dept_age_salary.csv")
+>>>
+>>> emps.show()
++----+---+---+-----+
+| _c0|_c1|_c2|  _c3|
++----+---+---+-----+
+|alex| d1| 60|18000|
+|adel| d1| 40|45000|
+|adel| d1| 50|77000|
+|jane| d2| 40|52000|
+|jane| d2| 60|81000|
+|alex| d2| 50|62000|
+|mary| d3| 50|92000|
+|mary| d3| 60|63000|
+|mary| d3| 40|55000|
+|mary| d3| 40|55000|
++----+---+---+-----+
+
+>>> emps.printSchema
+<bound method DataFrame.printSchema of DataFrame[_c0: string, _c1: string, _c2: int, _c3: int]>
+>>>
+>>>
+>>>
+>>> from pyspark.sql.types import StructType
+>>> from pyspark.sql.types import StructField
+>>> from pyspark.sql.types import StringType
+>>> from pyspark.sql.types import IntegerType
+>>>
+>>> empsSchema = StructType([
+... StructField("name", StringType(), True),
+... StructField("dept", StringType(), True),
+... StructField("age", IntegerType(), True),
+... StructField("salary", IntegerType(), True)
+... ])
+>>>
+>>>
+>>> emps2 = spark.read.format("csv").option("header", "false").option("inferSchema", "true").load("file:///Users/mbin/name_dept_age_salary.csv", schema = empsSchema)
+>>>
+>>> emps2.show()
++----+----+---+------+
+|name|dept|age|salary|
++----+----+---+------+
+|alex|  d1| 60| 18000|
+|adel|  d1| 40| 45000|
+|adel|  d1| 50| 77000|
+|jane|  d2| 40| 52000|
+|jane|  d2| 60| 81000|
+|alex|  d2| 50| 62000|
+|mary|  d3| 50| 92000|
+|mary|  d3| 60| 63000|
+|mary|  d3| 40| 55000|
+|mary|  d3| 40| 55000|
++----+----+---+------+
+
+>>> emps2 = spark.read.format("csv").option("header", "false").load("file:///Users/mparsian/spark-2.2.1/zbin/name_ schema = empsSchema)
+>>>
+>>> emps2.show()
++----+----+---+------+
+|name|dept|age|salary|
++----+----+---+------+
+|alex|  d1| 60| 18000|
+|adel|  d1| 40| 45000|
+|adel|  d1| 50| 77000|
+|jane|  d2| 40| 52000|
+|jane|  d2| 60| 81000|
+|alex|  d2| 50| 62000|
+|mary|  d3| 50| 92000|
+|mary|  d3| 60| 63000|
+|mary|  d3| 40| 55000|
+|mary|  d3| 40| 55000|
++----+----+---+------+
+
+>>> emps2 = spark.read.format("csv").option("header", "false").option("inferSchema", "true").load("file:///Usersspark.emps.printSchema
+<bound method DataFrame.printSchema of DataFrame[_c0: string, _c1: string, _c2: int, _c3: int]>
+>>>
+>>>
+>>> emps2.printSchema
+<bound method DataFrame.printSchema of DataFrame[name: string, dept: string, age: int, salary: int]>
+>>>
+>>>
+>>> emps2.registerTempTable("employees")
+>>>
+>>> spark.sql("select * from employees").show()
++----+----+---+------+
+|name|dept|age|salary|
++----+----+---+------+
+|alex|  d1| 60| 18000|
+|adel|  d1| 40| 45000|
+|adel|  d1| 50| 77000|
+|jane|  d2| 40| 52000|
+|jane|  d2| 60| 81000|
+|alex|  d2| 50| 62000|
+|mary|  d3| 50| 92000|
+|mary|  d3| 60| 63000|
+|mary|  d3| 40| 55000|
+|mary|  d3| 40| 55000|
++----+----+---+------+
+
+>>>
+>>> spark.sql("select * from employees where age > 40").show()
++----+----+---+------+
+|name|dept|age|salary|
++----+----+---+------+
+|alex|  d1| 60| 18000|
+|adel|  d1| 50| 77000|
+|jane|  d2| 60| 81000|
+|alex|  d2| 50| 62000|
+|mary|  d3| 50| 92000|
+|mary|  d3| 60| 63000|
++----+----+---+------+
+
+>>> spark.sql("select name, age  from employees where age > 40").show()
++----+---+
+|name|age|
++----+---+
+|alex| 60|
+|adel| 50|
+|jane| 60|
+|alex| 50|
+|mary| 50|
+|mary| 60|
++----+---+
+
+>>> spark.sql("select e1.dept, e1.age, e2.dept, e2.age from employees e1 cross join employees e2").show(100)
++----+---+----+---+
+|dept|age|dept|age|
++----+---+----+---+
+|  d1| 60|  d1| 60|
+|  d1| 60|  d1| 40|
+|  d1| 60|  d1| 50|
+|  d1| 60|  d2| 40|
+|  d1| 60|  d2| 60|
+|  d1| 60|  d2| 50|
+|  d1| 60|  d3| 50|
+|  d1| 60|  d3| 60|
+|  d1| 60|  d3| 40|
+|  d1| 60|  d3| 40|
+|  d1| 40|  d1| 60|
+|  d1| 40|  d1| 40|
+|  d1| 40|  d1| 50|
+|  d1| 40|  d2| 40|
+|  d1| 40|  d2| 60|
+|  d1| 40|  d2| 50|
+|  d1| 40|  d3| 50|
+|  d1| 40|  d3| 60|
+|  d1| 40|  d3| 40|
+|  d1| 40|  d3| 40|
+|  d1| 50|  d1| 60|
+|  d1| 50|  d1| 40|
+|  d1| 50|  d1| 50|
+|  d1| 50|  d2| 40|
+|  d1| 50|  d2| 60|
+|  d1| 50|  d2| 50|
+|  d1| 50|  d3| 50|
+|  d1| 50|  d3| 60|
+|  d1| 50|  d3| 40|
+|  d1| 50|  d3| 40|
+|  d2| 40|  d1| 60|
+|  d2| 40|  d1| 40|
+|  d2| 40|  d1| 50|
+|  d2| 40|  d2| 40|
+|  d2| 40|  d2| 60|
+|  d2| 40|  d2| 50|
+|  d2| 40|  d3| 50|
+|  d2| 40|  d3| 60|
+|  d2| 40|  d3| 40|
+|  d2| 40|  d3| 40|
+|  d2| 60|  d1| 60|
+|  d2| 60|  d1| 40|
+|  d2| 60|  d1| 50|
+|  d2| 60|  d2| 40|
+|  d2| 60|  d2| 60|
+|  d2| 60|  d2| 50|
+|  d2| 60|  d3| 50|
+|  d2| 60|  d3| 60|
+|  d2| 60|  d3| 40|
+|  d2| 60|  d3| 40|
+|  d2| 50|  d1| 60|
+|  d2| 50|  d1| 40|
+|  d2| 50|  d1| 50|
+|  d2| 50|  d2| 40|
+|  d2| 50|  d2| 60|
+|  d2| 50|  d2| 50|
+|  d2| 50|  d3| 50|
+|  d2| 50|  d3| 60|
+|  d2| 50|  d3| 40|
+|  d2| 50|  d3| 40|
+|  d3| 50|  d1| 60|
+|  d3| 50|  d1| 40|
+|  d3| 50|  d1| 50|
+|  d3| 50|  d2| 40|
+|  d3| 50|  d2| 60|
+|  d3| 50|  d2| 50|
+|  d3| 50|  d3| 50|
+|  d3| 50|  d3| 60|
+|  d3| 50|  d3| 40|
+|  d3| 50|  d3| 40|
+|  d3| 60|  d1| 60|
+|  d3| 60|  d1| 40|
+|  d3| 60|  d1| 50|
+|  d3| 60|  d2| 40|
+|  d3| 60|  d2| 60|
+|  d3| 60|  d2| 50|
+|  d3| 60|  d3| 50|
+|  d3| 60|  d3| 60|
+|  d3| 60|  d3| 40|
+|  d3| 60|  d3| 40|
+|  d3| 40|  d1| 60|
+|  d3| 40|  d1| 40|
+|  d3| 40|  d1| 50|
+|  d3| 40|  d2| 40|
+|  d3| 40|  d2| 60|
+|  d3| 40|  d2| 50|
+|  d3| 40|  d3| 50|
+|  d3| 40|  d3| 60|
+|  d3| 40|  d3| 40|
+|  d3| 40|  d3| 40|
+|  d3| 40|  d1| 60|
+|  d3| 40|  d1| 40|
+|  d3| 40|  d1| 50|
+|  d3| 40|  d2| 40|
+|  d3| 40|  d2| 60|
+|  d3| 40|  d2| 50|
+|  d3| 40|  d3| 50|
+|  d3| 40|  d3| 60|
+|  d3| 40|  d3| 40|
+|  d3| 40|  d3| 40|
++----+---+----+---+
+
+>>>
+>>> emps2.count()
+10
+>>> spark.sql("select e1.dept, e1.age, e2.dept, e2.age from employees e1 cross join employees e2").count()
+100
+>>> deptsSchema = StructType([
+... StructField("dept", StringType(), True),
+... StructField("deptname", StringType(), True)
+... ])
+>>>
+>>> deptsSchema
+StructType(List(StructField(dept,StringType,true),StructField(deptname,StringType,true)))
+>>>
+>>> depts = spark.read.format("csv").option("header", "false").load("file:///Users/mparsian/spark-2.2.1/zbin/deptshema), schema=deptsSc
+>>>
+>>>
+>>>
+>>> depts = spark.read.format("csv").option("header", "false").load("file:///Users/mparsian/spark-2.2.1/zbin/deptshema), schema=deptsSc
+>>>
+>>>
+
+>>>
+>>> depts = spark.read.format("csv").option("header", "false").load("file:///Users/mparsian/spark-2.2.1/zbin/deptsSchema)schema = depts
+>>>
+>>>
+>>> depts.show()
++----+---------+
+|dept| deptname|
++----+---------+
+|  d1|marketing|
+|  d2|    sales|
+|  d3| business|
++----+---------+
+
+>>> emps2.show()
++----+----+---+------+
+|name|dept|age|salary|
++----+----+---+------+
+|alex|  d1| 60| 18000|
+|adel|  d1| 40| 45000|
+|adel|  d1| 50| 77000|
+|jane|  d2| 40| 52000|
+|jane|  d2| 60| 81000|
+|alex|  d2| 50| 62000|
+|mary|  d3| 50| 92000|
+|mary|  d3| 60| 63000|
+|mary|  d3| 40| 55000|
+|mary|  d3| 40| 55000|
++----+----+---+------+
+
+>>> depts.registerTempTable("departments")
+>>>
+>>> spark.sql("select * from departments").show()
++----+---------+
+|dept| deptname|
++----+---------+
+|  d1|marketing|
+|  d2|    sales|
+|  d3| business|
++----+---------+
+
+>>> spark.sql("select e.name, d.deptname from employees e, departments d where e.dept = d.dept").show()
++----+---------+
+|name| deptname|
++----+---------+
+|alex|marketing|
+|adel|marketing|
+|adel|marketing|
+|jane|    sales|
+|jane|    sales|
+|alex|    sales|
+|mary| business|
+|mary| business|
+|mary| business|
+|mary| business|
++----+---------+
+
+>>>
+>>> emps.show()
++----+---+---+-----+
+| _c0|_c1|_c2|  _c3|
++----+---+---+-----+
+|alex| d1| 60|18000|
+|adel| d1| 40|45000|
+|adel| d1| 50|77000|
+|jane| d2| 40|52000|
+|jane| d2| 60|81000|
+|alex| d2| 50|62000|
+|mary| d3| 50|92000|
+|mary| d3| 60|63000|
+|mary| d3| 40|55000|
+|mary| d3| 40|55000|
++----+---+---+-----+
+
+>>> emps
+DataFrame[_c0: string, _c1: string, _c2: int, _c3: int]
+>>>
+>>> emps.printSchema()
+root
+ |-- _c0: string (nullable = true)
+ |-- _c1: string (nullable = true)
+ |-- _c2: integer (nullable = true)
+ |-- _c3: integer (nullable = true)
+
+>>>
+>>>
+>>>
+>>> from pyspark.sql.types import StructType
+>>> from pyspark.sql.types import StructField
+>>> from pyspark.sql.types import StringType
+>>> from pyspark.sql.types import IntegerType
+>>>
+>>> empsSchema = StructType([
+... StructField("name", StringType(), True),
+... StructField("dept", StringType(), True),
+... StructField("age", IntegerType(), True),
+... StructField("salary", IntegerType(), True)
+... ])
+>>>
+>>>
+>>> empsSchema
+StructType(List(StructField(name,StringType,true),StructField(dept,StringType,true),StructField(age,IntegerType,true),StructField(salary,IntegerType,true)))
+>>>
+>>>
+>>> emps2 = spark \
+...     .read \
+...     .format("csv") \
+...     .option("header", "false") \
+...     .load("file:///Users/mparsian/spark-2.2.1/zbin/name_dept_age_salary.csv", schema=empsSchema)
+>>>
+>>>
+>>> emps2.show()
++----+----+---+------+
+|name|dept|age|salary|
++----+----+---+------+
+|alex|  d1| 60| 18000|
+|adel|  d1| 40| 45000|
+|adel|  d1| 50| 77000|
+|jane|  d2| 40| 52000|
+|jane|  d2| 60| 81000|
+|alex|  d2| 50| 62000|
+|mary|  d3| 50| 92000|
+|mary|  d3| 60| 63000|
+|mary|  d3| 40| 55000|
+|mary|  d3| 40| 55000|
++----+----+---+------+
+
+>>> emps2.printSchema()
+root
+ |-- name: string (nullable = true)
+ |-- dept: string (nullable = true)
+ |-- age: integer (nullable = true)
+ |-- salary: integer (nullable = true)
+
+>>>
+>>>
+>>>
+>>>
+>>>
+>>> emps2.registerTempTable("employees")
+>>>
+>>>
+>>>
+>>> spark.sql("select * from employees").show()
++----+----+---+------+
+|name|dept|age|salary|
++----+----+---+------+
+|alex|  d1| 60| 18000|
+|adel|  d1| 40| 45000|
+|adel|  d1| 50| 77000|
+|jane|  d2| 40| 52000|
+|jane|  d2| 60| 81000|
+|alex|  d2| 50| 62000|
+|mary|  d3| 50| 92000|
+|mary|  d3| 60| 63000|
+|mary|  d3| 40| 55000|
+|mary|  d3| 40| 55000|
++----+----+---+------+
+
+>>> spark.sql("select * from employees where salary > 56000").show()
++----+----+---+------+
+|name|dept|age|salary|
++----+----+---+------+
+|adel|  d1| 50| 77000|
+|jane|  d2| 60| 81000|
+|alex|  d2| 50| 62000|
+|mary|  d3| 50| 92000|
+|mary|  d3| 60| 63000|
++----+----+---+------+
+
+>>> spark.sql("select name, salary from employees where salary > 56000").show()
++----+------+
+|name|salary|
++----+------+
+|adel| 77000|
+|jane| 81000|
+|alex| 62000|
+|mary| 92000|
+|mary| 63000|
++----+------+
+
+>>>
+>>>
+>>>
+>>>
+>>>
+>>> deptsSchema = StructType([
+... StructField("dept", StringType(), True),
+... StructField("deptname", StringType(), True)
+... ])
+>>>
+>>>
+>>> deptsSchema
+StructType(List(StructField(dept,StringType,true),StructField(deptname,StringType,true)))
+>>>
+>>>
+>>> depts = spark \
+...     .read \
+...     .format("csv") \
+...     .option("header", "false") \
+...     .load("file:///Users/mparsian/spark-2.2.1/zbin/depts.csv", schema=deptsSchema)
+>>>
+>>>
+>>> depts.show()
++----+---------+
+|dept| deptname|
++----+---------+
+|  d1|marketing|
+|  d2|    sales|
+|  d3| business|
++----+---------+
+
+>>> depts.show(1)
++----+---------+
+|dept| deptname|
++----+---------+
+|  d1|marketing|
++----+---------+
+only showing top 1 row
+
+>>> depts.show(2)
++----+---------+
+|dept| deptname|
++----+---------+
+|  d1|marketing|
+|  d2|    sales|
++----+---------+
+only showing top 2 rows
+
+>>> depts.show()
++----+---------+
+|dept| deptname|
++----+---------+
+|  d1|marketing|
+|  d2|    sales|
+|  d3| business|
++----+---------+
+
+>>>
+>>>
+>>> depts.printSchema()
+root
+ |-- dept: string (nullable = true)
+ |-- deptname: string (nullable = true)
+
+>>> emps2.printSchema()
+root
+ |-- name: string (nullable = true)
+ |-- dept: string (nullable = true)
+ |-- age: integer (nullable = true)
+ |-- salary: integer (nullable = true)
+
+>>> emps2.show()
++----+----+---+------+
+|name|dept|age|salary|
++----+----+---+------+
+|alex|  d1| 60| 18000|
+|adel|  d1| 40| 45000|
+|adel|  d1| 50| 77000|
+|jane|  d2| 40| 52000|
+|jane|  d2| 60| 81000|
+|alex|  d2| 50| 62000|
+|mary|  d3| 50| 92000|
+|mary|  d3| 60| 63000|
+|mary|  d3| 40| 55000|
+|mary|  d3| 40| 55000|
++----+----+---+------+
+
+>>> depts.show()
++----+---------+
+|dept| deptname|
++----+---------+
+|  d1|marketing|
+|  d2|    sales|
+|  d3| business|
++----+---------+
+
+>>> depts.registerTempTable("departments")
+>>> depts
+DataFrame[dept: string, deptname: string]
+>>>
+>>> spark.sql("select * from departments").show()
++----+---------+
+|dept| deptname|
++----+---------+
+|  d1|marketing|
+|  d2|    sales|
+|  d3| business|
++----+---------+
+
+
+>>> spark.sql("select e.name, e.dept, e.salary, d.deptname from employees e, departments d where e.dept = d.dept").show()
++----+----+------+---------+
+|name|dept|salary| deptname|
++----+----+------+---------+
+|alex|  d1| 18000|marketing|
+|adel|  d1| 45000|marketing|
+|adel|  d1| 77000|marketing|
+|jane|  d2| 52000|    sales|
+|jane|  d2| 81000|    sales|
+|alex|  d2| 62000|    sales|
+|mary|  d3| 92000| business|
+|mary|  d3| 63000| business|
+|mary|  d3| 55000| business|
+|mary|  d3| 55000| business|
++----+----+------+---------+
+
+>>> spark.sql("select e.name, e.dept, e.salary, d.deptname from employees e, departments d where e.dept = d.dept").show()
++----+----+------+---------+
+|name|dept|salary| deptname|
++----+----+------+---------+
+|alex|  d1| 18000|marketing|
+|adel|  d1| 45000|marketing|
+|adel|  d1| 77000|marketing|
+|jane|  d2| 52000|    sales|
+|jane|  d2| 81000|    sales|
+|alex|  d2| 62000|    sales|
+|mary|  d3| 92000| business|
+|mary|  d3| 63000| business|
+|mary|  d3| 55000| business|
+|mary|  d3| 55000| business|
++----+----+------+---------+
+
+>>> spark.sql("select d.dept, d.deptname, d2.dept, d2.deptname from departments d cross join departments d2").show()
++----+---------+----+---------+
+|dept| deptname|dept| deptname|
++----+---------+----+---------+
+|  d1|marketing|  d1|marketing|
+|  d1|marketing|  d2|    sales|
+|  d1|marketing|  d3| business|
+|  d2|    sales|  d1|marketing|
+|  d2|    sales|  d2|    sales|
+|  d2|    sales|  d3| business|
+|  d3| business|  d1|marketing|
+|  d3| business|  d2|    sales|
+|  d3| business|  d3| business|
++----+---------+----+---------+
+
+>>>
+deptsSchema = StructType([
+StructField("dept", StringType(), True),
+StructField("deptname", StringType(), True)
+])
+

@@ -1,0 +1,97 @@
+ $ cat /Users/mparsian/tmp/emps_no_header.txt
+1001,alex,67000,SALES
+1002,bob,24000,SALES
+1003,boby,24000,SALES
+1004,jane,69000,SOFTWARE
+1005,betty,55000,SOFTWARE
+1006,jeff,59000,SOFTWARE
+1007,dara,72000,SOFTWARE 
+ 
+ 
+ $ ./bin/pyspark
+Python 3.7.2 (v3.7.2:9a3ffc0492, Dec 24 2018, 02:44:43)
+[Clang 6.0 (clang-600.0.57)] on darwin
+Type "help", "copyright", "credits" or "license" for more information.
+To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).
+Welcome to
+      ____              __
+     / __/__  ___ _____/ /__
+    _\ \/ _ \/ _ `/ __/  '_/
+   /__ / .__/\_,_/_/ /_/\_\   version 2.4.0
+      /_/
+
+Using Python version 3.7.2 (v3.7.2:9a3ffc0492, Dec 24 2018 02:44:43)
+SparkSession available as 'spark'.
+>>>
+>>>
+>>>
+>>>
+>>>
+>>>
+>>>
+>>> input_path = "/Users/mparsian/tmp/emps_no_header.txt"
+>>> df = spark.read.csv(input_path)
+>>> df.show()
++----+-----+-----+--------+
+| _c0|  _c1|  _c2|     _c3|
++----+-----+-----+--------+
+|1001| alex|67000|   SALES|
+|1002|  bob|24000|   SALES|
+|1003| boby|24000|   SALES|
+|1004| jane|69000|SOFTWARE|
+|1005|betty|55000|SOFTWARE|
+|1006| jeff|59000|SOFTWARE|
+|1007| dara|72000|SOFTWARE|
++----+-----+-----+--------+
+
+>>> df.collect()
+[
+ Row(_c0='1001', _c1='alex', _c2='67000', _c3='SALES'), 
+ Row(_c0='1002', _c1='bob', _c2='24000', _c3='SALES'), 
+ Row(_c0='1003', _c1='boby', _c2='24000', _c3='SALES'), 
+ Row(_c0='1004', _c1='jane', _c2='69000', _c3='SOFTWARE'), 
+ Row(_c0='1005', _c1='betty', _c2='55000', _c3='SOFTWARE'), 
+ Row(_c0='1006', _c1='jeff', _c2='59000', _c3='SOFTWARE'), 
+ Row(_c0='1007', _c1='dara', _c2='72000', _c3='SOFTWARE')
+]
+>>>
+>>>
+
+>>>
+>>> df2 = df.selectExpr("_c0 as id", "_c1 as name", "_c2 as salary", "_c3 as dept")
+>>> df2.show()
++----+-----+------+--------+
+|  id| name|salary|    dept|
++----+-----+------+--------+
+|1001| alex| 67000|   SALES|
+|1002|  bob| 24000|   SALES|
+|1003| boby| 24000|   SALES|
+|1004| jane| 69000|SOFTWARE|
+|1005|betty| 55000|SOFTWARE|
+|1006| jeff| 59000|SOFTWARE|
+|1007| dara| 72000|SOFTWARE|
++----+-----+------+--------+
+
+>>> df2.printSchema()
+root
+ |-- id: string (nullable = true)
+ |-- name: string (nullable = true)
+ |-- salary: string (nullable = true)
+ |-- dept: string (nullable = true)
+
+>>> df2.createOrReplaceTempView("emp_table")
+>>>
+>>>
+>>> df3 = spark.sql("SELECT * FROM emp_table WHERE id > 1002")
+>>> df3.show()
++----+-----+------+--------+
+|  id| name|salary|    dept|
++----+-----+------+--------+
+|1003| boby| 24000|   SALES|
+|1004| jane| 69000|SOFTWARE|
+|1005|betty| 55000|SOFTWARE|
+|1006| jeff| 59000|SOFTWARE|
+|1007| dara| 72000|SOFTWARE|
++----+-----+------+--------+
+
+>>> 

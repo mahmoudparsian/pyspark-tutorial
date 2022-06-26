@@ -1,0 +1,480 @@
+Input Files Used:
+
+$ cat /Users/mparsian/zmp/pyspark_book_project/git-manning/code/chap08/sample_no_header.csv
+Alex,Sunnyvale,30
+Mary,Cupertino,28
+Jane,Stanford,44
+Bob,Ames,33
+
+$ cat /Users/mparsian/zmp/pyspark_book_project/git-manning/code/chap08/sample_with_header.csv
+name,city,age
+Alex,Sunnyvale,30
+Mary,Cupertino,28
+Jane,Stanford,44
+Bob,Ames,33
+
+MySQL Relational Database Table:
+
+mparsian@Mahmouds-MacBook ~/spark-2.3.0 $ mysql -uroot -p
+Enter password:
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 13
+Server version: 5.7.18 MySQL Community Server (GPL)
+
+Copyright (c) 2000, 2015, Oracle and/or its affiliates. All rights reserved.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> use metadb
+Reading table information for completion of table and column names
+You can turn off this feature to get a quicker startup with -A
+
+Database changed
+mysql> select * from dept;
++-------------+------------+---------------+---------+
+| dept_number | dept_name  | dept_location | manager |
++-------------+------------+---------------+---------+
+|          10 | ACCOUNTING | NEW YORK, NY  | alex    |
+|          20 | RESEARCH   | DALLAS, TX    | alex    |
+|          30 | SALES      | CHICAGO, IL   | jane    |
+|          40 | OPERATIONS | BOSTON, MA    | jane    |
+|          50 | MARKETING  | Sunnyvale, CA | jane    |
+|          60 | SOFTWARE   | Stanford, CA  | jane    |
+|          70 | HARDWARE   | BOSTON, MA    | sophia  |
++-------------+------------+---------------+---------+
+7 rows in set (0.00 sec)
+
+mysql>
+
+
+
+ $ ./bin/pyspark
+Python 2.7.10 (default, Oct  6 2017, 22:29:07)
+Welcome to
+      ____              __
+     / __/__  ___ _____/ /__
+    _\ \/ _ \/ _ `/ __/  '_/
+   /__ / .__/\_,_/_/ /_/\_\   version 2.3.0
+      /_/
+
+Using Python version 2.7.10 (default, Oct  6 2017 22:29:07)
+SparkSession available as 'spark'.
+>>>
+>>>
+>>> spark
+<pyspark.sql.session.SparkSession object at 0x11061cc50>
+>>>
+>>> input_path = "/Users/mparsian/zmp/pyspark_book_project/git-manning/code/chap08/sample_no_header.csv"
+>>> input_path
+'/Users/mparsian/zmp/pyspark_book_project/git-manning/code/chap08/sample_no_header.csv'
+>>>
+>>> df = spark\
+...           .read\
+...           .format("csv")\
+...           .option("header","false")\
+...           .option("inferSchema", "true")\
+...           .load(input_path)
+
+>>>
+>>> df.show()
++----+---------+---+
+| _c0|      _c1|_c2|
++----+---------+---+
+|Alex|Sunnyvale| 30|
+|Mary|Cupertino| 28|
+|Jane| Stanford| 44|
+| Bob|     Ames| 33|
++----+---------+---+
+
+>>> df.count()
+4
+>>> df.printSchema()
+root
+ |-- _c0: string (nullable = true)
+ |-- _c1: string (nullable = true)
+ |-- _c2: integer (nullable = true)
+
+>>> df.createOrReplaceTempView("people")
+>>>
+>>> df2 = spark.sql("select * from people")
+>>> df2.show()
++----+---------+---+
+| _c0|      _c1|_c2|
++----+---------+---+
+|Alex|Sunnyvale| 30|
+|Mary|Cupertino| 28|
+|Jane| Stanford| 44|
+| Bob|     Ames| 33|
++----+---------+---+
+
+>>> df2 = spark.sql("select * from people where _c2 > 30")
+>>> df2.show()
++----+--------+---+
+| _c0|     _c1|_c2|
++----+--------+---+
+|Jane|Stanford| 44|
+| Bob|    Ames| 33|
++----+--------+---+
+
+>>> df4 = df.selectExpr("_c0 as name", "_c1 as city", "_c2 as age")
+>>> df4.show()
++----+---------+---+
+|name|     city|age|
++----+---------+---+
+|Alex|Sunnyvale| 30|
+|Mary|Cupertino| 28|
+|Jane| Stanford| 44|
+| Bob|     Ames| 33|
++----+---------+---+
+
+>>> df.createOrReplaceTempView("people_table")
+>>>
+>>> df4.createOrReplaceTempView("people_table")
+>>> df4.show()
++----+---------+---+
+|name|     city|age|
++----+---------+---+
+|Alex|Sunnyvale| 30|
+|Mary|Cupertino| 28|
+|Jane| Stanford| 44|
+| Bob|     Ames| 33|
++----+---------+---+
+
+>>> df6 = spark.sql("select * from people_table where age > 30")
+>>> df6.show()
++----+--------+---+
+|name|    city|age|
++----+--------+---+
+|Jane|Stanford| 44|
+| Bob|    Ames| 33|
++----+--------+---+
+
+>>> df6.printSchema()
+root
+ |-- name: string (nullable = true)
+ |-- city: string (nullable = true)
+ |-- age: integer (nullable = true)
+
+>>>
+>>>
+>>> df6.collect()
+[Row(name=u'Jane', city=u'Stanford', age=44), Row(name=u'Bob', city=u'Ames', age=33)]
+>>> df6.show(1)
++----+--------+---+
+|name|    city|age|
++----+--------+---+
+|Jane|Stanford| 44|
++----+--------+---+
+only showing top 1 row
+
+>>> df6.show(2)
++----+--------+---+
+|name|    city|age|
++----+--------+---+
+|Jane|Stanford| 44|
+| Bob|    Ames| 33|
++----+--------+---+
+
+>>> df6.show(30)
++----+--------+---+
+|name|    city|age|
++----+--------+---+
+|Jane|Stanford| 44|
+| Bob|    Ames| 33|
++----+--------+---+
+
+>>>
+>>>
+>>>
+>>> input_path = "/Users/mparsian/zmp/pyspark_book_project/git-manning/code/chap08/sample_with_header.csv"
+>>>
+>>>
+>>> input_path
+'/Users/mparsian/zmp/pyspark_book_project/git-manning/code/chap08/sample_with_header.csv'
+>>>
+>>>
+>>>
+>>>
+>>> df8 = spark\
+...           .read\
+...           .format("csv")\
+...           .option("header","true")\
+...           .option("inferSchema", "true")\
+...           .load(input_path)
+>>>
+>>> df8.show()
++----+---------+---+
+|name|     city|age|
++----+---------+---+
+|Alex|Sunnyvale| 30|
+|Mary|Cupertino| 28|
+|Jane| Stanford| 44|
+| Bob|     Ames| 33|
++----+---------+---+
+
+>>> df8.createOrReplaceTempView("people22")
+>>> df8.printSchema()
+root
+ |-- name: string (nullable = true)
+ |-- city: string (nullable = true)
+ |-- age: integer (nullable = true)
+
+>>> spark.sql("select name, age from people22")
+DataFrame[name: string, age: int]
+>>> spark.sql("select name, age from people22").show()
++----+---+
+|name|age|
++----+---+
+|Alex| 30|
+|Mary| 28|
+|Jane| 44|
+| Bob| 33|
++----+---+
+
+>>>
+>>>
+>>> df10 = spark.createDataFrame([(1, "a"),(2, "b"), (3, "a")],["id", "name"])
+>>> df10.show()
++---+----+
+| id|name|
++---+----+
+|  1|   a|
+|  2|   b|
+|  3|   a|
++---+----+
+
+>>> df10 = spark.createDataFrame([(1, "a"),(2, "b"), (3, "a"), (1, "a"),(2, "b"), (3, "a")],["id", "name"])
+>>> df10.show()
++---+----+
+| id|name|
++---+----+
+|  1|   a|
+|  2|   b|
+|  3|   a|
+|  1|   a|
+|  2|   b|
+|  3|   a|
++---+----+
+
+>>> df10.createOrReplaceTempView("mytable")
+>>>
+>>> df10
+DataFrame[id: bigint, name: string]
+>>>
+>>>
+>>> spark.sql("select id, name from mytable").show()
++---+----+
+| id|name|
++---+----+
+|  1|   a|
+|  2|   b|
+|  3|   a|
+|  1|   a|
+|  2|   b|
+|  3|   a|
++---+----+
+
+>>> spark.sql("select id, name from mytable where id > 1").show()
++---+----+
+| id|name|
++---+----+
+|  2|   b|
+|  3|   a|
+|  2|   b|
+|  3|   a|
++---+----+
+
+>>>
+>>>
+>>>
+>>> spark.sql("select t1.id, t1.name, t2.id, t2.name from mytable t1, mytable t2 where t1.id == t2.id").show()
++---+----+---+----+
+| id|name| id|name|
++---+----+---+----+
+|  1|   a|  1|   a|
+|  1|   a|  1|   a|
+|  1|   a|  1|   a|
+|  1|   a|  1|   a|
+|  3|   a|  3|   a|
+|  3|   a|  3|   a|
+|  3|   a|  3|   a|
+|  3|   a|  3|   a|
+|  2|   b|  2|   b|
+|  2|   b|  2|   b|
+|  2|   b|  2|   b|
+|  2|   b|  2|   b|
++---+----+---+----+
+
+>>> spark.sql("select t1.id, t1.name, t2.id, t2.name from mytable t1, mytable t2 where t1.id == t2.id").show()
++---+----+---+----+
+| id|name| id|name|
++---+----+---+----+
+|  1|   a|  1|   a|
+|  1|   a|  1|   a|
+|  1|   a|  1|   a|
+|  1|   a|  1|   a|
+|  3|   a|  3|   a|
+|  3|   a|  3|   a|
+|  3|   a|  3|   a|
+|  3|   a|  3|   a|
+|  2|   b|  2|   b|
+|  2|   b|  2|   b|
+|  2|   b|  2|   b|
+|  2|   b|  2|   b|
++---+----+---+----+
+
+>>>
+>>>
+>>> JDBC_URL = "jdbc:mysql://localhost/metadb"
+>>> JDBC_DRIVER = "com.mysql.jdbc.Driver"
+>>> JDBC_USER = "root"
+>>> JDBC_PASSWORD = "mp22_pass"
+>>> JDBC_TABLE_NAME = "dept"
+>>>
+>>> JDBC_URL
+'jdbc:mysql://localhost/metadb'
+>>> JDBC_DRIVER
+'com.mysql.jdbc.Driver'
+>>> JDBC_USER
+'root'
+>>> JDBC_PASSWORD
+'mp22_pass'
+>>> JDBC_TABLE_NAME
+'dept'
+>>>
+>>>
+>>>
+>>>
+>>>
+>>> df = spark\
+...         .read\
+...         .format("jdbc")\
+...         .option("url", JDBC_URL)\
+...         .option("driver", JDBC_DRIVER)\
+...         .option("dbtable", JDBC_TABLE_NAME)\
+...         .option("user", JDBC_USER)\
+...         .option("password", JDBC_PASSWORD)\
+...         .load()
+Traceback (most recent call last):
+  File "<stdin>", line 8, in <module>
+  File "/Users/mparsian/spark-2.3.0/python/pyspark/sql/readwriter.py", line 172, in load
+    return self._df(self._jreader.load())
+  File "/Users/mparsian/spark-2.3.0/python/lib/py4j-0.10.6-src.zip/py4j/java_gateway.py", line 1160, in __call__
+  File "/Users/mparsian/spark-2.3.0/python/pyspark/sql/utils.py", line 63, in deco
+    return f(*a, **kw)
+  File "/Users/mparsian/spark-2.3.0/python/lib/py4j-0.10.6-src.zip/py4j/protocol.py", line 320, in get_return_value
+py4j.protocol.Py4JJavaError: An error occurred while calling o501.load.
+: java.lang.ClassNotFoundException: com.mysql.jdbc.Driver
+	at java.net.URLClassLoader.findClass(URLClassLoader.java:381)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:424)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:357)
+	at org.apache.spark.sql.execution.datasources.jdbc.DriverRegistry$.register(DriverRegistry.scala:45)
+	at org.apache.spark.sql.execution.datasources.jdbc.JDBCOptions$$anonfun$6.apply(JDBCOptions.scala:79)
+	at org.apache.spark.sql.execution.datasources.jdbc.JDBCOptions$$anonfun$6.apply(JDBCOptions.scala:79)
+	at scala.Option.foreach(Option.scala:257)
+	at org.apache.spark.sql.execution.datasources.jdbc.JDBCOptions.<init>(JDBCOptions.scala:79)
+	at org.apache.spark.sql.execution.datasources.jdbc.JDBCOptions.<init>(JDBCOptions.scala:35)
+	at org.apache.spark.sql.execution.datasources.jdbc.JdbcRelationProvider.createRelation(JdbcRelationProvider.scala:34)
+	at org.apache.spark.sql.execution.datasources.DataSource.resolveRelation(DataSource.scala:340)
+	at org.apache.spark.sql.DataFrameReader.loadV1Source(DataFrameReader.scala:239)
+	at org.apache.spark.sql.DataFrameReader.load(DataFrameReader.scala:227)
+	at org.apache.spark.sql.DataFrameReader.load(DataFrameReader.scala:164)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at py4j.reflection.MethodInvoker.invoke(MethodInvoker.java:244)
+	at py4j.reflection.ReflectionEngine.invoke(ReflectionEngine.java:357)
+	at py4j.Gateway.invoke(Gateway.java:282)
+	at py4j.commands.AbstractCommand.invokeMethod(AbstractCommand.java:132)
+	at py4j.commands.CallCommand.execute(CallCommand.java:79)
+	at py4j.GatewayConnection.run(GatewayConnection.java:214)
+	at java.lang.Thread.run(Thread.java:748)
+
+>>>
+>>>
+
+ $ export JAR="/Users/mparsian/zmp/pyspark_book_project/git-manning/code/jars/mysql-connector-java-5.1.42.jar"
+$ ./bin/pyspark --jars $JAR
+Python 2.7.10 (default, Oct  6 2017, 22:29:07)
+Welcome to
+      ____              __
+     / __/__  ___ _____/ /__
+    _\ \/ _ \/ _ `/ __/  '_/
+   /__ / .__/\_,_/_/ /_/\_\   version 2.3.0
+      /_/
+
+Using Python version 2.7.10 (default, Oct  6 2017 22:29:07)
+SparkSession available as 'spark'.
+>>> JDBC_URL = "jdbc:mysql://localhost/metadb"
+>>> JDBC_DRIVER = "com.mysql.jdbc.Driver"
+>>> JDBC_USER = "root"
+>>> JDBC_PASSWORD = "mp22_pass"
+>>> JDBC_TABLE_NAME = "dept"
+>>>
+>>> df = spark\
+...         .read\
+...         .format("jdbc")\
+...         .option("url", JDBC_URL)\
+...         .option("driver", JDBC_DRIVER)\
+...         .option("dbtable", JDBC_TABLE_NAME)\
+...         .option("user", JDBC_USER)\
+...         .option("password", JDBC_PASSWORD)\
+...         .load()
+Tue Oct 30 18:46:18 PDT 2018 WARN: Establishing SSL connection without server's identity verification is not recommended. According to MySQL 5.5.45+, 5.6.26+ and 5.7.6+ requirements SSL connection must be established by default if explicit option isn't set. For compliance with existing applications not using SSL the verifyServerCertificate property is set to 'false'. You need either to explicitly disable SSL by setting useSSL=false, or set useSSL=true and provide truststore for server certificate verification.
+
+>>>
+>>> df.show()
+
+Tue Oct 30 18:46:27 PDT 2018 WARN: Establishing SSL connection without server's identity verification is not recommended. According to MySQL 5.5.45+, 5.6.26+ and 5.7.6+ requirements SSL connection must be established by default if explicit option isn't set. For compliance with existing applications not using SSL the verifyServerCertificate property is set to 'false'. You need either to explicitly disable SSL by setting useSSL=false, or set useSSL=true and provide truststore for server certificate verification.
++-----------+----------+-------------+-------+
+|dept_number| dept_name|dept_location|manager|
++-----------+----------+-------------+-------+
+|         10|ACCOUNTING| NEW YORK, NY|   alex|
+|         20|  RESEARCH|   DALLAS, TX|   alex|
+|         30|     SALES|  CHICAGO, IL|   jane|
+|         40|OPERATIONS|   BOSTON, MA|   jane|
+|         50| MARKETING|Sunnyvale, CA|   jane|
+|         60|  SOFTWARE| Stanford, CA|   jane|
+|         70|  HARDWARE|   BOSTON, MA| sophia|
++-----------+----------+-------------+-------+
+
+>>>
+>>> df.printSchema()
+root
+ |-- dept_number: integer (nullable = true)
+ |-- dept_name: string (nullable = true)
+ |-- dept_location: string (nullable = true)
+ |-- manager: string (nullable = true)
+
+>>> df.createOrReplaceTempView("dept")
+>>> spark.sql("select * from dept").show()
+Tue Oct 30 18:49:20 PDT 2018 WARN: Establishing SSL connection without server's identity verification is not recommended. According to MySQL 5.5.45+, 5.6.26+ and 5.7.6+ requirements SSL connection must be established by default if explicit option isn't set. For compliance with existing applications not using SSL the verifyServerCertificate property is set to 'false'. You need either to explicitly disable SSL by setting useSSL=false, or set useSSL=true and provide truststore for server certificate verification.
++-----------+----------+-------------+-------+
+|dept_number| dept_name|dept_location|manager|
++-----------+----------+-------------+-------+
+|         10|ACCOUNTING| NEW YORK, NY|   alex|
+|         20|  RESEARCH|   DALLAS, TX|   alex|
+|         30|     SALES|  CHICAGO, IL|   jane|
+|         40|OPERATIONS|   BOSTON, MA|   jane|
+|         50| MARKETING|Sunnyvale, CA|   jane|
+|         60|  SOFTWARE| Stanford, CA|   jane|
+|         70|  HARDWARE|   BOSTON, MA| sophia|
++-----------+----------+-------------+-------+
+
+>>> spark.sql("select * from dept where dept_number < 50").show()
+Tue Oct 30 18:49:39 PDT 2018 WARN: Establishing SSL connection without server's identity verification is not recommended. According to MySQL 5.5.45+, 5.6.26+ and 5.7.6+ requirements SSL connection must be established by default if explicit option isn't set. For compliance with existing applications not using SSL the verifyServerCertificate property is set to 'false'. You need either to explicitly disable SSL by setting useSSL=false, or set useSSL=true and provide truststore for server certificate verification.
++-----------+----------+-------------+-------+
+|dept_number| dept_name|dept_location|manager|
++-----------+----------+-------------+-------+
+|         10|ACCOUNTING| NEW YORK, NY|   alex|
+|         20|  RESEARCH|   DALLAS, TX|   alex|
+|         30|     SALES|  CHICAGO, IL|   jane|
+|         40|OPERATIONS|   BOSTON, MA|   jane|
++-----------+----------+-------------+-------+
+
+>>>

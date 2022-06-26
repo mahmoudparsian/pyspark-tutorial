@@ -1,0 +1,90 @@
+$ cat /tmp/foxy.txt
+a fox jumped and jumped
+red fox jumped high
+a red high fox jumped and jumped
+red fox is red
+
+$ ./bin/pyspark
+Python 3.7.2 (v3.7.2:9a3ffc0492, Dec 24 2018, 02:44:43) 
+[Clang 6.0 (clang-600.0.57)] on darwin
+Type "help", "copyright", "credits" or "license" for more information.
+
+Using Spark's default log4j profile: org/apache/spark/log4j-defaults.properties
+Setting default log level to "WARN".
+To adjust logging level use sc.setLogLevel(newLevel). 
+For SparkR, use setLogLevel(newLevel).
+Welcome to
+      ____              __
+     / __/__  ___ _____/ /__
+    _\ \/ _ \/ _ `/ __/  '_/
+   /__ / .__/\_,_/_/ /_/\_\   version 3.0.0
+      /_/
+
+Using Python version 3.7.2 (v3.7.2:9a3ffc0492, Dec 24 2018 02:44:43)
+SparkSession available as 'spark'.
+>>> 
+>>> 
+>>> numbers = [1, 2, 3, 4, 5, 6, 10]
+>>> numbers
+[1, 2, 3, 4, 5, 6, 10]
+>>> 
+>>> 
+>>> spark
+<pyspark.sql.session.SparkSession object at 0x7f8e3713eba8>
+
+>>># create a new RDD from a Python collection named numbers
+>>> rdd_numbers = spark.sparkContext.parallelize(numbers)
+>>> rdd_numbers.count()
+7                                                                               
+
+>>> rdd_numbers.collect()
+[1, 2, 3, 4, 5, 6, 10]
+>>> # rdd_numbers : RDD[Integer]
+... 
+>>> total = rdd_numbers.reduce(lambda x, y: x+y)
+>>> total 
+31
+
+>>># create a new RDD from rdd_numbers
+>>> tuples2 = rdd_numbers.map(lambda x: (x, x+1))
+>>> tuples2.count()
+7
+>>> tuples2.collect()
+[(1, 2), (2, 3), (3, 4), (4, 5), (5, 6), (6, 7), (10, 11)]
+>>> 
+>>> 
+>>> input_path = '/tmp/foxy.txt'
+>>># create a new RDD[String] from a given text file
+>>> recs = spark.sparkContext.textFile(input_path)
+>>> recs.collect()
+[
+ 'a fox jumped and jumped', 
+ 'red fox jumped high', 
+ 'a red high fox jumped and jumped', 
+ 'red fox is red'
+]
+>>> recs.count()
+4
+>>> # recs : RDD[String]
+
+>>># create a new RDD[(String, Integer)] 
+>>> recs_length = recs.map(lambda x : (x, len(x)))
+>>> recs_length.collect()
+[
+ ('a fox jumped and jumped', 23), 
+ ('red fox jumped high', 19), 
+ ('a red high fox jumped and jumped', 32), 
+ ('red fox is red', 14)
+]
+>>> # recs_length : RDD[(String, Integer)]
+
+>>># keep only records if their lengt is greater than 20
+>>> recs_gt_20 = recs.filter(lambda x: len(x) > 20)
+>>> 
+>>> recs_gt_20.collect()
+[
+ 'a fox jumped and jumped', 
+ 'a red high fox jumped and jumped'
+]
+>>> recs_gt_20.count()
+2

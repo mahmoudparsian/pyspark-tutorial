@@ -1,0 +1,98 @@
+~/spark-2.4.4 $ ./bin/pyspark
+Python 3.7.2 (v3.7.2:9a3ffc0492, Dec 24 2018, 02:44:43)
+Welcome to
+      ____              __
+     / __/__  ___ _____/ /__
+    _\ \/ _ \/ _ `/ __/  '_/
+   /__ / .__/\_,_/_/ /_/\_\   version 2.4.4
+      /_/
+
+Using Python version 3.7.2 (v3.7.2:9a3ffc0492, Dec 24 2018 02:44:43)
+SparkSession available as 'spark'.
+>>> data = [ [1, 2, 3], [4, 5], [], [10] ]
+>>> data
+[[1, 2, 3], [4, 5], [], [10]]
+>>> len(data)
+4
+>>> rdd = spark.sparkContext.parallelize(data)
+>>> rdd.collect()
+[[1, 2, 3], [4, 5], [], [10]]
+>>> rdd.count()
+4
+>>> rdd2 = rdd.map(lambda x: x)
+>>> rdd2.count()
+4
+>>> rdd2.collect()
+[[1, 2, 3], [4, 5], [], [10]]
+>>>
+>>> rdd3 = rdd.flatMap(lambda x: x)
+>>> rdd3.count()
+6
+>>> rdd3.collect()
+[1, 2, 3, 4, 5, 10]
+>>>
+>>> data2 = [ [1, 2, 3, [44, 55] ], [4, 5], [], [10] ]
+>>> rdd4 = spark.sparkContext.parallelize(data2)
+>>> rdd4.collect()
+[[1, 2, 3, [44, 55]], [4, 5], [], [10]]
+>>> rdd5 = rdd4.flatMap(lambda x: x)
+>>> rdd5.collect()
+[1, 2, 3, [44, 55], 4, 5, 10]
+>>>
+>>>
+>>> data = [1, 2, 3, 4, 5, 6]
+>>> rdd = spark.sparkContext.parallelize(data)
+>>> rdd.collect()
+[1, 2, 3, 4, 5, 6]
+>>> sumofvalues = rdd.reduce(lambda x, y: x+y)
+>>> sumofvalues
+21
+>>> sumofvalues = rdd.reduce(lambda x, y: x*y)
+>>> sumofvalues
+720
+>>> tuples2 = [(1,20), (3,40), (5,60)]
+>>> rdd = spark.sparkContext.parallelize(tuples2)
+>>> rdd.collect()
+[(1, 20), (3, 40), (5, 60)]
+>>> rdd.count()
+3
+>>> sum2 = rdd.rduce(lambda x, y: (x[0]+y[0], x[1]+y[1]))
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+AttributeError: 'RDD' object has no attribute 'rduce'
+>>> sum2 = rdd.reduce(lambda x, y: (x[0]+y[0], x[1]+y[1]))
+>>> sum2
+(9, 120)
+>>>
+>>>
+>>> kv = [('A', 2), ('A', 3), ('A', 4), ('B', 10), ('B', 20), ('C', 7)]
+>>> kv
+[('A', 2), ('A', 3), ('A', 4), ('B', 10), ('B', 20), ('C', 7)]
+>>> len(kv)
+6
+>>> rdd = spark.sparkContext.parallelize(kv)
+>>> rdd.collect()
+[('A', 2), ('A', 3), ('A', 4), ('B', 10), ('B', 20), ('C', 7)]
+>>> rdd.count()
+6
+>>> sum_by_key = rdd.reduceByKey(lambda x, y: x+y)
+>>> sum_by_key.collect()
+[('B', 30), ('C', 7), ('A', 9)]
+>>>
+>>>
+>>>
+>>> grouped = rdd.groupByKey()
+>>> grouped.collect()
+[('B', <pyspark.resultiterable.ResultIterable object at 0x114b06128>), ('C', <pyspark.resultiterable.ResultIterable object at 0x114b06208>), ('A', <pyspark.resultiterable.ResultIterable object at 0x114b06390>)]
+>>> grouped.mapValues(lambda iter: list(iter)).collect()
+[('B', [10, 20]), ('C', [7]), ('A', [2, 3, 4])]
+>>>
+>>> sum_of_values_2 = grouped.mapValues(lambda iter: sum(iter))
+>>> sum_of_values_2.collect()
+[('B', 30), ('C', 7), ('A', 9)]
+
+... # find average of values per key for a give rdd by groupByKey()
+
+... # find average of values per key for a give rdd by reduceByKey()
+...
+>>>

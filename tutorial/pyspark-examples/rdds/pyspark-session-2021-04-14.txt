@@ -1,0 +1,158 @@
+$ cat /tmp/foxdata.txt
+a red fox jumped of high
+fox jumped over a high fence
+red of fox jumped
+
+
+Python 3.7.2 (v3.7.2:9a3ffc0492, Dec 24 2018, 02:44:43)
+...
+To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).
+Welcome to
+      ____              __
+     / __/__  ___ _____/ /__
+    _\ \/ _ \/ _ `/ __/  '_/
+   /__ / .__/\_,_/_/ /_/\_\   version 3.1.1
+      /_/
+
+Using Python version 3.7.2 (v3.7.2:9a3ffc0492, Dec 24 2018 02:44:43)
+Spark context Web UI available at http://10.0.0.93:4040
+Spark context available as 'sc' (master = local[*], app id = local-1618456720582).
+SparkSession available as 'spark'.
+>>>
+>>>
+>>>
+>>> spark
+<pyspark.sql.session.SparkSession object at 0x7fc8d618d438>
+
+>>> input_path = "/tmp/foxdata.txt"
+>>> input_path
+'/tmp/foxdata.txt'
+>>> # Read input path and create an RDD[String]
+...
+>>> records = spark.sparkContext.textFile(input_path)
+>>> records
+/tmp/foxdata.txt MapPartitionsRDD[1] at textFile at NativeMethodAccessorImpl.java:0
+>>>
+>>> records.collect()
+[
+ 'a red fox jumped of high', 
+ 'fox jumped over a high fence', 
+ 'red of fox jumped'
+]
+>>> records.count()
+3
+>>> #  tokenize records and create RDD[ [String] ]
+...
+>>> tokenizd = records.map(lambda record: record.split(" "))
+>>> tokenizd.collect()
+[
+ ['a', 'red', 'fox', 'jumped', 'of', 'high'], 
+ ['fox', 'jumped', 'over', 'a', 'high', 'fence'], 
+ ['red', 'of', 'fox', 'jumped']
+]
+>>> tokenizd.count()
+3
+>>> pairs = tokenizd.map(lambda word : (word, 1))
+>>> pairs.collect()
+[
+ (['a', 'red', 'fox', 'jumped', 'of', 'high'], 1), 
+ (['fox', 'jumped', 'over', 'a', 'high', 'fence'], 1), 
+ (['red', 'of', 'fox', 'jumped'], 1)
+]
+>>>
+>>> words = tokenizd.flatMap(lambda arr: arr)
+>>> words.collect()
+['a', 'red', 'fox', 'jumped', 'of', 'high', 'fox', 'jumped', 'over', 'a', 'high', 'fence', 'red', 'of', 'fox', 'jumped']
+>>> words.count()
+16
+>>> # words : RDD[String]
+...
+>>> key_value_pairs = words.map(lambda word: (word, 1))
+>>> key_value_pairs.collect()
+[('a', 1), ('red', 1), ('fox', 1), ('jumped', 1), ('of', 1), ('high', 1), ('fox', 1), ('jumped', 1), ('over', 1), ('a', 1), ('high', 1), ('fence', 1), ('red', 1), ('of', 1), ('fox', 1), ('jumped', 1)]
+>>>
+>>> # key_value_pairs: RDD[(String, Integer)]
+...
+>>>
+>>> grouped = key_value_pairs.groupByKey()
+>>> grouped.collect()
+[
+ ('of', <pyspark.resultiterable.ResultIterable object at 0x7fc8d61f9390>), 
+ ('high', <pyspark.resultiterable.ResultIterable object at 0x7fc8d61f9400>), 
+ ('fence', <pyspark.resultiterable.ResultIterable object at 0x7fc8d61f94e0>), 
+ ('a', <pyspark.resultiterable.ResultIterable object at 0x7fc8d61f9470>), 
+ ('red', <pyspark.resultiterable.ResultIterable object at 0x7fc8d61f9438>), 
+ ('fox', <pyspark.resultiterable.ResultIterable object at 0x7fc8d61f95f8>), 
+ ('jumped', <pyspark.resultiterable.ResultIterable object at 0x7fc8d61f9550>), 
+ ('over', <pyspark.resultiterable.ResultIterable object at 0x7fc8d61f96d8>)
+]
+>>>
+>>> debugged = grouped.mapValues(lambda values: list(values))
+>>> debugged.collect()
+[
+ ('of', [1, 1]), 
+ ('high', [1, 1]), 
+ ('fence', [1]), 
+ ('a', [1, 1]), 
+ ('red', [1, 1]), 
+ ('fox', [1, 1, 1]),
+ ('jumped', [1, 1, 1]), 
+ ('over', [1])
+]
+>>>
+>>>
+>>> frequency = grouped.mapValues(lambda values: sum(values))
+>>> frequency.collect()
+[('of', 2), ('high', 2), ('fence', 1), ('a', 2), ('red', 2), ('fox', 3), ('jumped', 3), ('over', 1)]
+>>>
+>>>
+>>>
+>>> key_value_pairs.collect()
+[('a', 1), ('red', 1), ('fox', 1), ('jumped', 1), ('of', 1), ('high', 1), ('fox', 1), ('jumped', 1), ('over', 1), ('a', 1), ('high', 1), ('fence', 1), ('red', 1), ('of', 1), ('fox', 1), ('jumped', 1)]
+>>>
+>>>
+>>>
+>>> reduced = key_value_pairs.reduceByKey(lambda x, y: x+y)
+>>> reduced.collect()
+[('of', 2), ('high', 2), ('fence', 1), ('a', 2), ('red', 2), ('fox', 3), ('jumped', 3), ('over', 1)]
+>>>
+>>> rdd7 = reduced.mapValues(lambda x: x+100)
+>>> rdd7.collect()
+[('of', 102), ('high', 102), ('fence', 101), ('a', 102), ('red', 102), ('fox', 103), ('jumped', 103), ('over', 101)]
+
+>>> rdd77 = reduced.map(lambda x: x[1]+100)
+>>> rdd77.collect()
+[102, 102, 101, 102, 102, 103, 103, 101]
+
+>>> rdd77 = reduced.map(lambda x: (x[0], x[1]+100))
+>>> rdd77.collect()
+[('of', 102), ('high', 102), ('fence', 101), ('a', 102), ('red', 102), ('fox', 103), ('jumped', 103), ('over', 101)]
+>>>
+
+>>># get number of partitions for rdd77
+>>> rdd77.getNumPartitions()
+2
+>>>
+>>>
+>>> KV = [('x', 3), ('x', 5), ('x', 8), ('y', 50), ('y', 60), ('y', 70), ('z', 3)]
+>>> KV
+[('x', 3), ('x', 5), ('x', 8), ('y', 50), ('y', 60), ('y', 70), ('z', 3)]
+>>> rdd = spark.sparkContext.parallelize(KV)
+>>>
+>>> rdd.collect()
+[('x', 3), ('x', 5), ('x', 8), ('y', 50), ('y', 60), ('y', 70), ('z', 3)]
+>>> rdd.count()
+7
+>>>
+>>> filtered1 = rdd.filter(lambda x : x[1] > 10)
+>>> filtered1.collect()
+[('y', 50), ('y', 60), ('y', 70)]
+>>> filtered2 = rdd.filter(lambda x : x[1] < 10)
+>>> filtered2.collect()
+[('x', 3), ('x', 5), ('x', 8), ('z', 3)]
+>>>
+>>>
+>>> added = rdd.reduceByKey(lambda a, b: a+b)
+>>> added.collect()
+[('y', 180), ('z', 3), ('x', 16)]
+>>>

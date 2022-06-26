@@ -1,0 +1,358 @@
+$ cat /Users/mparsian/spark-2.2.1/zbin/foxdata.txt
+red fox jumped high
+fox jumped over high fence
+red fox jumped
+
+
+NOTE: I have formatted output of PySpark's collect()
+      for better reading/understanding.
+
+$ ./bin/pysaprk
+
+>>>
+>>> spark
+<pyspark.sql.session.SparkSession object at 0x109672a50>
+>>>
+>>>
+>>> sc = spark.sparkContext
+>>>
+>>> sc
+<SparkContext master=local[*] appName=PySparkShell>
+>>>
+>>> rdd = sc.textFile("file:///Users/mparsian/spark-2.2.1/zbin/foxdata.txt")
+>>> rdd.collect()
+[
+ u'red fox jumped high', 
+ u'fox jumped over high fence', 
+ u'red fox jumped'
+]
+>>>
+>>> rdd.count()
+3
+>>>
+>>>
+>>> rdd2 = rdd.map(lambda x: (x, len(x)) )
+>>>
+>>> rdd2.collect()
+[
+ (u'red fox jumped high', 19), 
+ (u'fox jumped over high fence', 26), 
+ (u'red fox jumped', 14)
+]
+>>>
+>>>
+>>> rdd3 = rdd2.map(lambda (k, v) : (v, k, k))
+>>>
+>>> rdd3.collect()
+[
+ (19, u'red fox jumped high', u'red fox jumped high'), 
+ (26, u'fox jumped over high fence', u'fox jumped over high fence'), 
+ (14, u'red fox jumped', u'red fox jumped')
+]
+>>>
+>>>
+>>> rdd.collect()
+[
+ u'red fox jumped high', 
+ u'fox jumped over high fence', 
+ u'red fox jumped'
+]
+>>>
+>>>
+>>> words = rdd.flatMap(lambda x: x.split(" "))
+>>> words.collect()
+[
+ u'red', 
+ u'fox', 
+ u'jumped', 
+ u'high', 
+ u'fox', 
+ u'jumped', 
+ u'over', 
+ u'high', 
+ u'fence', 
+ u'red', 
+ u'fox', 
+ u'jumped'
+]
+>>> words.count()
+12
+>>>
+>>>
+>>> pairs = words.map(lambda x: (x, 1))
+>>> pairs.collect()
+[
+ (u'red', 1), 
+ (u'fox', 1), 
+ (u'jumped', 1), 
+ (u'high', 1), 
+ (u'fox', 1), 
+ (u'jumped', 1), 
+ (u'over', 1), 
+ (u'high', 1), 
+ (u'fence', 1), 
+ (u'red', 1), 
+ (u'fox', 1), 
+ (u'jumped', 1)
+]
+>>>
+>>>
+>>>
+>>> freq = pairs.reduceByKey(lambda x, y: x+y)
+>>> freq.collect()
+[
+ (u'high', 2), 
+ (u'over', 1), 
+ (u'fox', 3), 
+ (u'red', 2), 
+ (u'fence', 1), 
+ (u'jumped', 3)
+]
+>>>
+>>>
+>>>
+>>> grouped = pairs.groupByKey()
+>>> grouped.collect()
+[
+ (u'high', <pyspark.resultiterable.ResultIterable object at 0x109680250>), 
+ (u'over', <pyspark.resultiterable.ResultIterable object at 0x1096800d0>), 
+ (u'fox', <pyspark.resultiterable.ResultIterable object at 0x1096df1d0>), 
+ (u'red', <pyspark.resultiterable.ResultIterable object at 0x1096df090>), 
+ (u'fence', <pyspark.resultiterable.ResultIterable object at 0x1096df110>), 
+ (u'jumped', <pyspark.resultiterable.ResultIterable object at 0x1096df0d0>)
+]
+>>>
+>>> grouped.map(lambda (k,v): (k, list(v))).collect()
+[
+ (u'high', [1, 1]), 
+ (u'over', [1]), 
+ (u'fox', [1, 1, 1]), 
+ (u'red', [1, 1]), 
+ (u'fence', [1]), 
+ (u'jumped', [1, 1, 1])
+]
+>>>
+>>>
+>>> freqByList = grouped.map(lambda (k,v): (k, list(v)))
+>>> freqByList.collect()
+[
+ (u'high', [1, 1]), 
+ (u'over', [1]), 
+ (u'fox', [1, 1, 1]), 
+ (u'red', [1, 1]), 
+ (u'fence', [1]), 
+ (u'jumped', [1, 1, 1])
+]
+>>>
+>>> freq2 = freqByList.mapValues(lambda x : sum(x))
+>>> freq2.collect()
+[
+ (u'high', 2), 
+ (u'over', 1), 
+ (u'fox', 3), 
+ (u'red', 2), 
+ (u'fence', 1), 
+ (u'jumped', 3)
+]
+>>>
+>>> spark
+<pyspark.sql.session.SparkSession object at 0x109672a50>
+>>>
+>>>
+>>>
+>>> sc = spark.sparkContext
+>>>
+>>> sc
+<SparkContext master=local[*] appName=PySparkShell>
+>>>
+>>>
+>>>
+>>> rdd = sc.textFile("file:///Users/mparsian/spark-2.2.1/zbin/foxdata.txt")
+>>> rdd.collect()
+[
+ u'red fox jumped high', 
+ u'fox jumped over high fence', 
+ u'red fox jumped'
+]
+>>> rdd.count()
+3
+>>> rdd.take(2)
+[
+ u'red fox jumped high', 
+ u'fox jumped over high fence'
+]
+>>> rdd.take(1)
+[u'red fox jumped high']
+>>>
+>>> words = rdd.flatMap(lambda x: x.split(" "))
+>>> words.collect()
+[
+ u'red', 
+ u'fox', 
+ u'jumped', 
+ u'high', 
+ u'fox', 
+ u'jumped', 
+ u'over', 
+ u'high', 
+ u'fence', 
+ u'red', 
+ u'fox', 
+ u'jumped'
+]
+>>> words.count()
+12
+>>> pairs = words.map(lambda x: (x, 1))
+>>> pairs.collect()
+[
+ (u'red', 1), 
+ (u'fox', 1), 
+ (u'jumped', 1), 
+ (u'high', 1), 
+ (u'fox', 1), 
+ (u'jumped', 1), 
+ (u'over', 1), 
+ (u'high', 1), 
+ (u'fence', 1), 
+ (u'red', 1), 
+ (u'fox', 1), 
+ (u'jumped', 1)
+]
+>>>
+>>>
+>>> grouped = pairs.groupByKey()
+>>> grouped.collect()
+[
+ (u'high', <pyspark.resultiterable.ResultIterable object at 0x1096ecb50>), 
+ (u'over', <pyspark.resultiterable.ResultIterable object at 0x1096ecbd0>), 
+ (u'fox', <pyspark.resultiterable.ResultIterable object at 0x1096f6110>), 
+ (u'red', <pyspark.resultiterable.ResultIterable object at 0x1096f6190>), 
+ (u'fence', <pyspark.resultiterable.ResultIterable object at 0x1096f61d0>), 
+ (u'jumped', <pyspark.resultiterable.ResultIterable object at 0x1096ecf50>)
+]
+>>>
+>>> groupedList = grouped.map(lambda (k,v): (k, list(v)))
+>>> groupedList.collect()
+[
+ (u'high', [1, 1]), 
+ (u'over', [1]), 
+ (u'fox', [1, 1, 1]), 
+ (u'red', [1, 1]), 
+ (u'fence', [1]), 
+ (u'jumped', [1, 1, 1])
+]
+>>>
+>>> freq = groupedList.mapValues(lambda x : sum(x))
+>>> freq.collect()
+[
+ (u'high', 2), 
+ (u'over', 1), 
+ (u'fox', 3), 
+ (u'red', 2), 
+ (u'fence', 1), 
+ (u'jumped', 3)
+]
+>>>
+>>>
+>>> pairs.collect()
+[
+ (u'red', 1), 
+ (u'fox', 1), 
+ (u'jumped', 1), 
+ (u'high', 1), 
+ (u'fox', 1), 
+ (u'jumped', 1), 
+ (u'over', 1), 
+ (u'high', 1), 
+ (u'fence', 1), 
+ (u'red', 1), 
+ (u'fox', 1), 
+ (u'jumped', 1)
+]
+>>> freq22 = pairs.reduceByKey(lambda x, y : x+y)
+>>> freq22.collect()
+[
+ (u'high', 2), 
+ (u'over', 1), 
+ (u'fox', 3), 
+ (u'red', 2), 
+ (u'fence', 1), 
+ (u'jumped', 3)
+]
+>>>
+>>>
+>>> myrdd = freq22.map(lambda (k,v): (k, (v,v)))
+>>> myrdd.collect()
+[
+ (u'high', (2, 2)), 
+ (u'over', (1, 1)), 
+ (u'fox', (3, 3)), 
+ (u'red', (2, 2)), 
+ (u'fence', (1, 1)), 
+ (u'jumped', (3, 3))
+]
+>>> myrdd2 = myrdd.map(lambda (k, (v1,v2)): (k, v1+v2))
+>>> myrdd2.collect()
+[
+ (u'high', 4), 
+ (u'over', 2), 
+ (u'fox', 6), 
+ (u'red', 4), 
+ (u'fence', 2), 
+ (u'jumped', 6)
+]
+>>> myrdd2 = myrdd.map(lambda (k, (v1,v2)): (k, v1+v2+100))
+>>> myrdd2.collect()
+[
+ (u'high', 104), 
+ (u'over', 102), 
+ (u'fox', 106), 
+ (u'red', 104), 
+ (u'fence', 102), 
+ (u'jumped', 106)
+]
+>>> grouped.collect()
+[
+ (u'high', <pyspark.resultiterable.ResultIterable object at 0x1096d4fd0>), 
+ (u'over', <pyspark.resultiterable.ResultIterable object at 0x109672f90>), 
+ (u'fox', <pyspark.resultiterable.ResultIterable object at 0x1096cae50>), 
+ (u'red', <pyspark.resultiterable.ResultIterable object at 0x1096cac50>), 
+ (u'fence', <pyspark.resultiterable.ResultIterable object at 0x1096ca1d0>), 
+ (u'jumped', <pyspark.resultiterable.ResultIterable object at 0x1096caed0>)
+]
+>>> sumitup = grouped.mapValues(lambda i : sum(i))
+>>> sumitup.collect()
+[
+ (u'high', 2), 
+ (u'over', 1), 
+ (u'fox', 3), 
+ (u'red', 2), 
+ (u'fence', 1), 
+ (u'jumped', 3)
+]
+>>>
+>>>
+>>>
+>>> def myfunc(x):
+...     y = x + 100
+...     return y
+...
+>>> z = myfunc(21)
+>>> z
+121
+>>> rdd55 = sumitup.map(lambda (k,v): (k, myfunc(v)))
+>>> rdd55.collect()
+[
+ (u'high', 102), 
+ (u'over', 101), 
+ (u'fox', 103), 
+ (u'red', 102), 
+ (u'fence', 101), 
+ (u'jumped', 103)
+]
+>>> rdd55.lookup('high')
+[102]
+>>> rdd55.lookup('fox')
+[103]
+>>> rdd55.lookup('foxy')
+[]

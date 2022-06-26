@@ -1,0 +1,174 @@
+>>> spark
+<pyspark.sql.session.SparkSession object at 0x1034a29d0>
+
+>>> spark.version
+'3.2.0'
+
+>>> # create a Python collection as data
+>>> data = 
+[
+ ('alex', 20, 12000), 
+ ('jane', 30, 45000), 
+ ('rafa', 40, 56000), 
+ ('ted', 30, 145000), 
+ ('xo2', 10, 1332000), 
+ ('mary', 44, 555000)
+]
+
+>>> data
+[
+ ('alex', 20, 12000), 
+ ('jane', 30, 45000), 
+ ('rafa', 40, 56000), 
+ ('ted', 30, 145000), 
+ ('xo2', 10, 1332000), 
+ ('mary', 44, 555000)
+]
+
+>>> #define column names
+>>> column_names = ['name', 'age', 'salary']
+>>> column_names
+['name', 'age', 'salary']
+
+>>> # create a DataFrame as df
+>>> df = spark.createDataFrame(data, column_names)
+>>>
+>>> # inspect created DataFrame
+>>> df
+DataFrame[name: string, age: bigint, salary: bigint]
+
+>>> # inspect created DataFrame's Schema
+>>> df.printSchema()
+root
+ |-- name: string (nullable = true)
+ |-- age: long (nullable = true)
+ |-- salary: long (nullable = true)
+
+>>> # display the first 20 rows of a DataFrame
+>>> df.show()
++----+---+-------+
+|name|age| salary|
++----+---+-------+
+|alex| 20|  12000|
+|jane| 30|  45000|
+|rafa| 40|  56000|
+| ted| 30| 145000|
+| xo2| 10|1332000|
+|mary| 44| 555000|
++----+---+-------+
+
+>>> # count the number of rows
+>>> df.count()
+6
+
+
+>>> # Creates or replaces a local temporary view with this DataFrame
+>>> df.createOrReplaceTempView("people")
+
+>>> df2 = spark.sql("select * from people where salary > 67000")
+>>> df2.show()
++----+---+-------+
+|name|age| salary|
++----+---+-------+
+| ted| 30| 145000|
+| xo2| 10|1332000|
+|mary| 44| 555000|
++----+---+-------+
+
+>>> df3 = spark.sql("select * from people where salary > 67000 and age > 11")
+>>> df3.show()
++----+---+------+
+|name|age|salary|
++----+---+------+
+| ted| 30|145000|
+|mary| 44|555000|
++----+---+------+
+
+>>> df.show()
++----+---+-------+
+|name|age| salary|
++----+---+-------+
+|alex| 20|  12000|
+|jane| 30|  45000|
+|rafa| 40|  56000|
+| ted| 30| 145000|
+| xo2| 10|1332000|
+|mary| 44| 555000|
++----+---+-------+
+
+>>> df4 = spark.sql("select * from people")
+>>> df4.show()
++----+---+-------+
+|name|age| salary|
++----+---+-------+
+|alex| 20|  12000|
+|jane| 30|  45000|
+|rafa| 40|  56000|
+| ted| 30| 145000|
+| xo2| 10|1332000|
+|mary| 44| 555000|
++----+---+-------+
+
+>>> cart = spark.sql("select * from people p1, people p2")
+>>> cart.show()
++----+---+------+----+---+-------+
+|name|age|salary|name|age| salary|
++----+---+------+----+---+-------+
+|alex| 20| 12000|alex| 20|  12000|
+|alex| 20| 12000|jane| 30|  45000|
+|alex| 20| 12000|rafa| 40|  56000|
+|alex| 20| 12000| ted| 30| 145000|
+|alex| 20| 12000| xo2| 10|1332000|
+|alex| 20| 12000|mary| 44| 555000|
+|jane| 30| 45000|alex| 20|  12000|
+|jane| 30| 45000|jane| 30|  45000|
+|jane| 30| 45000|rafa| 40|  56000|
+|jane| 30| 45000| ted| 30| 145000|
+|jane| 30| 45000| xo2| 10|1332000|
+|jane| 30| 45000|mary| 44| 555000|
+|rafa| 40| 56000|alex| 20|  12000|
+|rafa| 40| 56000|jane| 30|  45000|
+|rafa| 40| 56000|rafa| 40|  56000|
+|rafa| 40| 56000| ted| 30| 145000|
+|rafa| 40| 56000| xo2| 10|1332000|
+|rafa| 40| 56000|mary| 44| 555000|
+| ted| 30|145000|alex| 20|  12000|
+| ted| 30|145000|jane| 30|  45000|
++----+---+------+----+---+-------+
+only showing top 20 rows
+
+>>> cart                                                                                                   
+>>> Frame[name: string, age: bigint, salary: bigint, name: string, age: bigint, salary: bigint]      
+>>>                                                          
+
+>>> cart2 = spark.sql("select p1.name as name, p2.age as age, p1.salary as salary, p2.name as name2, p2.age as age2, p2.salary as salary2 from people p1, people p2")
+>>> cart2.show()
++----+---+------+-----+----+-------+
+|name|age|salary|name2|age2|salary2|
++----+---+------+-----+----+-------+
+|alex| 20| 12000| alex|  20|  12000|
+|alex| 30| 12000| jane|  30|  45000|
+|alex| 40| 12000| rafa|  40|  56000|
+|alex| 30| 12000|  ted|  30| 145000|
+|alex| 10| 12000|  xo2|  10|1332000|
+|alex| 44| 12000| mary|  44| 555000|
+|jane| 20| 45000| alex|  20|  12000|
+|jane| 30| 45000| jane|  30|  45000|
+|jane| 40| 45000| rafa|  40|  56000|
+|jane| 30| 45000|  ted|  30| 145000|
+|jane| 10| 45000|  xo2|  10|1332000|
+|jane| 44| 45000| mary|  44| 555000|
+|rafa| 20| 56000| alex|  20|  12000|
+|rafa| 30| 56000| jane|  30|  45000|
+|rafa| 40| 56000| rafa|  40|  56000|
+|rafa| 30| 56000|  ted|  30| 145000|
+|rafa| 10| 56000|  xo2|  10|1332000|
+|rafa| 44| 56000| mary|  44| 555000|
+| ted| 20|145000| alex|  20|  12000|
+| ted| 30|145000| jane|  30|  45000|
++----+---+------+-----+----+-------+
+only showing top 20 rows
+
+>>>
+>>> cart2
+DataFrame[name: string, age: bigint, salary: bigint, name2: string, age2: bigint, salary2: bigint]

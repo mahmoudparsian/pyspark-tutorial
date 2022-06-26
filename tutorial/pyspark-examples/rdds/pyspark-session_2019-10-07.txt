@@ -1,0 +1,299 @@
+$ cat /tmp/foxdata.txt
+red fox jumped high
+fox jumped over high fence
+red fox jumped
+
+$ cat  /tmp/wordcount.py
+from __future__ import print_function
+import sys
+from operator import add
+from pyspark.sql import SparkSession
+
+if __name__ == "__main__":
+#
+    print ("This is the name of the script: ", sys.argv[0])
+    print ("Number of arguments: ", len(sys.argv))
+    print ("The arguments are: " , str(sys.argv))
+#
+
+#   DEFINE your input path
+    input_path = sys.argv[1]
+    print("input_path: ", input_path)
+
+#   CREATE an instance of a SparkSession object
+    spark = SparkSession\
+        .builder\
+        .appName("PythonWordCount")\
+        .getOrCreate()
+
+#   CREATE a new RDD[String]
+    lines = spark.sparkContext.textFile(input_path)
+
+#   APPLY a SET of TRANSFORMATIONS...
+    counts = lines.flatMap(lambda x: x.split(' ')) \
+                  .map(lambda x: (x, 1)) \
+                  .reduceByKey(add)
+#                 .reduceByKey(lambda a,b : a+b)
+
+#   output = [(word1, count1), (word2, count2), ...]
+    output = counts.collect()
+    for (word, count) in output:
+        print("%s: %i" % (word, count))
+
+#   DONE!
+    spark.stop()
+    
+$ ./bin/spark-submit  /tmp/wordcount.py  /tmp/foxdata.txt 
+19/10/07 19:59:19 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+This is the name of the script:  /Users/mparsian/spark-2.4.4/zbin/wordcount.py
+Number of arguments:  2
+The arguments are:  ['/tmp/wordcount.py', '/tmp/foxdata.txt']
+input_path:  /tmp/foxdata.txt
+19/10/07 19:59:19 INFO SparkContext: Running Spark version 2.4.4
+...
+...
+...
+high: 2
+fence: 1
+red: 2
+fox: 3
+jumped: 3
+over: 1
+19/10/07 19:59:22 INFO SparkUI: Stopped Spark web UI at http://172.31.63.69:4041
+...
+
+
+$ cat /tmp/ratings.txt
+U1,M4,4
+U1,M4,3
+U1,M2,5
+U1,M2,0
+U1,M3,2
+U2,M4,3
+U2,M4,4
+U2,M4,5
+U3,M1,1
+U3,M5,6
+U3,M4,4
+U3,M4,5
+U4,M2,3
+U4,M1,1
+U4,M1,4
+U4,M1,5
+U5,M1,3
+U5,M1,1
+U6,M1,3
+U6,M9,4
+
+mparsian@Mahmouds-MacBook ~/spark-2.4.4 $ ./bin/pyspark
+Python 3.7.2 (v3.7.2:9a3ffc0492, Dec 24 2018, 02:44:43)
+[Clang 6.0 (clang-600.0.57)] on darwin
+Type "help", "copyright", "credits" or "license" for more information.
+19/10/07 18:51:12 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+Using Spark's default log4j profile: org/apache/spark/log4j-defaults.properties
+Setting default log level to "WARN".
+To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).
+Welcome to
+      ____              __
+     / __/__  ___ _____/ /__
+    _\ \/ _ \/ _ `/ __/  '_/
+   /__ / .__/\_,_/_/ /_/\_\   version 2.4.4
+      /_/
+
+Using Python version 3.7.2 (v3.7.2:9a3ffc0492, Dec 24 2018 02:44:43)
+SparkSession available as 'spark'.
+>>>
+>>>
+>>> spark
+<pyspark.sql.session.SparkSession object at 0x105c4cda0>
+>>>
+>>> input_path = "/tmp/ratings.txt"
+>>> input_path
+'/tmp/ratings.txt'
+>>>
+>>>
+>>> records = spark.sparkContext.textFile(input_path)
+>>> records.count()
+20
+>>> records.collect()
+['U1,M4,4', 'U1,M4,3', 'U1,M2,5', 'U1,M2,0', 'U1,M3,2', 'U2,M4,3', 'U2,M4,4', 'U2,M4,5', 'U3,M1,1', 'U3,M5,6', 'U3,M4,4', 'U3,M4,5', 'U4,M2,3', 'U4,M1,1', 'U4,M1,4', 'U4,M1,5', 'U5,M1,3', 'U5,M1,1', 'U6,M1,3', 'U6,M9,4']
+>>>
+>>>
+>>> records.getNumPartitions()
+2
+>>> records2 = spark.sparkContext.textFile(input_path, 5)
+>>> records2.getNumPartitions()
+5
+>>> records.saveAsTextFile('/tmp/myoutput')
+>>>
+>>>
+>>> input_data = ['fox ah jumped', 'blue of fox jumped', 'blue fox jumped']
+>>> input_data
+['fox ah jumped', 'blue of fox jumped', 'blue fox jumped']
+>>>
+>>> rdd = spark.sparkContext.parallelize(input_data)
+>>> rdd.collect()
+['fox ah jumped', 'blue of fox jumped', 'blue fox jumped']
+>>> rdd.count()
+3
+>>>
+>>> words = rdd.flatMap(lambda x: x.split(" "))
+>>> words.count()
+10
+>>> words.collect()
+['fox', 'ah', 'jumped', 'blue', 'of', 'fox', 'jumped', 'blue', 'fox', 'jumped']
+>>>
+>>> x = "fox ah jumped"
+>>> mylist = x.split(" ")
+>>> mylist
+['fox', 'ah', 'jumped']
+>>>
+>>> words.collect()
+['fox', 'ah', 'jumped', 'blue', 'of', 'fox', 'jumped', 'blue', 'fox', 'jumped']
+>>> pairs = words.map(lambda w: (w, 1))
+>>> pairs.collect()
+[('fox', 1), ('ah', 1), ('jumped', 1), ('blue', 1), ('of', 1), ('fox', 1), ('jumped', 1), ('blue', 1), ('fox', 1), ('jumped', 1)]
+>>>
+>>>
+>>> freqs = pairs.reduceByKey(lambda a, b: a+b)
+>>> freqs.collect()
+[('of', 1), ('fox', 3), ('ah', 1), ('blue', 2), ('jumped', 3)]
+>>>
+
+
+
+>>> rdd = spark.sparkContext.parallelize([1, 2, 40, 60])
+>>> rdd.collect()
+[1, 2, 40, 60]
+
+
+>>> spark
+<pyspark.sql.session.SparkSession object at 0x11935ada0>
+>>>
+
+>>> input_path = "/tmp/ratings.txt"
+>>> input_path
+'/tmp/ratings.txt'
+>>>
+>>>
+>>> records = spark.sparkContext.textFile(input_path)
+>>> records.count()
+20
+>>> records.collect()
+['U1,M4,4', 'U1,M4,3', 'U1,M2,5', 'U1,M2,0', 'U1,M3,2', 'U2,M4,3', 'U2,M4,4', 'U2,M4,5', 'U3,M1,1', 'U3,M5,6', 'U3,M4,4', 'U3,M4,5', 'U4,M2,3', 'U4,M1,1', 'U4,M1,4', 'U4,M1,5', 'U5,M1,3', 'U5,M1,1', 'U6,M1,3', 'U6,M9,4']
+>>>
+>>>
+>>> records.getNumPartitions()
+2
+>>> records2 = spark.sparkContext.textFile(input_path, 5)
+>>> records2.getNumPartitions()
+5
+>>> records.saveAsTextFile('/tmp/myoutput')
+>>>
+>>> input_data = ['fox ah jumped', 'blue of fox jumped', 'blue fox jumped']
+>>> input_data
+['fox ah jumped', 'blue of fox jumped', 'blue fox jumped']
+>>>
+>>> rdd = spark.sparkContext.parallelize(input_data)
+>>> rdd.collect()
+['fox ah jumped', 'blue of fox jumped', 'blue fox jumped']
+>>> rdd.count()
+3
+>>>
+>>> words = rdd.flatMap(lambda x: x.split(" "))
+>>> words.count()
+10
+>>> words.collect()
+['fox', 'ah', 'jumped', 'blue', 'of', 'fox', 'jumped', 'blue', 'fox', 'jumped']
+>>> words.collect()
+['fox', 'ah', 'jumped', 'blue', 'of', 'fox', 'jumped', 'blue', 'fox', 'jumped']
+>>>
+>>> pairs = words.map(lambda w: (w, 1))
+>>> pairs.collect()
+[('fox', 1), ('ah', 1), ('jumped', 1), ('blue', 1), ('of', 1), ('fox', 1), ('jumped', 1), ('blue', 1), ('fox', 1), ('jumped', 1)]
+>>>
+>>>
+>>> freqs = pairs.reduceByKey(lambda a, b: a+b)
+>>> freqs.collect()
+[('of', 1), ('fox', 3), ('ah', 1), ('blue', 2), ('jumped', 3)]
+
+>>> spark
+<pyspark.sql.session.SparkSession object at 0x10e636da0>
+>>>
+>>>
+>>> coll = ['fox ah jumped', 'ah blue fox jumped', 'blue fox jumped']
+>>> len(coll)
+3
+>>> rdd = spark.sparkContext.parallelize(coll)
+>>> rdd.collect()
+['fox ah jumped', 'ah blue fox jumped', 'blue fox jumped']
+>>>
+>>> x ="A B C"
+>>> mylist = x.split(" ")
+>>> mylist
+['A', 'B', 'C']
+>>>
+>>>
+>>> words = rdd.flatMap(lambda x: x.split(" "))
+>>> words.count()
+10
+>>> words.collect()
+['fox', 'ah', 'jumped', 'ah', 'blue', 'fox', 'jumped', 'blue', 'fox', 'jumped']
+>>> words
+PythonRDD[6] at collect at <stdin>:1
+>>> pairs = words.map(lambda word: (word, 1))
+>>> pairs.collect()
+[('fox', 1), ('ah', 1), ('jumped', 1), ('ah', 1), ('blue', 1), ('fox', 1), ('jumped', 1), ('blue', 1), ('fox', 1), ('jumped', 1)]
+>>>
+>>> freqs = pairs.reduceByKey(lambda a, b: a+b)
+>>> freqs.collect()
+[('fox', 3), ('ah', 2), ('blue', 2), ('jumped', 3)]
+>>>
+>>>
+>>>
+>>>
+>>> data = [1, 2, 3, 4, 40, 50, 60]
+>>> data
+[1, 2, 3, 4, 40, 50, 60]
+>>> rdd = spark.sparkContext.parallelize(data)
+>>> rdd
+ParallelCollectionRDD[13] at parallelize at PythonRDD.scala:195
+>>> rdd.collect()
+[1, 2, 3, 4, 40, 50, 60]
+>>> rdd.count()
+7
+
+>>>
+>>> rdd
+ParallelCollectionRDD[13] at parallelize at PythonRDD.scala:195
+>>> rdd.collect()
+[1, 2, 3, 4, 40, 50, 60]
+>>>
+>>> def custom_fun(n):
+...    if n < 40:
+...       return [n, 100]
+...    elif n < 50:
+...       return [200, 300, 400]
+...    else:
+...       return []
+...
+>>> custom_fun(30)
+[30, 100]
+>>> custom_fun(50)
+[]
+>>> custom_fun(60)
+[]
+>>> target = rdd.flatMap(custom_fun)
+>>> target.collect()
+[1, 100, 2, 100, 3, 100, 4, 100, 200, 300, 400]
+>>> rdd.getNumPartitions()
+8
+>>>
+>>>
+>>>
+>>> data
+[1, 2, 3, 4, 40, 50, 60]
+>>> rdd = spark.sparkContext.parallelize(data, 3)
+>>> rdd.getNumPartitions()
+3
+>>>

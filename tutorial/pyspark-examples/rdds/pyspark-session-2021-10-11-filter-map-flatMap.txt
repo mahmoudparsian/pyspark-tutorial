@@ -1,0 +1,147 @@
+Understand filter(), map(), and flatMap()
+
+$ ./bin/pyspark
+Python 3.7.2 (v3.7.2:9a3ffc0492, Dec 24 2018, 02:44:43)
+To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).
+Welcome to
+      ____              __
+     / __/__  ___ _____/ /__
+    _\ \/ _ \/ _ `/ __/  '_/
+   /__ / .__/\_,_/_/ /_/\_\   version 3.1.2
+      /_/
+
+Using Python version 3.7.2 (v3.7.2:9a3ffc0492, Dec 24 2018 02:44:43)
+Spark context Web UI available at http://10.0.0.94:4040
+Spark context available as 'sc' (master = local[*], app id = local-1634007457887).
+SparkSession available as 'spark'.
+>>>
+>>>
+>>>
+>>> records = ["this is fox", "fox", "is", "fox is red", "fox is gone"]
+>>> records
+['this is fox', 'fox', 'is', 'fox is red', 'fox is gone']
+>>> >>>
+>>>
+>>> rdd = sc.parallelize(records)
+>>>
+>>> rdd
+ParallelCollectionRDD[0] at readRDDFromFile at PythonRDD.scala:274
+>>> rdd.count()
+5
+>>> rdd.collect()
+['this is fox', 'fox', 'is', 'fox is red', 'fox is gone']
+>>>
+>>>
+>>> filtered = rdd.filter(lambda x: len(x) > 3)
+>>> filtered.collect()
+['this is fox', 'fox is red', 'fox is gone']
+>>>
+>>>
+>>> def apply_filter(x):
+...     if len(x) > 3: return True
+...     return False
+...
+>>>
+>>> b = apply_filter("this is a long one")
+>>> b
+True
+>>> c = apply_filter("one")
+>>> c
+False
+>>>
+>>> filtered_recs = rdd.filter(apply_filter)
+>>>
+>>> filtered_recs.collect()
+['this is fox', 'fox is red', 'fox is gone']
+>>>
+>>>
+>>> rdd.collect()
+['this is fox', 'fox', 'is', 'fox is red', 'fox is gone']
+>>> flattened = rdd.flatMap(lambda x: x.split(" "))
+>>>
+>>> flattened.collect()
+['this', 'is', 'fox', 'fox', 'is', 'fox', 'is', 'red', 'fox', 'is', 'gone']
+>>> flattened.count()
+11
+>>> mapped = rdd.map(lambda x: x.split(" "))
+>>> mapped.collect()
+[['this', 'is', 'fox'], ['fox'], ['is'], ['fox', 'is', 'red'], ['fox', 'is', 'gone']]
+>>> mapped.count()
+5
+>>>
+>>> a = [ ["this", "is"], [], [], ["fox", "is", "red", "jumped"] ]
+>>> a
+[['this', 'is'], [], [], ['fox', 'is', 'red', 'jumped']]
+>>> rdd_list = sc.parallelize(a)
+>>> rdd_list.collect()
+[['this', 'is'], [], [], ['fox', 'is', 'red', 'jumped']]
+>>> rdd_list.count()
+4
+>>> flattened22 = rdd_list.flatMap(lambda L : L)
+>>> flattened22.collect()
+['this', 'is', 'fox', 'is', 'red', 'jumped']
+>>>
+>>>
+>>> key_value_pairs = [("a", 10), ("a", 20), ("a", 30), ("a", 40), ("b", 300), ("b", 400)]
+>>> key_value_pairs
+[('a', 10), ('a', 20), ('a', 30), ('a', 40), ('b', 300), ('b', 400)]
+>>> key_value_rdd = sc.parallelize(key_value_pairs)
+>>>
+>>> key_value_rdd.collect()
+[('a', 10), ('a', 20), ('a', 30), ('a', 40), ('b', 300), ('b', 400)]
+>>>
+>>> def custom_func(x):
+...     k = x[0]
+...     v = x[1]
+...     if (v < 30): return []
+...     return [(k, v+1000), ("MYKEY", v+4000)]
+...
+>>>
+>>> y = custom_func(("x", 25))
+>>> y
+[]
+>>> y = custom_func(("x", 300))
+>>> y
+[('x', 1300), ('MYKEY', 4300)]
+>>> flattened = key_value_rdd.flatMap(custom_func)
+>>> flattened.collect()
+[('a', 1030), ('MYKEY', 4030), ('a', 1040), ('MYKEY', 4040), ('b', 1300), ('MYKEY', 4300), ('b', 1400), ('MYKEY', 4400)]
+>>> flattened.count()
+8
+>>>
+>>> mapped = key_value_rdd.map(custom_func)
+>>> mapped.collect()
+[[], [], [('a', 1030), ('MYKEY', 4030)], [('a', 1040), ('MYKEY', 4040)], [('b', 1300), ('MYKEY', 4300)], [('b', 1400), ('MYKEY', 4400)]]
+>>> mapped.count()
+6
+>>> filtered99 = mapped.filter(lambda x: len(x) > 0)
+>>> filtered99.collect()
+[[('a', 1030), ('MYKEY', 4030)], [('a', 1040), ('MYKEY', 4040)], [('b', 1300), ('MYKEY', 4300)], [('b', 1400), ('MYKEY', 4400)]]
+>>>
+>>>
+>>>
+>>> x = set()
+>>> x.add(1)
+>>> x
+{1}
+>>> x.add(1)
+>>> x
+{1}
+>>> x.add(3)
+>>> x.add(4)
+>>> x
+{1, 3, 4}
+>>> x.add(4)
+>>> x.add(4)
+>>> x.add(4)
+>>> x.add(4)
+>>> x
+{1, 3, 4}
+>>> x = []
+>>> x.append(1)
+>>> x
+[1]
+>>> x.append(1)
+>>> x
+[1, 1]
+>>>

@@ -1,0 +1,67 @@
+ $ ./bin/pyspark
+Python 3.7.2 (v3.7.2:9a3ffc0492, Dec 24 2018, 02:44:43)
+[Clang 6.0 (clang-600.0.57)] on darwin
+Type "help", "copyright", "credits" or "license" for more information.
+
+Welcome to
+      ____              __
+     / __/__  ___ _____/ /__
+    _\ \/ _ \/ _ `/ __/  '_/
+   /__ / .__/\_,_/_/ /_/\_\   version 2.4.4
+      /_/
+
+Using Python version 3.7.2 (v3.7.2:9a3ffc0492, Dec 24 2018 02:44:43)
+SparkSession available as 'spark'.
+>>>
+>>> spark
+<pyspark.sql.session.SparkSession object at 0x117a227b8>
+>>>
+>>> input_path = '/Users/mparsian/spark-2.4.4/zbin/foxdata.txt'
+>>> input_path
+'/Users/mparsian/spark-2.4.4/zbin/foxdata.txt'
+>>>
+>>> recs = spark.sparkContext.textFile(input_path)
+>>>
+>>> recs.collect()
+['red fox jumped high', 'fox jumped over high fence', 'red fox jumped']
+>>> recs.count()
+3
+>>>
+>>>
+>>> words = recs.map(lambda r: r.split(" "))
+>>> words.collect()
+[['red', 'fox', 'jumped', 'high'], ['fox', 'jumped', 'over', 'high', 'fence'], ['red', 'fox', 'jumped']]
+>>>
+>>> words.take(1)
+[['red', 'fox', 'jumped', 'high']]
+>>> words.take(2)
+[['red', 'fox', 'jumped', 'high'], ['fox', 'jumped', 'over', 'high', 'fence']]
+>>> # recs : RDD[String]
+...
+>>> # words : RDD[[String]]
+...
+>>> x = "fox jumped"
+>>> y = x.split(" ")
+>>> y
+['fox', 'jumped']
+>>>
+>>>
+>>> single_words = words.flatMap(lambda x: x)
+>>> single_words.collect()
+['red', 'fox', 'jumped', 'high', 'fox', 'jumped', 'over', 'high', 'fence', 'red', 'fox', 'jumped']
+>>> words.count()
+3
+>>> single_words.count()
+12
+>>> # single_words : RDD[String]
+...
+>>>
+>>> pairs = single_words.map(lambda x : (x, 1))
+>>> pairs.collect()
+[('red', 1), ('fox', 1), ('jumped', 1), ('high', 1), ('fox', 1), ('jumped', 1), ('over', 1), ('high', 1), ('fence', 1), ('red', 1), ('fox', 1), ('jumped', 1)]
+>>>
+>>> pairs.collect()
+[('red', 1), ('fox', 1), ('jumped', 1), ('high', 1), ('fox', 1), ('jumped', 1), ('over', 1), ('high', 1), ('fence', 1), ('red', 1), ('fox', 1), ('jumped', 1)]
+>>> freq = pairs.reduceByKey(lambda a, b : a+b)
+>>> freq.collect()
+[('high', 2), ('fence', 1), ('red', 2), ('fox', 3), ('jumped', 3), ('over', 1)]

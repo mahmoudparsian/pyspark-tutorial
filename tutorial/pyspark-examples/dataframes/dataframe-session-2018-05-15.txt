@@ -1,0 +1,889 @@
+$ cat emps_no_header.txt
+1001,alex,67000,SALES
+1002,bob,24000,SALES
+1003,boby,24000,SALES
+1004,jane,69000,SOFTWARE
+1005,betty,55000,SOFTWARE
+1006,jeff,59000,SOFTWARE
+1007,dara,72000,SOFTWARE
+
+$ cat emps_with_header.txt
+id,name,salary,dept
+1001,alex,67000,SALES
+1002,bob,24000,SALES
+1003,boby,24000,SALES
+1004,jane,69000,SOFTWARE
+1005,betty,55000,SOFTWARE
+1006,jeff,59000,SOFTWARE
+1007,dara,72000,SOFTWARE
+
+
+$ ./zbin/zstart_cluster.sh
+Welcome to
+      ____              __
+     / __/__  ___ _____/ /__
+    _\ \/ _ \/ _ `/ __/  '_/
+   /__ / .__/\_,_/_/ /_/\_\   version 2.3.0
+      /_/
+
+Using Python version 2.7.10 (default, Feb  7 2017 00:08:15)
+SparkSession available as 'spark'.
+
+
+>>> mylist = [('Alice', 1), ('Bob', 2), ('Mary', 3)]
+>>> mylist
+[('Alice', 1), ('Bob', 2), ('Mary', 3)]
+>>> df = spark.createDataFrame(mylist)
+>>> df.show()
++-----+---+
+|   _1| _2|
++-----+---+
+|Alice|  1|
+|  Bob|  2|
+| Mary|  3|
++-----+---+
+
+>>> df2 = spark.createDataFrame(mylist, ["name", "age"])
+>>> df2.show()
++-----+---+
+| name|age|
++-----+---+
+|Alice|  1|
+|  Bob|  2|
+| Mary|  3|
++-----+---+
+
+>>> singles = [('Alice'), ('Bob'), ('Mary')]
+>>> singles
+['Alice', 'Bob', 'Mary']
+>>> singlesDF = spark.createDataFrame(singles)
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+  File "/Users/mparsian/spark-2.3.0/python/pyspark/sql/session.py", line 689, in createDataFrame
+    rdd, schema = self._createFromLocal(map(prepare, data), schema)
+  File "/Users/mparsian/spark-2.3.0/python/pyspark/sql/session.py", line 410, in _createFromLocal
+    struct = self._inferSchemaFromList(data, names=schema)
+  File "/Users/mparsian/spark-2.3.0/python/pyspark/sql/session.py", line 342, in _inferSchemaFromList
+    schema = reduce(_merge_type, (_infer_schema(row, names) for row in data))
+  File "/Users/mparsian/spark-2.3.0/python/pyspark/sql/session.py", line 342, in <genexpr>
+    schema = reduce(_merge_type, (_infer_schema(row, names) for row in data))
+  File "/Users/mparsian/spark-2.3.0/python/pyspark/sql/types.py", line 1094, in _infer_schema
+    raise TypeError("Can not infer schema for type: %s" % type(row))
+TypeError: Can not infer schema for type: <type 'str'>
+
+>>> singles_revised = [('Alice',), ('Bob',), ('Mary',)]
+>>> singles_revised
+[('Alice',), ('Bob',), ('Mary',)]
+>>> singlesRevisedDF =spark.createDataFrame(singles_revised)
+>>> singlesRevisedDF.show()
++-----+
+|   _1|
++-----+
+|Alice|
+|  Bob|
+| Mary|
++-----+
+
+>>> singlesRevisedDF2 =spark.createDataFrame(singles_revised, ["name"])
+>>> singlesRevisedDF2.show()
++-----+
+| name|
++-----+
+|Alice|
+|  Bob|
+| Mary|
++-----+
+
+>>>
+>>> from pyspark.sql.types import *
+>>> from pyspark.sql import Row
+>>> schema = StructType([StructField("name", StringType(), True)])
+>>> mylist = ['name1','name2','name3']
+>>> mylist
+['name1', 'name2', 'name3']
+>>> rdd = sc.parallelize(mylist).map (lambda x: Row(x))
+>>> rdd.collect()
+[<Row(name1)>, <Row(name2)>, <Row(name3)>]
+>>> df = spark.createDataFrame(rdd, schema)
+>>> df.show()
++-----+
+| name|
++-----+
+|name1|
+|name2|
+|name3|
++-----+
+
+>>> list_of_tuples = [
+...   (1001, "Alex", 30, "Sales"),
+...   (1002, "Mary", 32, "Sales"),
+...   (1003, "Jane", 40, "Sales"),
+...   (1004, "Bob", 45, "Business"),
+...   (1005, "Jeff", 60, "Business")
+... ]
+>>> list_of_tuples
+[(1001, 'Alex', 30, 'Sales'), (1002, 'Mary', 32, 'Sales'), (1003, 'Jane', 40, 'Sales'), (1004, 'Bob', 45, 'Business'), (1005, 'Jeff', 60, 'Business')]
+>>> schema = ["id", "name", "age", "dept"]
+>>> df = spark.createDataFrame(list_of_tuples , schema)
+>>>
+>>> df.show()
++----+----+---+--------+
+|  id|name|age|    dept|
++----+----+---+--------+
+|1001|Alex| 30|   Sales|
+|1002|Mary| 32|   Sales|
+|1003|Jane| 40|   Sales|
+|1004| Bob| 45|Business|
+|1005|Jeff| 60|Business|
++----+----+---+--------+
+
+>>> df.printSchema()
+root
+ |-- id: long (nullable = true)
+ |-- name: string (nullable = true)
+ |-- age: long (nullable = true)
+ |-- dept: string (nullable = true)
+
+>>> df.printSchema()
+root
+ |-- id: long (nullable = true)
+ |-- name: string (nullable = true)
+ |-- age: long (nullable = true)
+ |-- dept: string (nullable = true)
+
+>>> df = spark.createDataFrame(list_of_tuples , schema)
+>>> df.collect()
+[Row(id=1001, name=u'Alex', age=30, dept=u'Sales'), Row(id=1002, name=u'Mary', age=32, dept=u'Sales'), Row(id=1003, name=u'Jane', age=40, dept=u'Sales'), Row(id=1004, name=u'Bob', age=45, dept=u'Business'), Row(id=1005, name=u'Jeff', age=60, dept=u'Business')]
+>>>
+>>>
+>>>
+>>> df = spark.read.csv('file:///tmp/emps_no_header.txt')
+>>> df.collect()
+[Row(_c0=u'1001', _c1=u'alex', _c2=u'67000', _c3=u'SALES'), Row(_c0=u'1002', _c1=u'bob', _c2=u'24000', _c3=u'SALES'), Row(_c0=u'1003', _c1=u'bob', _c2=u'24000', _c3=u'SALES'), Row(_c0=u'1004', _c1=u'jane', _c2=u'69000', _c3=u'SOFTWARE'), Row(_c0=u'1005', _c1=u'betty', _c2=u'55000', _c3=u'SOFTWARE'), Row(_c0=u'1006', _c1=u'jeff', _c2=u'59000', _c3=u'SOFTWARE'), Row(_c0=u'1007', _c1=u'dara', _c2=u'72000', _c3=u'SOFTWARE')]
+>>> df.show()
++----+-----+-----+--------+
+| _c0|  _c1|  _c2|     _c3|
++----+-----+-----+--------+
+|1001| alex|67000|   SALES|
+|1002|  bob|24000|   SALES|
+|1003|  bob|24000|   SALES|
+|1004| jane|69000|SOFTWARE|
+|1005|betty|55000|SOFTWARE|
+|1006| jeff|59000|SOFTWARE|
+|1007| dara|72000|SOFTWARE|
++----+-----+-----+--------+
+
+>>> df.count()
+7
+>>> df.printSchema()
+root
+ |-- _c0: string (nullable = true)
+ |-- _c1: string (nullable = true)
+ |-- _c2: string (nullable = true)
+ |-- _c3: string (nullable = true)
+
+>>> df2 = df.selectExpr("_c0 as id", "_c1 as name", "_c2 as salary", "_c3 as dept")
+>>> df2.show()
++----+-----+------+--------+
+|  id| name|salary|    dept|
++----+-----+------+--------+
+|1001| alex| 67000|   SALES|
+|1002|  bob| 24000|   SALES|
+|1003|  bob| 24000|   SALES|
+|1004| jane| 69000|SOFTWARE|
+|1005|betty| 55000|SOFTWARE|
+|1006| jeff| 59000|SOFTWARE|
+|1007| dara| 72000|SOFTWARE|
++----+-----+------+--------+
+
+>>> df2.printSchema()
+root
+ |-- id: string (nullable = true)
+ |-- name: string (nullable = true)
+ |-- salary: string (nullable = true)
+ |-- dept: string (nullable = true)
+
+>>>
+>>> df2.createOrReplaceTempView("emp_table")
+>>> df2
+DataFrame[id: string, name: string, salary: string, dept: string]
+>>> df3 = spark.sql("SELECT * from emp_table where id > 1002")
+>>> df3.show()
++----+-----+------+--------+
+|  id| name|salary|    dept|
++----+-----+------+--------+
+|1003|  bob| 24000|   SALES|
+|1004| jane| 69000|SOFTWARE|
+|1005|betty| 55000|SOFTWARE|
+|1006| jeff| 59000|SOFTWARE|
+|1007| dara| 72000|SOFTWARE|
++----+-----+------+--------+
+
+>>> df4 = spark.sql("SELECT * from emp_table where salary < 60000")
+>>> df4.show()
++----+-----+------+--------+
+|  id| name|salary|    dept|
++----+-----+------+--------+
+|1002|  bob| 24000|   SALES|
+|1003|  bob| 24000|   SALES|
+|1005|betty| 55000|SOFTWARE|
+|1006| jeff| 59000|SOFTWARE|
++----+-----+------+--------+
+
+>>>
+>>> df5 = spark.sql("SELECT name, salary from emp_table where salary > 25000")
+>>> df5.show()
++-----+------+
+| name|salary|
++-----+------+
+| alex| 67000|
+| jane| 69000|
+|betty| 55000|
+| jeff| 59000|
+| dara| 72000|
++-----+------+
+
+>>> df5
+DataFrame[name: string, salary: string]
+>>>
+>>>
+>>>
+>>>
+>>> df6 = spark.sql("SELECT name, salary from emp_table where salary > 55000 order by salary")
+>>> df6
+DataFrame[name: string, salary: string]
+>>> df6.show()
++----+------+
+|name|salary|
++----+------+
+|jeff| 59000|
+|alex| 67000|
+|jane| 69000|
+|dara| 72000|
++----+------+
+
+>>> df.show()
++----+-----+-----+--------+
+| _c0|  _c1|  _c2|     _c3|
++----+-----+-----+--------+
+|1001| alex|67000|   SALES|
+|1002|  bob|24000|   SALES|
+|1003|  bob|24000|   SALES|
+|1004| jane|69000|SOFTWARE|
+|1005|betty|55000|SOFTWARE|
+|1006| jeff|59000|SOFTWARE|
+|1007| dara|72000|SOFTWARE|
++----+-----+-----+--------+
+
+>>> df7 = spark.sql("SELECT dept, count(*) as count from emp_table group by dept")
+>>> df7.show()
++--------+-----+
+|    dept|count|
++--------+-----+
+|   SALES|    3|
+|SOFTWARE|    4|
++--------+-----+
+
+>>> df7
+DataFrame[dept: string, count: bigint]
+>>>
+>>>
+>>>
+>>> df8 = spark.read.option("inferSchema", "true").csv('file:///tmp/emps_no_header.txt')
+>>> df8.show()
++----+-----+-----+--------+
+| _c0|  _c1|  _c2|     _c3|
++----+-----+-----+--------+
+|1001| alex|67000|   SALES|
+|1002|  bob|24000|   SALES|
+|1003|  bob|24000|   SALES|
+|1004| jane|69000|SOFTWARE|
+|1005|betty|55000|SOFTWARE|
+|1006| jeff|59000|SOFTWARE|
+|1007| dara|72000|SOFTWARE|
++----+-----+-----+--------+
+
+>>> df8.printSchema()
+root
+ |-- _c0: integer (nullable = true)
+ |-- _c1: string (nullable = true)
+ |-- _c2: integer (nullable = true)
+ |-- _c3: string (nullable = true)
+
+
+>>> df8.dtypes
+[('_c0', 'int'), ('_c1', 'string'), ('_c2', 'int'), ('_c3', 'string')]
+>>>
+>>> df8 = spark.read.option("inferSchema", "true").csv('file:///tmp/emps_no_header.txt')
+>>> df8.show()
++----+-----+-----+--------+
+| _c0|  _c1|  _c2|     _c3|
++----+-----+-----+--------+
+|1001| alex|67000|   SALES|
+|1002|  bob|24000|   SALES|
+|1003|  bob|24000|   SALES|
+|1004| jane|69000|SOFTWARE|
+|1005|betty|55000|SOFTWARE|
+|1006| jeff|59000|SOFTWARE|
+|1007| dara|72000|SOFTWARE|
++----+-----+-----+--------+
+
+>>> df8.printSchema()
+root
+ |-- _c0: integer (nullable = true)
+ |-- _c1: string (nullable = true)
+ |-- _c2: integer (nullable = true)
+ |-- _c3: string (nullable = true)
+
+>>> df9 = df8.selectExpr("_c0 as id", "_c1 as name", "_c2 as salary", "_c3 as dept")
+>>> df9.show()
++----+-----+------+--------+
+|  id| name|salary|    dept|
++----+-----+------+--------+
+|1001| alex| 67000|   SALES|
+|1002|  bob| 24000|   SALES|
+|1003|  bob| 24000|   SALES|
+|1004| jane| 69000|SOFTWARE|
+|1005|betty| 55000|SOFTWARE|
+|1006| jeff| 59000|SOFTWARE|
+|1007| dara| 72000|SOFTWARE|
++----+-----+------+--------+
+
+>>> df9.printSchema()
+root
+ |-- id: integer (nullable = true)
+ |-- name: string (nullable = true)
+ |-- salary: integer (nullable = true)
+ |-- dept: string (nullable = true)
+
+>>>
+>>>
+>>>
+>>>
+>>> from pyspark.sql.types import StructType
+>>> from pyspark.sql.types import StructField
+>>> from pyspark.sql.types import StringType
+>>> from pyspark.sql.types import IntegerType
+>>>
+>>> emps_schema = StructType([
+... StructField("id", IntegerType(), True),
+... StructField("name", StringType(), True),
+... StructField("salary", IntegerType(), True),
+... StructField("dept", StringType(), True)
+... ])
+>>>
+>>> emps_schema
+StructType(List(StructField(id,IntegerType,true),StructField(name,StringType,true),StructField(salary,IntegerType,true),StructField(dept,StringType,true)))
+>>>
+>>> empsDF = spark.read.csv('file:///tmp/emps_no_header.txt', schema=emps_schema)
+>>> empsDF.show()
++----+-----+------+--------+
+|  id| name|salary|    dept|
++----+-----+------+--------+
+|1001| alex| 67000|   SALES|
+|1002|  bob| 24000|   SALES|
+|1003|  bob| 24000|   SALES|
+|1004| jane| 69000|SOFTWARE|
+|1005|betty| 55000|SOFTWARE|
+|1006| jeff| 59000|SOFTWARE|
+|1007| dara| 72000|SOFTWARE|
++----+-----+------+--------+
+
+>>> empsDF.printSchema()
+root
+ |-- id: integer (nullable = true)
+ |-- name: string (nullable = true)
+ |-- salary: integer (nullable = true)
+ |-- dept: string (nullable = true)
+
+>>>
+>>> df = spark.read.format("csv").option("header","true").option("inferSchema", "true").load('file:///tmp/emps_with_header.txt')
+>>> df.show()
++----+-----+------+--------+
+|  id| name|salary|    dept|
++----+-----+------+--------+
+|1001| alex| 67000|   SALES|
+|1002|  bob| 24000|   SALES|
+|1003| boby| 24000|   SALES|
+|1004| jane| 69000|SOFTWARE|
+|1005|betty| 55000|SOFTWARE|
+|1006| jeff| 59000|SOFTWARE|
+|1007| dara| 72000|SOFTWARE|
++----+-----+------+--------+
+
+>>> df.printSchema()
+root
+ |-- id: integer (nullable = true)
+ |-- name: string (nullable = true)
+ |-- salary: integer (nullable = true)
+ |-- dept: string (nullable = true)
+
+
+>>>
+
+>>> mylist = [('Alice', 1), ('Bob', 2), ('Mary', ''), ('Terry', ''), ('' , 4), ('' , 5)]
+>>> mylist
+[('Alice', 1), ('Bob', 2), ('Mary', ''), ('Terry', ''), ('', 4), ('', 5)]
+
+>>> df = spark.read.format("csv").option("header","true").option("inferSchema", "true").load('file:///tmp/name_and_age.txt')
+>>> df.show()
++-----+----+
+| name| age|
++-----+----+
+|Alice|   1|
+|  Bob|   2|
+| null|   3|
+| null|   4|
+| Jeff|null|
+| Mary|null|
++-----+----+
+
+>>> df.na.fill({'age': 100, 'name': 'unknown'}).show()
++-------+---+
+|   name|age|
++-------+---+
+|  Alice|  1|
+|    Bob|  2|
+|unknown|  3|
+|unknown|  4|
+|   Jeff|100|
+|   Mary|100|
++-------+---+
+
+
+>>> list = [2,3,4]
+>>> rdd = spark.sparkContext.parallelize(list)
+>>> rdd.collect()
+[2, 3, 4]
+
+>>> list = [(1,2),(3,4)]
+>>> rdd = spark.sparkContext.parallelize(list)
+>>> rdd.collect()
+[(1, 2), (3, 4)]
+>>> df = spark.createDataFrame(rdd, ["a", "b"])
+>>> df.collect()
+[Row(a=1, b=2), Row(a=3, b=4)]
+>>>
+>>>
+
+
+>>> spark
+<pyspark.sql.session.SparkSession object at 0x10f6bfa90>
+>>>
+>>>
+>>>
+>>> df = spark.read.csv('file:///tmp/emps_no_header.txt')
+>>> df
+DataFrame[_c0: string, _c1: string, _c2: string, _c3: string]
+>>> df.show()
++----+-----+-----+--------+
+| _c0|  _c1|  _c2|     _c3|
++----+-----+-----+--------+
+|1001| alex|67000|   SALES|
+|1002|  bob|24000|   SALES|
+|1003| boby|24000|   SALES|
+|1004| jane|69000|SOFTWARE|
+|1005|betty|55000|SOFTWARE|
+|1006| jeff|59000|SOFTWARE|
+|1007| dara|72000|SOFTWARE|
++----+-----+-----+--------+
+
+>>> df.printSchema()
+root
+ |-- _c0: string (nullable = true)
+ |-- _c1: string (nullable = true)
+ |-- _c2: string (nullable = true)
+ |-- _c3: string (nullable = true)
+
+
+>>> df2 = spark.read.option("inferSchema", "true").csv('file:///tmp/emps_no_header.txt')
+>>> df2.show()
++----+-----+-----+--------+
+| _c0|  _c1|  _c2|     _c3|
++----+-----+-----+--------+
+|1001| alex|67000|   SALES|
+|1002|  bob|24000|   SALES|
+|1003| boby|24000|   SALES|
+|1004| jane|69000|SOFTWARE|
+|1005|betty|55000|SOFTWARE|
+|1006| jeff|59000|SOFTWARE|
+|1007| dara|72000|SOFTWARE|
++----+-----+-----+--------+
+
+>>> df2.printSchema()
+root
+ |-- _c0: integer (nullable = true)
+ |-- _c1: string (nullable = true)
+ |-- _c2: integer (nullable = true)
+ |-- _c3: string (nullable = true)
+
+>>> df.printSchema()
+root
+ |-- _c0: string (nullable = true)
+ |-- _c1: string (nullable = true)
+ |-- _c2: string (nullable = true)
+ |-- _c3: string (nullable = true)
+
+>>>
+>>>
+>>>
+>>>
+>>>
+>>> from pyspark.sql.types import StructType
+>>> from pyspark.sql.types import StructField
+>>> from pyspark.sql.types import StringType
+>>> from pyspark.sql.types import IntegerType
+>>>
+>>> emps_schema = StructType([
+... StructField("id", IntegerType(), True),
+... StructField("name", StringType(), True),
+... StructField("salary", IntegerType(), True),
+... StructField("dept", StringType(), True)
+... ])
+>>>
+>>> emps_schema
+StructType(List(StructField(id,IntegerType,true),StructField(name,StringType,true),StructField(salary,IntegerType,true),StructField(dept,StringType,true)))
+>>>
+>>> empsDF = spark.read.csv('file:///tmp/emps_no_header.txt', schema=emps_schema)
+>>> empsDF.show()
++----+-----+------+--------+
+|  id| name|salary|    dept|
++----+-----+------+--------+
+|1001| alex| 67000|   SALES|
+|1002|  bob| 24000|   SALES|
+|1003| boby| 24000|   SALES|
+|1004| jane| 69000|SOFTWARE|
+|1005|betty| 55000|SOFTWARE|
+|1006| jeff| 59000|SOFTWARE|
+|1007| dara| 72000|SOFTWARE|
++----+-----+------+--------+
+
+>>> empsDF.printSchema()
+root
+ |-- id: integer (nullable = true)
+ |-- name: string (nullable = true)
+ |-- salary: integer (nullable = true)
+ |-- dept: string (nullable = true)
+
+>>>
+>>>
+>>> empsDF.createOrReplaceTempView("emp_table")
+>>>
+>>>
+>>>
+>>>
+>>> spark.sql("select * from emp_table where salary > 24000").show()
++----+-----+------+--------+
+|  id| name|salary|    dept|
++----+-----+------+--------+
+|1001| alex| 67000|   SALES|
+|1004| jane| 69000|SOFTWARE|
+|1005|betty| 55000|SOFTWARE|
+|1006| jeff| 59000|SOFTWARE|
+|1007| dara| 72000|SOFTWARE|
++----+-----+------+--------+
+
+>>> spark.sql("select id, salary from emp_table where salary > 24000").show()
++----+------+
+|  id|salary|
++----+------+
+|1001| 67000|
+|1004| 69000|
+|1005| 55000|
+|1006| 59000|
+|1007| 72000|
++----+------+
+
+>>> spark.sql("select dept, count(*) as count from emp_table group by dept").show()
++--------+-----+
+|    dept|count|
++--------+-----+
+|   SALES|    3|
+|SOFTWARE|    4|
++--------+-----+
+
+>>>
+>>>
+>>>
+>>>
+>>>
+>>> df = spark.read.format("csv").option("header","true").option("inferSchema", "true").load('file:///tmp/emps_with_header.txt')
+>>>
+>>>
+>>> df.show()
++----+-----+------+--------+
+|  id| name|salary|    dept|
++----+-----+------+--------+
+|1001| alex| 67000|   SALES|
+|1002|  bob| 24000|   SALES|
+|1003| boby| 24000|   SALES|
+|1004| jane| 69000|SOFTWARE|
+|1005|betty| 55000|SOFTWARE|
+|1006| jeff| 59000|SOFTWARE|
+|1007| dara| 72000|SOFTWARE|
++----+-----+------+--------+
+
+>>> df.printSchema()
+root
+ |-- id: integer (nullable = true)
+ |-- name: string (nullable = true)
+ |-- salary: integer (nullable = true)
+ |-- dept: string (nullable = true)
+
+
+
+>>>
+>>> spark
+<pyspark.sql.session.SparkSession object at 0x10f6bfa90>
+>>>
+>>>
+>>>
+>>> df = spark.read.csv('file:///tmp/emps_no_header.txt')
+>>> df.show()
++----+-----+-----+--------+
+| _c0|  _c1|  _c2|     _c3|
++----+-----+-----+--------+
+|1001| alex|67000|   SALES|
+|1002|  bob|24000|   SALES|
+|1003| boby|24000|   SALES|
+|1004| jane|69000|SOFTWARE|
+|1005|betty|55000|SOFTWARE|
+|1006| jeff|59000|SOFTWARE|
+|1007| dara|72000|SOFTWARE|
++----+-----+-----+--------+
+
+>>> df = spark.read.csv('file:///tmp/emps_with_header.txt')
+>>> df.show()
++----+-----+------+--------+
+| _c0|  _c1|   _c2|     _c3|
++----+-----+------+--------+
+|  id| name|salary|    dept|
+|1001| alex| 67000|   SALES|
+|1002|  bob| 24000|   SALES|
+|1003| boby| 24000|   SALES|
+|1004| jane| 69000|SOFTWARE|
+|1005|betty| 55000|SOFTWARE|
+|1006| jeff| 59000|SOFTWARE|
+|1007| dara| 72000|SOFTWARE|
++----+-----+------+--------+
+
+>>>
+>>>
+>>> df = spark.read.csv('file:///tmp/emps_no_header.txt')
+>>> df.show()
++----+-----+-----+--------+
+| _c0|  _c1|  _c2|     _c3|
++----+-----+-----+--------+
+|1001| alex|67000|   SALES|
+|1002|  bob|24000|   SALES|
+|1003| boby|24000|   SALES|
+|1004| jane|69000|SOFTWARE|
+|1005|betty|55000|SOFTWARE|
+|1006| jeff|59000|SOFTWARE|
+|1007| dara|72000|SOFTWARE|
++----+-----+-----+--------+
+
+>>>
+>>>
+>>>
+>>> df.printSchema()
+root
+ |-- _c0: string (nullable = true)
+ |-- _c1: string (nullable = true)
+ |-- _c2: string (nullable = true)
+ |-- _c3: string (nullable = true)
+
+>>> df.collect()
+[Row(_c0=u'1001', _c1=u'alex', _c2=u'67000', _c3=u'SALES'), Row(_c0=u'1002', _c1=u'bob', _c2=u'24000', _c3=u'SALES'), Row(_c0=u'1003', _c1=u'boby', _c2=u'24000', _c3=u'SALES'), Row(_c0=u'1004', _c1=u'jane', _c2=u'69000', _c3=u'SOFTWARE'), Row(_c0=u'1005', _c1=u'betty', _c2=u'55000', _c3=u'SOFTWARE'), Row(_c0=u'1006', _c1=u'jeff', _c2=u'59000', _c3=u'SOFTWARE'), Row(_c0=u'1007', _c1=u'dara', _c2=u'72000', _c3=u'SOFTWARE')]
+>>> Row(_c0=u'1001', _c1=u'alex', _c2=u'67000', _c3=u'SALES')
+Row(_c0=u'1001', _c1=u'alex', _c2=u'67000', _c3=u'SALES')
+>>>
+>>>
+>>>
+>>>
+>>> df2 = df.selectExpr("_c0 as id", "_c1 as name", "_c2 as salary", "_c3 as dept")
+>>> df2.show()
++----+-----+------+--------+
+|  id| name|salary|    dept|
++----+-----+------+--------+
+|1001| alex| 67000|   SALES|
+|1002|  bob| 24000|   SALES|
+|1003| boby| 24000|   SALES|
+|1004| jane| 69000|SOFTWARE|
+|1005|betty| 55000|SOFTWARE|
+|1006| jeff| 59000|SOFTWARE|
+|1007| dara| 72000|SOFTWARE|
++----+-----+------+--------+
+
+>>> df2.createOrReplaceTempView("emp_table")
+>>> df2
+DataFrame[id: string, name: string, salary: string, dept: string]
+>>>
+>>>
+>>> df3 = spark.sql("SELECT * from emp_table where id > 1002")
+>>> df3.show()
++----+-----+------+--------+
+|  id| name|salary|    dept|
++----+-----+------+--------+
+|1003| boby| 24000|   SALES|
+|1004| jane| 69000|SOFTWARE|
+|1005|betty| 55000|SOFTWARE|
+|1006| jeff| 59000|SOFTWARE|
+|1007| dara| 72000|SOFTWARE|
++----+-----+------+--------+
+
+>>> df5 = spark.sql("SELECT name, salary from emp_table where salary > 25000")
+>>> df5.show()
++-----+------+
+| name|salary|
++-----+------+
+| alex| 67000|
+| jane| 69000|
+|betty| 55000|
+| jeff| 59000|
+| dara| 72000|
++-----+------+
+
+>>> df6 = spark.sql("SELECT dept, count(*) as size from emp_table group by dept")
+>>> df6.show()
++--------+----+
+|    dept|size|
++--------+----+
+|   SALES|   3|
+|SOFTWARE|   4|
++--------+----+
+
+>>>
+>>>
+>>> df = spark.read.format("csv").option("header","true").option("inferSchema", "true").load('file:///tmp/emps_with_header.txt')
+>>> df.show()
++----+-----+------+--------+
+|  id| name|salary|    dept|
++----+-----+------+--------+
+|1001| alex| 67000|   SALES|
+|1002|  bob| 24000|   SALES|
+|1003| boby| 24000|   SALES|
+|1004| jane| 69000|SOFTWARE|
+|1005|betty| 55000|SOFTWARE|
+|1006| jeff| 59000|SOFTWARE|
+|1007| dara| 72000|SOFTWARE|
++----+-----+------+--------+
+
+>>> df.printSchema()
+root
+ |-- id: integer (nullable = true)
+ |-- name: string (nullable = true)
+ |-- salary: integer (nullable = true)
+ |-- dept: string (nullable = true)
+
+>>>
+>>>
+>>>
+>>>
+>>> from pyspark.sql.types import StructType
+>>> from pyspark.sql.types import StructField
+>>> from pyspark.sql.types import StringType
+>>> from pyspark.sql.types import IntegerType
+>>>
+>>> emps_schema = StructType([
+... StructField("id", IntegerType(), True),
+... StructField("name", StringType(), True),
+... StructField("salary", IntegerType(), True),
+... StructField("dept", StringType(), True)
+... ])
+>>>
+>>>
+>>>
+>>>
+>>>
+>>>
+>>> empsDF = spark.read.csv('file:///tmp/emps_no_header.txt', schema=emps_schema)
+>>> empsDF.show()
++----+-----+------+--------+
+|  id| name|salary|    dept|
++----+-----+------+--------+
+|1001| alex| 67000|   SALES|
+|1002|  bob| 24000|   SALES|
+|1003| boby| 24000|   SALES|
+|1004| jane| 69000|SOFTWARE|
+|1005|betty| 55000|SOFTWARE|
+|1006| jeff| 59000|SOFTWARE|
+|1007| dara| 72000|SOFTWARE|
++----+-----+------+--------+
+
+>>> empsDF.printSchema()
+root
+ |-- id: integer (nullable = true)
+ |-- name: string (nullable = true)
+ |-- salary: integer (nullable = true)
+ |-- dept: string (nullable = true)
+
+>>>
+>>> data = [('alex', 10, 'sales'), ('betty', 20, 'sales'), ('bob', 30, 'sales')]
+>>> data
+[('alex', 10, 'sales'), ('betty', 20, 'sales'), ('bob', 30, 'sales')]
+>>> df4 = spark.createDataFrame(data, ['name', 'age', 'dept'])
+>>> df4.show()
++-----+---+-----+
+| name|age| dept|
++-----+---+-----+
+| alex| 10|sales|
+|betty| 20|sales|
+|  bob| 30|sales|
++-----+---+-----+
+
+>>>
+>>>
+>>>
+>>> singles = [('Alice'), ('Bob'), ('Mary')]
+>>> singles
+['Alice', 'Bob', 'Mary']
+>>> singlesDF = spark.createDataFrame(singles)
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+  File "/Users/mparsian/spark-2.3.0/python/pyspark/sql/session.py", line 689, in createDataFrame
+    rdd, schema = self._createFromLocal(map(prepare, data), schema)
+  File "/Users/mparsian/spark-2.3.0/python/pyspark/sql/session.py", line 410, in _createFromLocal
+    struct = self._inferSchemaFromList(data, names=schema)
+  File "/Users/mparsian/spark-2.3.0/python/pyspark/sql/session.py", line 342, in _inferSchemaFromList
+    schema = reduce(_merge_type, (_infer_schema(row, names) for row in data))
+  File "/Users/mparsian/spark-2.3.0/python/pyspark/sql/session.py", line 342, in <genexpr>
+    schema = reduce(_merge_type, (_infer_schema(row, names) for row in data))
+  File "/Users/mparsian/spark-2.3.0/python/pyspark/sql/types.py", line 1094, in _infer_schema
+    raise TypeError("Can not infer schema for type: %s" % type(row))
+TypeError: Can not infer schema for type: <type 'str'>
+>>>
+>>> singles_revised = [('Alice',), ('Bob',), ('Mary',)]
+>>> singlesDF = spark.createDataFrame(singles_revised)
+>>> singlesDF.show()
++-----+
+|   _1|
++-----+
+|Alice|
+|  Bob|
+| Mary|
++-----+
+
+>>> df.collect()
+[Row(id=1001, name=u'alex', salary=67000, dept=u'SALES'), Row(id=1002, name=u'bob', salary=24000, dept=u'SALES'), Row(id=1003, name=u'boby', salary=24000, dept=u'SALES'), Row(id=1004, name=u'jane', salary=69000, dept=u'SOFTWARE'), Row(id=1005, name=u'betty', salary=55000, dept=u'SOFTWARE'), Row(id=1006, name=u'jeff', salary=59000, dept=u'SOFTWARE'), Row(id=1007, name=u'dara', salary=72000, dept=u'SOFTWARE')]
+>>> df.count()
+7
+
+>>>
+>>> df.write.csv('file:///tmp/mycsv.csv')
+>>>
+>>> df8 = spark.read.option("inferSchema", "true").csv('file:///tmp/mycsv.csv')
+>>> df8.show()
++----+-----+-----+--------+
+| _c0|  _c1|  _c2|     _c3|
++----+-----+-----+--------+
+|1001| alex|67000|   SALES|
+|1002|  bob|24000|   SALES|
+|1003| boby|24000|   SALES|
+|1004| jane|69000|SOFTWARE|
+|1005|betty|55000|SOFTWARE|
+|1006| jeff|59000|SOFTWARE|
+|1007| dara|72000|SOFTWARE|
++----+-----+-----+--------+
+
+>>>

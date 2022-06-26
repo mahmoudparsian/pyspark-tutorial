@@ -1,0 +1,8 @@
+Structuring Apache Spark 2.0: SQL, DataFrames, Datasets And Streaming - by Michael Armbrust
+https://www.youtube.com/watch?v=1a4pgYzeFwE
+28 mins
+
+AWS Tutorial - AWS Athena + S3
+20 mins
+https://www.youtube.com/watch?v=SiUDN95sJIo
+

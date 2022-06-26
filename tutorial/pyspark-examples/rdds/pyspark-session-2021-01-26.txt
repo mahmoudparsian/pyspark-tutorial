@@ -1,0 +1,87 @@
+Spark's Mapper Transformations:
+
+# map: 1 -> 1
+
+# flatMap: 1 -> Many
+
+# mapPartitions: partition -> 1  (Many to 1)
+
+Many = 0, 1, 2, 3, 4, ...
+partition = many elements
+
+$ ./bin/pyspark
+Python 3.7.2 (v3.7.2:9a3ffc0492, Dec 24 2018, 02:44:43)
+To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).
+Welcome to
+      ____              __
+     / __/__  ___ _____/ /__
+    _\ \/ _ \/ _ `/ __/  '_/
+   /__ / .__/\_,_/_/ /_/\_\   version 3.0.0
+      /_/
+
+Using Python version 3.7.2 (v3.7.2:9a3ffc0492, Dec 24 2018 02:44:43)
+SparkSession available as 'spark'.
+>>>
+>>>
+>>> spark
+<pyspark.sql.session.SparkSession object at 0x7f8fc593dba8>
+>>> sc = spark.sparkContext
+>>> sc
+<SparkContext master=local[*] appName=PySparkShell>
+>>>
+>>>
+>>> data = [ [1, 2, 3], [4, 5, 6, 7] ]
+>>> data
+[[1, 2, 3], [4, 5, 6, 7]]
+>>> data[0]
+[1, 2, 3]
+>>> data[1]
+[4, 5, 6, 7]
+>>>
+>>> rdd = spark.sparkContext.parallelize(data)
+>>> rdd.collect()
+[[1, 2, 3], [4, 5, 6, 7]]
+>>> rdd.count()
+2
+>>>
+>>> rdd_mapped = rdd.map(lambda x: x)
+>>> rdd_mapped.collect()
+[[1, 2, 3], [4, 5, 6, 7]]
+>>> rdd_mapped.count()
+2
+>>>
+>>> rdd_flat_mapped = rdd.flatMap(lambda x: x)
+>>> rdd_flat_mapped.collect()
+[1, 2, 3, 4, 5, 6, 7]
+>>> rdd_flat_mapped.count()
+7
+>>> data = [ [1, 2, 3], [], [4, 5, 6, 7], [], [9] ]
+>>> data
+[[1, 2, 3], [], [4, 5, 6, 7], [], [9]]
+>>> data[0]
+[1, 2, 3]
+>>> data[1]
+[]
+>>> data[3]
+[]
+>>> data[2]
+[4, 5, 6, 7]
+>>> data[3]
+[]
+>>> data[4]
+[9]
+>>> rdd = spark.sparkContext.parallelize(data)
+>>> rdd.collect()
+[[1, 2, 3], [], [4, 5, 6, 7], [], [9]]
+>>> rdd.count()
+5
+>>> rdd_mapped = rdd.map(lambda x: x)
+>>> rdd_mapped.collect()
+[[1, 2, 3], [], [4, 5, 6, 7], [], [9]]
+>>> rdd_mapped.count()
+5
+>>> rdd_flat_mapped = rdd.flatMap(lambda x: x)
+>>> rdd_flat_mapped.collect()
+[1, 2, 3, 4, 5, 6, 7, 9]
+>>> rdd_flat_mapped.count()
+8
