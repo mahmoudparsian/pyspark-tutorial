@@ -9,7 +9,9 @@
 
 ------
 
-# [PySpark Algorithms Book](https://github.com/mahmoudparsian/pyspark-algorithms/) 
+# [Data Algorithms with Spark (book)](https://github.com/mahmoudparsian/data-algorithms-with-spark/) 
+
+# [PySpark Algorithms (book)](https://github.com/mahmoudparsian/pyspark-algorithms/) 
 
 # [Download, Install Spark and Run PySpark](./howto/download_install_run_spark.md) 
 
