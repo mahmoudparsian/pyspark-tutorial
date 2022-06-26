@@ -65,57 +65,57 @@ You may create RDDs by:
 
 * Example-1
 
-	>>> data = [1, 2, 3, 4, 5, 8, 9]
-	>>> data
-	[1, 2, 3, 4, 5, 8, 9]
-	>>> myRDD = sc.parallelize(data)
-	>>> myRDD.collect()
-	[1, 2, 3, 4, 5, 8, 9]
-	>>> myRDD.count()
-	7
-	>>> 
+		>>> data = [1, 2, 3, 4, 5, 8, 9]
+		>>> data
+		[1, 2, 3, 4, 5, 8, 9]
+		>>> myRDD = sc.parallelize(data)
+		>>> myRDD.collect()
+		[1, 2, 3, 4, 5, 8, 9]
+		>>> myRDD.count()
+		7
+		>>> 
 
 
 * Example-2
 
-	>>> kv = [('a',7), ('a', 2), ('b', 2), ('b',4), ('c',1), ('c',2), ('c',3), ('c',4)]
-	>>> kv
-	[('a', 7), ('a', 2), ('b', 2), ('b', 4), ('c', 1), ('c', 2), ('c', 3), ('c', 4)]
-	>>> rdd2 = sc.parallelize(kv)
-	>>> rdd2.collect()
-	[('a', 7), ('a', 2), ('b', 2), ('b', 4), ('c', 1), ('c', 2), ('c', 3), ('c', 4)]
-	>>>
-	>>> rdd3 = rdd2.reduceByKey(lambda x, y : x+y)
-	>>> rdd3.collect()
-	[('a', 9), ('c', 10), ('b', 6)]
-	>>> 
+		>>> kv = [('a',7), ('a', 2), ('b', 2), ('b',4), ('c',1), ('c',2), ('c',3), ('c',4)]
+		>>> kv
+		[('a', 7), ('a', 2), ('b', 2), ('b', 4), ('c', 1), ('c', 2), ('c', 3), ('c', 4)]
+		>>> rdd2 = sc.parallelize(kv)
+		>>> rdd2.collect()
+		[('a', 7), ('a', 2), ('b', 2), ('b', 4), ('c', 1), ('c', 2), ('c', 3), ('c', 4)]
+		>>>
+		>>> rdd3 = rdd2.reduceByKey(lambda x, y : x+y)
+		>>> rdd3.collect()
+		[('a', 9), ('c', 10), ('b', 6)]
+		>>> 
 
 
 * Example-3
 
 
-	>>> kv = [('a',7), ('a', 2), ('b', 2), ('b',4), ('c',1), ('c',2), ('c',3), ('c',4)]
-	>>> kv
-	[('a', 7), ('a', 2), ('b', 2), ('b', 4), ('c', 1), ('c', 2), ('c', 3), ('c', 4)]
-	>>> rdd2 = sc.parallelize(kv)
-	>>> rdd2.collect()
-	[('a', 7), ('a', 2), ('b', 2), ('b', 4), ('c', 1), ('c', 2), ('c', 3), ('c', 4)]
+		>>> kv = [('a',7), ('a', 2), ('b', 2), ('b',4), ('c',1), ('c',2), ('c',3), ('c',4)]
+		>>> kv
+		[('a', 7), ('a', 2), ('b', 2), ('b', 4), ('c', 1), ('c', 2), ('c', 3), ('c', 4)]
+		>>> rdd2 = sc.parallelize(kv)
+		>>> rdd2.collect()
+		[('a', 7), ('a', 2), ('b', 2), ('b', 4), ('c', 1), ('c', 2), ('c', 3), ('c', 4)]
 
-	>>> rdd3 = rdd2.groupByKey()
-	>>> rdd3.collect()
-	[
-	 ('a', <pyspark.resultiterable.ResultIterable object at 0x104ec4c50>), 
-	 ('c', <pyspark.resultiterable.ResultIterable object at 0x104ec4cd0>), 
-	 ('b', <pyspark.resultiterable.ResultIterable object at 0x104ce7290>)
-	]
+		>>> rdd3 = rdd2.groupByKey()
+		>>> rdd3.collect()
+		[
+		 ('a', <pyspark.resultiterable.ResultIterable object at 0x104ec4c50>), 
+		 ('c', <pyspark.resultiterable.ResultIterable object at 0x104ec4cd0>), 
+		 ('b', <pyspark.resultiterable.ResultIterable object at 0x104ce7290>)
+		]
 
-	>>> rdd3.map(lambda x : (x[0], list(x[1]))).collect()
-	[
-	 ('a', [7, 2]), 
-	 ('c', [1, 2, 3, 4]), 
-	 ('b', [2, 4])
-	]
-	>>> 
+		>>> rdd3.map(lambda x : (x[0], list(x[1]))).collect()
+		[
+		 ('a', [7, 2]), 
+		 ('c', [1, 2, 3, 4]), 
+		 ('b', [2, 4])
+		]
+		>>> 
 
 
 
@@ -135,26 +135,26 @@ You may create RDDs by:
 
 * Example-1:
 
-	import org.apache.spark.api.java.JavaRDD;
-	import org.apache.spark.api.java.JavaSparkContext;
-	...
-	JavaSparkContext context = new JavaSparkContext();
-	...
-	final String inputPath ="hdfs://myhadoopserver:9000/dir1/dir2/myinputfile.txt";
-	JavaRDD<String> rdd = context.textFile(inputPath);
-	...
+		import org.apache.spark.api.java.JavaRDD;
+		import org.apache.spark.api.java.JavaSparkContext;
+		...
+		JavaSparkContext context = new JavaSparkContext();
+		...
+		final String inputPath ="hdfs://myhadoopserver:9000/dir1/dir2/myinputfile.txt";
+		JavaRDD<String> rdd = context.textFile(inputPath);
+		...
 
 * Example-2:
 
 
-	import org.apache.spark.api.java.JavaRDD;
-	import org.apache.spark.api.java.JavaSparkContext;
-	...
-	JavaSparkContext context = new JavaSparkContext();
-	...
-	final String inputPath ="/dir1/dir2/myinputfile.txt";
-	JavaRDD<String> rdd = context.textFile(inputPath);
-	...
+		import org.apache.spark.api.java.JavaRDD;
+		import org.apache.spark.api.java.JavaSparkContext;
+		...
+		JavaSparkContext context = new JavaSparkContext();
+		...
+		final String inputPath ="/dir1/dir2/myinputfile.txt";
+		JavaRDD<String> rdd = context.textFile(inputPath);
+		...
 
 
 # Questions/Comments
