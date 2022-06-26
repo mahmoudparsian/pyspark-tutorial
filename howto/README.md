@@ -171,4 +171,29 @@ best regards,
 Mahmoud Parsian
 ````
 
-[![Data Algorithms Book](https://github.com/mahmoudparsian/data-algorithms-book/blob/master/misc/data_algorithms_image.jpg)](http://shop.oreilly.com/product/0636920033950.do) 
+-----
+
+
+<a href="https://www.oreilly.com/library/view/data-algorithms-with/9781492082378/">
+    <img
+        alt="Data Algorithms with Spark"
+        src="../images/Data-Algorithms-with-Spark_mech2.png"
+>
+
+<a href="https://www.oreilly.com/library/view/data-algorithms-with/9781492082378/">
+    <img
+        alt="Data Algorithms with Spark"
+        src="../images/Data_Algorithms_with_Spark_COVER_9781492082385.png"
+>
+
+<a href="https://www.amazon.com/dp/B07X4B2218/ref=sr_1_2">
+    <img
+        alt="PySpark Algorithms"
+        src="../images/pyspark_algorithms2.jpg"
+>
+
+<a href="http://shop.oreilly.com/product/0636920033950.do">
+    <img
+        alt="Data Algorithms"
+        src="../images/data_algorithms_image.jpg"
+>
