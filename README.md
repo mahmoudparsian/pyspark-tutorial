@@ -9,6 +9,10 @@
 
 ------
 
+# [Basics of PySpark with Examples](./howto/README.md) 
+
+------
+
 # PySpark Examples and Tutorials
 
 * [PySpark Examples: RDDs](./tutorial/pyspark-examples/rdds/)
@@ -44,8 +48,6 @@
 # Miscellaneous 
 
 ### [Download, Install Spark and Run PySpark](./howto/download_install_run_spark.md) 
-
-### [Basics of PySpark](./howto/README.md) 
 
 ### [How to Minimize the Verbosity of Spark](./howto/minimize_verbosity.md) 
 
