@@ -19,46 +19,33 @@
 
 Download the latest binary Spark from the following URL:
 
-	http://www.apache.org/dyn/closer.lua/spark/spark-1.6.1/spark-1.6.1-bin-hadoop2.6.tgz
+	https://www.apache.org/dyn/closer.lua/spark/spark-3.3.0/spark-3.3.0-bin-hadoop3.tgz
 
 
 # 4. Open the Downloaded File
 
-Assuming that I have downloaded my file in /home/mparsian/spark-1.6.1-bin-hadoop2.6.tgz
+Assuming that I have downloaded my file in 
+`/home/mparsian/spark-3.3.0-bin-hadoop3.tgz`
 
 
 	cd /home/mparsian
 
-	tar zvfx  spark-1.6.1-bin-hadoop2.6.tgz
-	x spark-1.6.1-bin-hadoop2.6/
-	x spark-1.6.1-bin-hadoop2.6/NOTICE
-	x spark-1.6.1-bin-hadoop2.6/CHANGES.txt
+	tar zvfx  spark-3.3.0-bin-hadoop3.tgz
+	x spark-3.3.0-bin-hadoop3/
+	x spark-3.3.0-bin-hadoop3/NOTICE
+	x spark-3.3.0-bin-hadoop3/CHANGES.txt
 	...
 
 
 # 5. Start the Spark Cluster
 
-	cd /home/mparsian/spark-1.6.1-bin-hadoop2.6/
-
-	ls -l
-	-rw-r--r--@  1 mparsian  897801646  1343562 Feb 26 21:02 CHANGES.txt
-	-rw-r--r--@  1 mparsian  897801646    17352 Feb 26 21:02 LICENSE
-	-rw-r--r--@  1 mparsian  897801646    23529 Feb 26 21:02 NOTICE
-	drwxr-xr-x@  3 mparsian  897801646      102 Feb 26 21:02 R
-	-rw-r--r--@  1 mparsian  897801646     3359 Feb 26 21:02 README.md
-	-rw-r--r--@  1 mparsian  897801646      120 Feb 26 21:02 RELEASE
-	drwxr-xr-x@ 25 mparsian  897801646      850 Feb 26 21:02 bin
-	drwxr-xr-x@  9 mparsian  897801646      306 Feb 26 21:02 conf
-	drwxr-xr-x@  3 mparsian  897801646      102 Feb 26 21:02 data
-	drwxr-xr-x@  6 mparsian  897801646      204 Feb 26 21:02 ec2
-	drwxr-xr-x@  3 mparsian  897801646      102 Feb 26 21:02 examples
-	drwxr-xr-x@  8 mparsian  897801646      272 Feb 26 21:02 lib
-	drwxr-xr-x@ 37 mparsian  897801646     1258 Feb 26 21:02 licenses
-	drwxr-xr-x@  9 mparsian  897801646      306 Feb 26 21:02 python
-	drwxr-xr-x@ 24 mparsian  897801646      816 Feb 26 21:02 sbin
-
+	cd /home/mparsian/spark-3.3.0-bin-hadoop3/
 
 	./sbin/start-all.sh
+	
+	NOTE: If you are going to run Spark in your pc/macbook/windows, 
+	then you do NOT need to start cluster at all. Invoking
+	./bin/pyspark, your laptop is considered as your cluster 
 
 
 # 6. Check Master and Worker
@@ -76,25 +63,20 @@ Make sure that Master and Worker processes are running:
 	http://localhost:8080
 
 
-# 8. Define 2 Very Basic Python Programs
+# 8. Define Very Basic Python Program
 
-* Python program: `test.py`
+* Python program: `/home/mparsian/spark-3.3.0-bin-hadoop3/test.py`
 
-		cat /home/mparsian/spark-1.6.1-bin-hadoop2.6/test.py
 		#!/usr/bin/python
-
 		import sys
 
 		for line in sys.stdin:
 			print "hello " + line
 		
 
-* Python program: ````test2.py````
+* Python program: `/home/mparsian/spark-3.3.0-bin-hadoop3/test2.py`	
 	
-	
-		cat /home/mparsian/spark-1.6.1-bin-hadoop2.6/test2.py
 		#!/usr/bin/python
-
 		def fun2(str):
 			str2 = str + " zaza"
 			return str2
@@ -102,24 +84,16 @@ Make sure that Master and Worker processes are running:
 
 # 9. Start and Run pyspark
 
-		cd /home/mparsian/spark-1.6.1-bin-hadoop2.6/
+		cd /home/mparsian/spark-3.3.0-bin-hadoop3/
 		./bin/pyspark
-		Python 2.7.10 (default, Oct 23 2015, 19:19:21)
-		[GCC 4.2.1 Compatible Apple LLVM 7.0.0 (clang-700.0.59.5)] on darwin
-		Type "help", "copyright", "credits" or "license" for more information.
-		16/04/04 11:18:01 INFO spark.SparkContext: Running Spark version 1.6.1
-		...
-		...
+				...
 		...
 		Welcome to
 			  ____              __
 			 / __/__  ___ _____/ /__
 			_\ \/ _ \/ _ `/ __/  '_/
-		   /__ / .__/\_,_/_/ /_/\_\   version 1.6.1
+		   /__ / .__/\_,_/_/ /_/\_\   version 3.3.0
 			  /_/
-
-		Using Python version 2.7.10 (default, Oct 23 2015 19:19:21)
-		SparkContext available as sc, HiveContext available as sqlContext.
 
 		>>> data = ["john","paul","george","ringo"]
 		>>> data
@@ -130,8 +104,8 @@ Make sure that Master and Worker processes are running:
 		['john', 'paul', 'george', 'ringo']
 
 
-		>>> test = "/home/mparsian/spark-1.6.1-bin-hadoop2.6/test.py"
-		>>> test2 = "/home/mparsian/spark-1.6.1-bin-hadoop2.6/test2.py"
+		>>> test = "/home/mparsian/spark-3.3.0-bin-hadoop3/test.py"
+		>>> test2 = "/home/mparsian/spark-3.3.0-bin-hadoop3/test2.py"
 		>>> import test
 		>>> import test2
 
