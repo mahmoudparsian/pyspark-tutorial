@@ -32,6 +32,8 @@
 * [Sort By Key: sortByKey() ascending/descending](./tutorial/basic-sort)
 * [How to Add Indices](./tutorial/add-indices)
 * [Map Partitions: mapPartitions() by Examples](./tutorial/map-partitions/README.md)
+* [Monoid: Design Principle](https://github.com/mahmoudparsian/data-algorithms-with-spark/blob/master/wiki-spark/docs/monoid/README.md)
+* [Glossary: big data, MapReduce, Spark](https://github.com/mahmoudparsian/big-data-mapreduce-course/blob/master/slides/glossary/README.md)
 
 ------
 
