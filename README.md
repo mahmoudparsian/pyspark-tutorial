@@ -2,7 +2,12 @@
 
 * PySpark is the Python API for Spark.  
 
-* The purpose of PySpark tutorial is to provide basic distributed algorithms using PySpark. 
+* The purpose of PySpark tutorial is to provide 
+  basic distributed algorithms using PySpark. 
+
+* PySpark supports two types of Data Abstractions:
+	* RDDs
+	* DataFrames
 
 * **PySpark Interactive Mode**: has an interactive shell 
   (`$SPARK_HOME/bin/pyspark`) for basic testing 
