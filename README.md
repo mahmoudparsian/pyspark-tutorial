@@ -1,11 +1,21 @@
 # PySpark Tutorial
 
 * PySpark is the Python API for Spark.  
+
 * The purpose of PySpark tutorial is to provide basic distributed algorithms using PySpark. 
-* PySpark  has an interactive shell (`$SPARK_HOME/bin/pyspark`) for basic testing and 
-  debugging and is not supposed to be used for production environment.
-* You may use `$SPARK_HOME/bin/spark-submit` command for running PySpark programs 
-  (may be used for testing and production environemtns)
+
+* **PySpark Interactive Mode**: has an interactive shell 
+  (`$SPARK_HOME/bin/pyspark`) for basic testing 
+  and debugging and is not supposed to be used 
+  for production environment.
+
+* **PySpark Batch Mode**: you may use `$SPARK_HOME/bin/spark-submit` 
+  command for running PySpark programs (may be used for 
+  testing and production environemtns)
+
+------
+
+# [Glossary: big data, MapReduce, Spark](https://github.com/mahmoudparsian/big-data-mapreduce-course/blob/master/slides/glossary/README.md)
 
 ------
 
@@ -33,7 +43,6 @@
 * [How to Add Indices](./tutorial/add-indices)
 * [Map Partitions: mapPartitions() by Examples](./tutorial/map-partitions/README.md)
 * [Monoid: Design Principle](https://github.com/mahmoudparsian/data-algorithms-with-spark/blob/master/wiki-spark/docs/monoid/README.md)
-* [Glossary: big data, MapReduce, Spark](https://github.com/mahmoudparsian/big-data-mapreduce-course/blob/master/slides/glossary/README.md)
 
 ------
 
