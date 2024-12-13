@@ -40,7 +40,7 @@ Example-1: Sum Each Partition
 ...             print(x)
 ...     print "==="
 ...
->>> rdd.foreachPartition(f)
+>>> rdd.mapPartitions(f).collect()
 1
 2
 3
