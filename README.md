@@ -48,6 +48,7 @@
 * [How to Add Indices](./tutorial/add-indices)
 * [Map Partitions: mapPartitions() by Examples](./tutorial/map-partitions/README.md)
 * [Monoid: Design Principle](https://github.com/mahmoudparsian/data-algorithms-with-spark/blob/master/wiki-spark/docs/monoid/README.md)
+* [Ranking Functions by Examples](./tutorial/ranking/README.md)
 
 ------
 
@@ -124,5 +125,3 @@ Mahmoud Parsian
 [//]: # (Spark, PySpark, Python)
 [//]: # (MapReduce, Distributed Algorithms, mappers, reducers, partitioners)
 [//]: # (Transformations, Actions, RDDs, DataFrames, SQL)
-
-# Just adding a comment line.
